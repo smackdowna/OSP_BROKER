@@ -7,17 +7,34 @@ generator client {
     provider = "prisma-client-js"
 }
 
-// model Image{
-//     fileId String @id @default(auto()) @map("_id") @db.ObjectId
-//     name String
-//     url String
-//     thumbnailUrl String
-//     userId String @db.ObjectId @unique
-//     user User @relation(fields: [userId], references: [id])
-// }
+
+enum ROLE{
+    USER
+    ADMIN
+    MODERATOR
+    REPRESENTATIVE
+    BUSINESS_ADMIN
+}
+
+model User{
+    id      String   @id @default(auto()) @map("_id") @db.ObjectId
+    fullName    String
+    email   String   @unique
+    password String
+    role    ROLE @default(USER)
+    phone   String
+    userProfile UserProfile? @relation("userToUserProfile")
+    representative Representative? @relation("userToRepresentative")
+    businessAdmin BusinessAdmin? @relation("userToBusinessAdmin")
+    moderator Moderator? @relation("userToModerator")
+    admin Admin? @relation("userToAdmin")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
 
 // user model
-model User {
+model UserProfile {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   fullName    String
   email   String   @unique
@@ -31,6 +48,8 @@ model User {
   experience Experience[] @relation("userToExperience")
   skills String[]
   socialLinks Json?
+  userId String @db.ObjectId @unique
+  user User @relation("userToUserProfile",fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -44,8 +63,8 @@ model Education{
     startYear Int
     endYear Int
     grade String
-    userId String @db.ObjectId
-    user User @relation("userToEducation",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade) 
+    userProfileId String @db.ObjectId @unique
+    UserProfile UserProfile @relation("userToEducation",fields: [userProfileId], references: [id] , onDelete: Cascade , onUpdate: Cascade) 
 }
 
 model Experience{
@@ -56,6 +75,38 @@ model Experience{
     startDate DateTime
     endDate DateTime
     description String
-    userId String @db.ObjectId
-    user User @relation("userToExperience",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    userProfileId String @db.ObjectId
+    UserProfile UserProfile @relation("userToExperience",fields: [userProfileId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+}
+
+model Moderator{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId @unique
+    user User @relation("userToModerator",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusinessAdmin{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId @unique
+    user User @relation("userToBusinessAdmin",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Representative{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId @unique  
+    user User @relation("userToRepresentative",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Admin{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId @unique
+    user User @relation("userToAdmin",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

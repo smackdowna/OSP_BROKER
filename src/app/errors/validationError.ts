@@ -1,8 +1,6 @@
 import mongoose from "mongoose";
 import { TErrorSource, TGenericErrorResponse } from "../interface/error";
 
-
-
 const handleValidationError = (err : mongoose.Error.ValidationError): TGenericErrorResponse => {
     const statusCode = 400;
     const errorSources: TErrorSource = Object.values(err.errors).map((val : mongoose.Error.ValidatorError | mongoose.Error.CastError) => {
@@ -17,7 +15,6 @@ const handleValidationError = (err : mongoose.Error.ValidationError): TGenericEr
      statusCode,
      message: "Zod Validation Error.",
      errorSources,
-     
     }
 }
 
