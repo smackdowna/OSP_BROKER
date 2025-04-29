@@ -29,11 +29,12 @@ const createUser =async (payload: Partial<TUser>) =>{
         throw new AppError(400, "Invalid email format");
     }
 
-    const existingUser = await prismadb.user.findFist({
+    const existingUser = await prismadb.user.findFirst({
         where: {
             email: email,
         },
     });
+
     if (existingUser) {
         throw new AppError(400, "User already exists with this email");
     }
@@ -41,16 +42,37 @@ const createUser =async (payload: Partial<TUser>) =>{
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user= await prismadb.user.create({
-        data: {
-            fullName,
-            email,
-            password: hashedPassword,
-            role,
-            phone,
-            userProfile: userProfile
+    const user = await prismadb.user.create({
+      data: {
+        fullName,
+        email,
+        password: hashedPassword,
+        role,
+        phone,
+        userProfile: userProfile
           ? {
-              create: userProfile,
+              create: {
+                fullName,
+                email,
+                password: hashedPassword,
+                phone,
+                headLine: userProfile.headLine,
+                location: userProfile.location,
+                about: userProfile.about,
+                profileImageUrl: userProfile.profileImageUrl,
+                skills: userProfile.skills,
+                socialLinks: userProfile.socialLinks,
+                education: userProfile.education
+                  ? {
+                      create: userProfile.education,
+                    }
+                  : undefined,
+                experience: userProfile.experience
+                  ? {
+                      create: userProfile.experience,
+                    }
+                  : undefined,
+              },
             }
           : undefined,
         representative: representative
@@ -72,9 +94,17 @@ const createUser =async (payload: Partial<TUser>) =>{
           ? {
               create: admin,
             }
-          : undefined
-        },
+          : undefined,
+      },
+      include: {
+        userProfile: true,
+        representative: true,
+        businessAdmin: true,
+        moderator: true,
+        admin: true,
+      }
     });
+  
 
     const { password: _, ...userWithoutPassword } = user;
 
@@ -105,7 +135,7 @@ const loginUser = async (payload: TLoginAuth) => {
     }
 
     const jwtPayload = {
-        userId: user._id.toString(),
+        userId: user.id.toString(),
         email: user.email,
         role: user.role,
       };
@@ -126,7 +156,7 @@ const loginUser = async (payload: TLoginAuth) => {
         accessToken,
         refreshToken,
         user: {
-          id: user._id.toString(),
+          id: user.id.toString(),
           fullName: user.fullName,
           email: user.email,
           role: user.role,
@@ -156,7 +186,7 @@ const refreshToken = async (refreshToken: string) => {
     }
 
     const jwtPayload = {
-        userId: user._id.toString(),
+        userId: user.id.toString(),
         email: user.email,
         role: user.role,
     };
@@ -171,7 +201,7 @@ const refreshToken = async (refreshToken: string) => {
 }
 
 
-export const AuthServices = {
+export const authServices = {
     createUser,
     loginUser,
     refreshToken

@@ -1,4 +1,4 @@
-import { AuthServices } from "./auth.services";
+import { authServices } from "./auth.services";
 import catchAsyncError from "../../utils/catchAsyncError";
 import { Request, Response  ,NextFunction } from "express";
 import config from "../../config";
@@ -6,7 +6,7 @@ import sendResponse from "../../middlewares/sendResponse";
 
 const createUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { fullName, email, password, role, phone , userProfile , representative, moderator , businessAdmin , admin } = req.body;
-    const user = await AuthServices.createUser({ fullName, email, password, role, phone });
+    const user = await authServices.createUser({ fullName, email, password, role, phone , userProfile , representative, moderator , businessAdmin , admin });
     sendResponse(res, {
         statusCode: 201,
         success: true,
@@ -17,7 +17,7 @@ const createUser = catchAsyncError(async (req: Request, res: Response, next: Nex
 
 const loginUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
-    const result = await AuthServices.loginUser({ email, password });
+    const result = await authServices.loginUser({ email, password });
 
     const {refreshToken, accessToken, user} = result;
     res.cookie("refreshToken", refreshToken, {
@@ -50,7 +50,7 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response, next: N
         });
     }
 
-    const result = await AuthServices.refreshToken(refreshToken);
+    const result = await authServices.refreshToken(refreshToken);
     const { accessToken } = result;
 
     sendResponse(res, {
@@ -63,3 +63,9 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response, next: N
     });
 }
 );
+
+export const authControllers = {
+    createUser,
+    loginUser,
+    refreshToken
+};

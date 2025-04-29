@@ -11,25 +11,40 @@ export type TLoginAuth = {
     role: "USER" | "REPRESENTATIVE" | "BUSINESS_ADMIN" | "MODERATOR" | "ADMIN";
     phone: string;
     userProfile?: {
-      bio?: string;
-      avatarUrl?: string;
-      location?: string;
+      headLine: string;
+      location: string;
+      about?: string;
+      profileImageUrl?: string;
+      skills: string[];
+      socialLinks?: Record<string, any>; // Can be refined if structure is known
+      education: {
+        school: string;
+        degree: string;
+        fieldOfStudy: string;
+        startYear: number;
+        endYear: number;
+        grade: string;
+      }[];
+      experience: {
+        company: string;
+        title: string;
+        location: string;
+        startDate: string; // or Date if you parse it
+        endDate: string;   // or Date if you parse it
+        description: string;
+      }[];
     };
     representative?: {
-      businessId: string;
-      role: string;
-      department: string;
-      message?: string;
+      id: string;
     };
     businessAdmin?: {
-      businessId: string;
-      permissions: string[]; 
+      id: string;
     };
     moderator?: {
-      permissions: string[];
+      id: string;
     };
     admin?: {
-      superAdmin: boolean;
+      id: string;
     };
   };
   

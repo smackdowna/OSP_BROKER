@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import config from "./app/config";
 import cookieParser from "cookie-parser";
 
-// import appRouter from "./routes/index";
+import router from "./app/routes";
 
 const app = express();
 
@@ -42,8 +42,8 @@ app.get("/", (req, res) => {
     res.send("Welcome to the OSP_broker API");
   });
 
-// app.use("/api", appRouter);
+app.use("/api", router);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${config.port}`);
-  });
+});
