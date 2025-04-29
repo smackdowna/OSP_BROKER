@@ -27,7 +27,7 @@ model User{
     representative Representative? @relation("userToRepresentative")
     businessAdmin BusinessAdmin? @relation("userToBusinessAdmin")
     moderator Moderator? @relation("userToModerator")
-    admin Admin? @relation("userToAdmin")
+    admin Admin? @relation("userToAdmin")  
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

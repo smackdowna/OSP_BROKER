@@ -11,104 +11,96 @@ import z from "zod";
 
 const emailSchema = z.string().email();
 
-const createUser =async (payload: Partial<TUser>) =>{
-    const {fullName , email , password , role ,phone,
-        userProfile,
-        representative,
-        businessAdmin,
-        moderator,
-        admin
-        }=payload;
+const createUser = async (payload: Partial<TUser>) => {
+  const { fullName, email, password, role, phone, userProfile, representative, businessAdmin, moderator, admin } = payload;
 
-    if( !fullName || !email || !password || !role || !phone ){
-        throw new AppError(400 , "please provide all fields" );
-    }
+  if (!fullName || !email || !password || !role || !phone) {
+    throw new AppError(400, "please provide all fields");
+  }
 
-    const emailValidation = emailSchema.safeParse(email);
-    if (!emailValidation.success) {
-        throw new AppError(400, "Invalid email format");
-    }
+  const emailValidation = emailSchema.safeParse(email);
+  if (!emailValidation.success) {
+    throw new AppError(400, "Invalid email format");
+  }
 
-    const existingUser = await prismadb.user.findFirst({
-        where: {
-            email: email,
+  const existingUser = await prismadb.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+
+  if (existingUser) {
+    throw new AppError(400, "User already exists with this email");
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Define mapping from role to relation name
+  const roleToRelation = {
+    USER: 'userProfile',
+    REPRESENTATIVE: 'representative',
+    BUSINESS_ADMIN: 'businessAdmin',
+    MODERATOR: 'moderator',
+    ADMIN: 'admin',
+  };
+
+  // Set dynamic include option based on the role
+  const relationName = roleToRelation[role];
+  const includeOption = relationName ? { [relationName]: true } : {};
+
+  const user = await prismadb.user.create({
+    data: {
+      fullName,
+      email,
+      password: hashedPassword,
+      role,
+      phone,
+      ...(role === 'USER' && userProfile ? {
+        userProfile: {
+          create: {
+            fullName,
+            email,
+            password: hashedPassword,
+            phone,
+            headLine: userProfile.headLine,
+            location: userProfile.location,
+            about: userProfile.about,
+            profileImageUrl: userProfile.profileImageUrl,
+            skills: userProfile.skills,
+            socialLinks: userProfile.socialLinks,
+            education: userProfile.education ? { create: userProfile.education } : undefined,
+            experience: userProfile.experience ? { create: userProfile.experience } : undefined,
+          },
         },
-    });
+      } : {}),
+      ...(role === 'REPRESENTATIVE' && representative ? {
+        representative: {
+          create: representative,
+        },
+      } : {}),
+      ...(role === 'BUSINESS_ADMIN' && businessAdmin ? {
+        businessAdmin: {
+          create: businessAdmin,
+        },
+      } : {}),
+      ...(role === 'MODERATOR' && moderator ? {
+        moderator: {
+          create: moderator,
+        },
+      } : {}),
+      ...(role === 'ADMIN' && admin ? {
+        admin: {
+          create: admin,
+        },
+      } : {}),
+    },
+    include: includeOption,
+  });
 
-    if (existingUser) {
-        throw new AppError(400, "User already exists with this email");
-    }
+  const { password: _, ...userWithoutPassword } = user;
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = await prismadb.user.create({
-      data: {
-        fullName,
-        email,
-        password: hashedPassword,
-        role,
-        phone,
-        userProfile: userProfile
-          ? {
-              create: {
-                fullName,
-                email,
-                password: hashedPassword,
-                phone,
-                headLine: userProfile.headLine,
-                location: userProfile.location,
-                about: userProfile.about,
-                profileImageUrl: userProfile.profileImageUrl,
-                skills: userProfile.skills,
-                socialLinks: userProfile.socialLinks,
-                education: userProfile.education
-                  ? {
-                      create: userProfile.education,
-                    }
-                  : undefined,
-                experience: userProfile.experience
-                  ? {
-                      create: userProfile.experience,
-                    }
-                  : undefined,
-              },
-            }
-          : undefined,
-        representative: representative
-          ? {
-              create: representative,
-            }
-          : undefined,
-        businessAdmin: businessAdmin
-          ? {
-              create: businessAdmin,
-            }
-          : undefined,
-        moderator: moderator
-          ? {
-              create: moderator,
-            }
-          : undefined,
-        admin: admin
-          ? {
-              create: admin,
-            }
-          : undefined,
-      },
-      include: {
-        userProfile: true,
-        representative: true,
-        businessAdmin: true,
-        moderator: true,
-        admin: true,
-      }
-    });
-  
-
-    const { password: _, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+  return userWithoutPassword;
 }
 
 const loginUser = async (payload: TLoginAuth) => {
