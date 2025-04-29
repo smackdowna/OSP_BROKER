@@ -1,0 +1,61 @@
+datasource db {
+    provider = "mongodb"
+    url      = env("db_url")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+// model Image{
+//     fileId String @id @default(auto()) @map("_id") @db.ObjectId
+//     name String
+//     url String
+//     thumbnailUrl String
+//     userId String @db.ObjectId @unique
+//     user User @relation(fields: [userId], references: [id])
+// }
+
+// user model
+model User {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  fullName    String
+  email   String   @unique
+  password String
+  phone   String
+  headLine String
+  location String
+  about   String?
+  profileImageUrl String?
+  education Education[]  @relation("userToEducation")
+  experience Experience[] @relation("userToExperience")
+  skills String[]
+  socialLinks Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Education{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    school String
+    degree String
+    fieldOfStudy String
+    startYear Int
+    endYear Int
+    grade String
+    userId String @db.ObjectId
+    user User @relation("userToEducation",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade) 
+}
+
+model Experience{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    company String
+    title String
+    location String
+    startDate DateTime
+    endDate DateTime
+    description String
+    userId String @db.ObjectId
+    user User @relation("userToExperience",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+}

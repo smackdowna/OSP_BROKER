@@ -1,32 +1,49 @@
-import app from "./app";
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import bodyParser from "body-parser";
 import config from "./app/config";
-import mongoose from "mongoose";
-import {Server} from 'http';
+import cookieParser from "cookie-parser";
 
-let server : Server
+// import appRouter from "./routes/index";
 
-async function main() {
-  try {
-    await mongoose.connect(config.db_url as string);
-    server = app.listen(config.port, () => {
-      console.log(`App listening on port ${config.port}`);
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
+const app = express();
 
-main();
+// middlewares
+app.use(cookieParser());
 
-process.on('unhandledRejection' , () => {
-  if(server){
-    server.close(() => {
-      process.exit(1)
+app.use(
+    bodyParser.urlencoded({ 
+        limit: (config.MAX_REQUEST_SIZE as string | number) || '100kb', 
+        extended: true 
     })
-  }
-  process.exit(1)
+);
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", "true");
+ next();
 });
 
-process.on('uncaughtException', () => {
-  process.exit(1)
-})
+app.use(cors({
+  origin: ["http://localhost:3000" ],
+  credentials: true,
+  methods: ["GET", "POST", "DELETE", "PUT"],
+}));
+
+
+app.use(express.json());
+
+if (config.node_env === "development") {
+    app.use(morgan("tiny"));
+}
+
+// api route
+app.get("/", (req, res) => {
+    res.send("Welcome to the OSP_broker API");
+  });
+
+// app.use("/api", appRouter);
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${config.port}`);
+  });

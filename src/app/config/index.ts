@@ -4,6 +4,7 @@ dotenv.config();
 export default {
   port: process.env.PORT,
   db_url: process.env.DB_URL,
+  MAX_REQUEST_SIZE: process.env.MAX_REQUEST_SIZE,
   bcrypt_salt_round : process.env.BCRYPT_SALT_ROUND,
   node_env: process.env.NODE_ENV,
   jwt_access_secret: process.env.JWT_ACCESS_SECRET,
