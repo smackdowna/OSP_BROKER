@@ -10,9 +10,6 @@
     "build:dev": "tsc -p . && node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "prisma": {
-    "schema": "./src/app/Prisma/schema.prisma"
-  },
   "author": "",
   "license": "ISC",
   "devDependencies": {

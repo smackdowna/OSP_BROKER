@@ -36,6 +36,8 @@ export type TLoginAuth = {
     };
     representative?: {
       id: string;
+      department: string;
+      message: string;
     };
     businessAdmin?: {
       id: string;

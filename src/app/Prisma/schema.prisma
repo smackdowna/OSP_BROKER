@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["relationJoins"]
 }
 
 
@@ -36,10 +37,6 @@ model User{
 // user model
 model UserProfile {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  fullName    String
-  email   String   @unique
-  password String
-  phone   String
   headLine String
   location String
   about   String?
@@ -95,8 +92,12 @@ model BusinessAdmin{
     updatedAt DateTime @updatedAt
 }
 
+
+// this representative may have relatino with business admin.
 model Representative{
     id String @id @default(auto()) @map("_id") @db.ObjectId
+    department String
+    message String
     userId String @db.ObjectId @unique  
     user User @relation("userToRepresentative",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     createdAt DateTime @default(now())
@@ -107,6 +108,56 @@ model Admin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String @db.ObjectId @unique
     user User @relation("userToAdmin",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// forum models
+model Forum{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+    description String
+    topics Topic[] @relation("forumToTopic")
+    author String
+    comments Int @default(0)
+    views Int @default(0)
+    categoryId String @db.ObjectId
+    Categories Categories @relation("forumToCategory",fields: [categoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Topic{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+    content String
+    forumId String @db.ObjectId
+    Forum Forum @relation("forumToTopic",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    comments Comment[] @relation("topicToComment")
+    author String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Comment{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    content String
+    author String
+    topicId String @db.ObjectId
+    Topic Topic @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Categories{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    forums Forum[] @relation("forumToCategory")
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }

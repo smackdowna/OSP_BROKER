@@ -11,6 +11,7 @@ import z from "zod";
 
 const emailSchema = z.string().email();
 
+// create user
 const createUser = async (payload: Partial<TUser>) => {
   const { fullName, email, password, role, phone, userProfile, representative, businessAdmin, moderator, admin } = payload;
 
@@ -59,10 +60,6 @@ const createUser = async (payload: Partial<TUser>) => {
       ...(role === 'USER' && userProfile ? {
         userProfile: {
           create: {
-            fullName,
-            email,
-            password: hashedPassword,
-            phone,
             headLine: userProfile.headLine,
             location: userProfile.location,
             about: userProfile.about,
@@ -103,6 +100,7 @@ const createUser = async (payload: Partial<TUser>) => {
   return userWithoutPassword;
 }
 
+// login user
 const loginUser = async (payload: TLoginAuth) => {
     const { email, password } = payload;
 
@@ -157,7 +155,7 @@ const loginUser = async (payload: TLoginAuth) => {
       }
 }
 
-
+// refresh token service to get new access token using refresh token
 const refreshToken = async (refreshToken: string) => {
     if (!refreshToken) {
         throw new AppError(401, "Please provide refresh token");
@@ -192,9 +190,39 @@ const refreshToken = async (refreshToken: string) => {
     return {accessToken};
 }
 
+// get all users
+const getUsers = async () => {
+    const users = await prismadb.user.findMany();
+    if (!users || users.length === 0) {
+        throw new AppError(404, "No users found");
+    }
+    return users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    });
+}
+
+// get user by id
+const getUserById = async (id: string) => {
+    const user = await prismadb.user.findFirst({
+        where: {
+            id: id,
+        },
+    });
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+}
+
 
 export const authServices = {
     createUser,
     loginUser,
-    refreshToken
+    refreshToken,
+    getUsers,
+    getUserById
 };

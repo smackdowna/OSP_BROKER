@@ -4,6 +4,7 @@ import { Request, Response  ,NextFunction } from "express";
 import config from "../../config";
 import sendResponse from "../../middlewares/sendResponse";
 
+// sigup controller
 const createUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { fullName, email, password, role, phone , userProfile , representative, moderator , businessAdmin , admin } = req.body;
     const user = await authServices.createUser({ fullName, email, password, role, phone , userProfile , representative, moderator , businessAdmin , admin });
@@ -15,6 +16,7 @@ const createUser = catchAsyncError(async (req: Request, res: Response, next: Nex
     });
 });
 
+// login user controller
 const loginUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     const result = await authServices.loginUser({ email, password });
@@ -39,6 +41,7 @@ const loginUser = catchAsyncError(async (req: Request, res: Response, next: Next
     });
 });
 
+// refresh token to get new access token controller
 const refreshToken = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
@@ -64,8 +67,34 @@ const refreshToken = catchAsyncError(async (req: Request, res: Response, next: N
 }
 );
 
+// get all users controller
+const getAllUsers= catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const users = await authServices.getUsers();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Users fetched successfully",
+        data: users,
+    });
+});
+
+// get single user controller
+const getSingleUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const user = await authServices.getUserById(id);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User fetched successfully",
+        data: user,
+    });
+})
+
+
 export const authControllers = {
     createUser,
     loginUser,
-    refreshToken
+    refreshToken,
+    getAllUsers,
+    getSingleUser
 };
