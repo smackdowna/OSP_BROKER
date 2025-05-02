@@ -8,7 +8,7 @@ import { categoriesServices } from "./categories.services";
 const createCategory = catchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
         const { name } = req.body;
-        const category = await categoriesServices.createCategory(name);
+        const category = await categoriesServices.createCategory({name});
         sendResponse(res, {
             statusCode: 200,
             success: true,
@@ -32,7 +32,7 @@ const getAllCategories = catchAsyncError(async (req: Request, res: Response, nex
 // get category by id
 const getCategoryById = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const category = await categoriesServices.getCategoryById(id);
+    const category = await categoriesServices.getCategoryById(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -44,8 +44,7 @@ const getCategoryById = catchAsyncError(async (req: Request, res: Response, next
 // update category
 const updateCategory = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { name } = req.body;
-    const updatedCategory = await categoriesServices.updateCategory(id, name);
+    const updatedCategory = await categoriesServices.updateCategory(id,res, req.body);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -57,7 +56,7 @@ const updateCategory = catchAsyncError(async (req: Request, res: Response, next:
 // delete category
 const deleteCategory = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const deletedCategory = await categoriesServices.deleteCategory(id);
+    const deletedCategory = await categoriesServices.deleteCategory(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,

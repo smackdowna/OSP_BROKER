@@ -30,7 +30,7 @@ const getAllTopics = catchAsyncError(async (req: Request, res: Response, next: N
 // get topic by id
 const getTopicById = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const topic = await topicServices.getTopicById(id);
+    const topic = await topicServices.getTopicById(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -42,8 +42,7 @@ const getTopicById = catchAsyncError(async (req: Request, res: Response, next: N
 // update topic
 const updateTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const {title , content, author} = req.body;
-    const updatedTopic = await topicServices.updateTopic(id, { title, content, author });
+    const updatedTopic = await topicServices.updateTopic(id, res , req.body);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -55,7 +54,7 @@ const updateTopic = catchAsyncError(async (req: Request, res: Response, next: Ne
 // delete topic
 const deleteTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    await topicServices.deleteTopic(id);
+    await topicServices.deleteTopic(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,

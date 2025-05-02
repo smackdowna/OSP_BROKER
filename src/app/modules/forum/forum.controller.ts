@@ -1,5 +1,5 @@
 import catchAsyncError from "../../utils/catchAsyncError";
-import { Request, Response  ,NextFunction } from "express";
+import { Request, Response  ,NextFunction, response } from "express";
 import sendResponse from "../../middlewares/sendResponse";
 
 import {forumServices} from "./forum.services";
@@ -29,8 +29,8 @@ const getAllForums = catchAsyncError(async (req: Request, res: Response, next: N
 
 // get forum by id
 const getForumById = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { forumId } = req.params;
-    const forum = await forumServices.getForumById(forumId);
+    const { id } = req.params;
+    const forum = await forumServices.getForumById(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -41,9 +41,8 @@ const getForumById = catchAsyncError(async (req: Request, res: Response, next: N
 
 // update forum
 const updateForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { forumId } = req.params;
-    const { title, description, author } = req.body;
-    const forum = await forumServices.updateForum(forumId, {title, description, author});
+    const { id } = req.params;
+    const forum = await forumServices.updateForum(id,res , req.body);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -54,8 +53,8 @@ const updateForum = catchAsyncError(async (req: Request, res: Response, next: Ne
 
 // delete forum
 const deleteForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { forumId } = req.params;
-    await forumServices.deleteForum(forumId);
+    const { id } = req.params;
+    await forumServices.deleteForum(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,

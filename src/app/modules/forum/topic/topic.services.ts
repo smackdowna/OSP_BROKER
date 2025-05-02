@@ -1,6 +1,8 @@
 import {  TTopic } from "../forum.interface";
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
+import { Response } from "express"; 
+import sendResponse from "../../../middlewares/sendResponse";
 
 // create topic 
 const createTopic = async (topic: TTopic) => {
@@ -32,7 +34,11 @@ const createTopic = async (topic: TTopic) => {
 const getAllTopics = async () => {
     const topics = await prismadb.topic.findMany({
         include: {
-            comments: true,
+            comments: {
+                select:{
+                    topicId: true
+                }
+            }
         },
     });
     if (!topics) {
@@ -42,25 +48,35 @@ const getAllTopics = async () => {
 }
 
 // get topic by id
-const getTopicById= async (topicId: string) => {
+const getTopicById= async (topicId: string , res:Response) => {
     const topic = await prismadb.topic.findFirst({
         where: {
             id: topicId,
         },
         include: {
-            comments: true,
+            comments: {
+                select:{
+                    topicId: true
+                }
+            }
         },
     });
     if (!topic) {
-        throw new AppError(404, "Topic not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Topic not found with this id",
+            })  
+        )
     }
     return {topic};
 }
 
 // update topic
-const updateTopic = async (topicId: string, topic: Partial<TTopic>) => {
-    const { title, content, author } = topic;
-    if (!title || !content  || !author) {
+const updateTopic = async (topicId: string, res: Response ,topic: Partial<TTopic>) => {
+    const { title, content } = topic;
+    if (!title || !content ) {
         throw new AppError(400, "please provide all fields");
     }
     const existingTopic = await prismadb.topic.findFirst({
@@ -69,7 +85,13 @@ const updateTopic = async (topicId: string, topic: Partial<TTopic>) => {
         },
     });
     if (!existingTopic) {
-        throw new AppError(404, "Topic not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Topic not found with this id",
+            })  
+        )
     }
     const updatedTopic = await prismadb.topic.update({
         where: {
@@ -78,21 +100,30 @@ const updateTopic = async (topicId: string, topic: Partial<TTopic>) => {
         data: {
             title,
             content,
-            author,
         },
     });
     return {updatedTopic};
 }
 
 // delete topic 
-const deleteTopic = async (topicId: string) => {
+const deleteTopic = async (topicId: string , res: Response) => {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to deleteTopic");
+    }
+    
     const existingTopic = await prismadb.topic.findFirst({
         where: {
             id: topicId,
         },
     });
     if (!existingTopic) {
-        throw new AppError(404, "Topic not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Topic not found with this id",
+            })  
+        )
     }
     const deletedTopic = await prismadb.topic.delete({
         where: {

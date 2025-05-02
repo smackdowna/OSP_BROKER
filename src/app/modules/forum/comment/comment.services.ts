@@ -1,17 +1,20 @@
 import {  TComment } from "../forum.interface";
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
+import sendResponse from "../../../middlewares/sendResponse";
+import { Response } from "express";
 
 // create comment 
-const createComment = async (comment: TComment) => {
-    const { content, topicId, author } = comment;
+const createComment = async (commentBody: TComment) => {
+    const { comment, topicId, author } = commentBody;
 
-    if (!content || !topicId || !author) {
+    if (!comment || !topicId || !author) {
         throw new AppError(400, "please provide all fields");
     }
+    
     const existingComment = await prismadb.comment.findFirst({
         where: {
-            content: content,
+            comment: comment,
         },
     });
     if (existingComment) {
@@ -19,19 +22,24 @@ const createComment = async (comment: TComment) => {
     }
     const newComment = await prismadb.comment.create({
         data: {
-            content,
+            comment,
             topicId,
             author,
         },
     });
-    return {newComment};
+    return {comment:newComment};
 }
 
 // get all comments
 const getAllComments = async () => {
     const comments = await prismadb.comment.findMany({
         include: {
-            Topic: true,
+            Topic: {
+                select:{
+                    id: true,
+                    title:true
+                }
+            },
         },
     });
     if (!comments) {
@@ -40,26 +48,47 @@ const getAllComments = async () => {
     return {comments};
 }
 
+// delete all comments
+const deleteAllComments = async () => {
+    const comments = await prismadb.comment.deleteMany({});
+    if (!comments) {
+        throw new AppError(404, "No comments found");
+    }
+    return {comments};
+}
+
+
 // get comment by id
-const getCommentById= async (commentId: string) => {
+const getCommentById= async (commentId: string , res: Response) => {
     const comment = await prismadb.comment.findFirst({
         where: {
             id: commentId,
         },
         include: {
-            Topic: true,
+            Topic: {
+                select:{
+                    id: true,
+                    title:true
+                }
+            },
         },
     });
     if (!comment) {
-        throw new AppError(404, "Comment not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found",
+            })
+        );
     }
     return {comment};
 }
 
 // update comment
-const updateComment = async (commentId: string, comment: Partial<TComment>) => {
-    const { content, author } = comment;
-    if (!content || !author) {
+const updateComment = async (commentId: string,res:Response, commentBody: Partial<TComment>) => {
+    const { comment } = commentBody;
+    if (!comment ) {
         throw new AppError(400, "please provide all fields");
     }
 
@@ -69,29 +98,44 @@ const updateComment = async (commentId: string, comment: Partial<TComment>) => {
         },
     });
     if (!existingComment) {
-        throw new AppError(404, "Comment not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found with this id",
+            })
+        );
     }
     const updatedComment = await prismadb.comment.update({
         where: {
             id: commentId,
         },
         data: {
-            content,
-            author,
+            comment,
         },
     });
-    return {updatedComment};
+    return {comment:updatedComment};
 }
 
 // delete comment
-const deleteComment = async (commentId: string) => {
+const deleteComment = async (commentId: string , res: Response) => {
+
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to deleteTopic");
+    }
     const existingComment = await prismadb.comment.findFirst({
         where: {
             id: commentId,
         },
     });
     if (!existingComment) {
-        throw new AppError(404, "Comment not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found with this id",
+            })
+        )
     }
     const deletedComment = await prismadb.comment.delete({
         where: {
@@ -104,6 +148,7 @@ const deleteComment = async (commentId: string) => {
 export const commentServices = {
     createComment,
     getAllComments,
+    deleteAllComments,
     getCommentById,
     updateComment,
     deleteComment,

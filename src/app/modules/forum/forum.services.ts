@@ -1,10 +1,12 @@
 import {  TForum } from "./forum.interface";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
+import { Request, Response, NextFunction } from "express";
+import sendResponse from "../../middlewares/sendResponse";
 
 // create forum 
 const createForum = async (forum: TForum) => {
-    const { title, description, author, categoryId } = forum;
+    const { title, description, author , categoryId } = forum;
     if (!title || !description || !author || !categoryId) {
         throw new AppError(400, "please provide all fields");
     }
@@ -16,7 +18,7 @@ const createForum = async (forum: TForum) => {
     if (existingForum) {
         throw new AppError(400, "Forum already exists with this title");
     }
-    const Forum = await prismadb.forum.create({
+    const forumBody = await prismadb.forum.create({
         data: {
             title,
             description,
@@ -24,14 +26,18 @@ const createForum = async (forum: TForum) => {
             categoryId,
         },
     });
-    return {Forum};
+    return {forum:forumBody};
 }
 
 // get all forums 
 const getAllForums = async () => {
     const forums = await prismadb.forum.findMany({
         include: {
-            topics: true,
+            topics: {
+                select:{
+                    forumId: true
+                }
+            },
         },
     });
     if (!forums) {
@@ -41,25 +47,33 @@ const getAllForums = async () => {
 }
 
 // get forum by id 
-const getForumById= async (forumId: string) => {
+const getForumById= async (forumId: string , res: Response ) => {
     const forum = await prismadb.forum.findFirst({
         where: {
             id: forumId,
         },
         include: {
-            topics: true,
+            topics:{
+                select:{
+                    forumId: true
+                }
+            }
         },
     });
     if (!forum) {
-        throw new AppError(404, "Forum not found with this id");
+        sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Forum not found with this id",
+        });
     }
     return {forum};
 }
 
 // update forum 
-const updateForum = async (forumId: string, forum: Partial<TForum>) => {
-    const { title, description, author, categoryId } = forum;
-    if (!title || !description || !author || !categoryId) {
+const updateForum = async (forumId: string, res: Response, forum: Partial<TForum> ) => {
+    const { title, description  } = forum;
+    if (!title || !description  ) {
         throw new AppError(400, "please provide all fields");
     }
     const existingForum = await prismadb.forum.findFirst({
@@ -68,7 +82,11 @@ const updateForum = async (forumId: string, forum: Partial<TForum>) => {
         },
     });
     if (!existingForum) {
-        throw new AppError(404, "Forum not found with this id");
+        return(sendResponse(res, {
+            statusCode: 404,               
+            success: false,
+            message: "Forum not found with this id",
+        }));
     }
     const updatedForum = await prismadb.forum.update({
         where: {
@@ -77,22 +95,24 @@ const updateForum = async (forumId: string, forum: Partial<TForum>) => {
         data: {
             title,
             description,
-            author,
-            categoryId,
         },
     });
-    return {updatedForum};
+    return {forum: updatedForum};
 }
 
 // delete forum
-const deleteForum = async (forumId: string) => {
+const deleteForum = async (forumId: string , res:Response) => {
     const existingForum = await prismadb.forum.findFirst({
         where: {
             id: forumId,
         },
     });
     if (!existingForum) {
-        throw new AppError(404, "Forum not found with this id");
+        return(sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Forum not found with this id",
+        }));
     }
     const deletedForum = await prismadb.forum.delete({
         where: {

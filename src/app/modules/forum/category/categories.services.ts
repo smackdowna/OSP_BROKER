@@ -1,12 +1,14 @@
 import {  TCategory } from "../forum.interface";
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
+import { Response } from "express";
+import sendResponse from "../../../middlewares/sendResponse";
 
 // create category
 const createCategory = async (category: TCategory) => {
     const { name } = category;
     if (!name) {
-        throw new AppError(400, "please provide all fields");
+        throw new AppError(400, "name field is required");
     }
     const existingCategory = await prismadb.categories.findFirst({
         where: {
@@ -18,7 +20,7 @@ const createCategory = async (category: TCategory) => {
     }
     const Category = await prismadb.categories.create({
         data: {
-            name,
+            name
         },
     });
     return {Category};
@@ -28,7 +30,11 @@ const createCategory = async (category: TCategory) => {
 const getAllCategories = async () => {
     const categories = await prismadb.categories.findMany({
         include: {
-            forums: true,
+            forums: {
+                select:{
+                    categoryId: true
+                }
+            },
         },
     });
     if (!categories) {
@@ -38,23 +44,33 @@ const getAllCategories = async () => {
 }
 
 // get category by id
-const getCategoryById= async (categoryId: string) => {
+const getCategoryById= async (categoryId: string , res: Response) => {
     const category = await prismadb.categories.findFirst({
         where: {
             id: categoryId,
         },
         include: {
-            forums: true,
+            forums: {
+                select:{
+                    categoryId: true
+                }
+            },
         },
     });
     if (!category) {
-        throw new AppError(404, "Category not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Category not found with this id",
+            })
+        )
     }
     return {category};
 }
 
 // update category
-const updateCategory = async (categoryId: string, category: Partial<TCategory>) => {
+const updateCategory = async (categoryId: string,res: Response, category: Partial<TCategory>) => {
     const { name } = category;
     if (!name) {
         throw new AppError(400, "please provide all fields");
@@ -65,7 +81,13 @@ const updateCategory = async (categoryId: string, category: Partial<TCategory>) 
         },
     });
     if (!existingCategory) {
-        throw new AppError(404, "Category not found with this id");
+        return (
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Category not found with this id",
+            })
+        )
     }
     const updatedCategory = await prismadb.categories.update({
         where: {
@@ -79,14 +101,20 @@ const updateCategory = async (categoryId: string, category: Partial<TCategory>) 
 }
 
 // delete category
-const deleteCategory = async (categoryId: string) => {
+const deleteCategory = async (categoryId: string ,res: Response) => {
     const existingCategory = await prismadb.categories.findFirst({
         where: {
             id: categoryId,
         },
     });
     if (!existingCategory) {
-        throw new AppError(404, "Category not found with this id");
+        return(
+            sendResponse(res, {
+                statusCode: 404,    
+                success: false,
+                message: "Category not found with this id",
+            })
+        )
     }
     const deletedCategory = await prismadb.categories.delete({
         where: {

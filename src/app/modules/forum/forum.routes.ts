@@ -3,36 +3,39 @@ import { forumControllers } from './forum.controller';
 import { topicController } from './topic/topic.controller';
 import { commentController } from './comment/comment.controller';
 import { categoriesController } from './category/categories.controller';
+import { verifyToken } from '../../middlewares/requireAuth';
 
 const router = express.Router();
 
-// Forum routes
-router.post('/createForum', forumControllers.createForum);
-router.get('/getAllForums', forumControllers.getAllForums);
-router.get('/getForumById/:id', forumControllers.getForumById);
-router.put('/updateForum/:id', forumControllers.updateForum);
-router.delete('/deleteForum/:id', forumControllers.deleteForum);
+
 
 // Topic routes
-router.post('/createTopic', topicController.createTopic);
-router.get('/getAllTopics', topicController.getAllTopics);
-router.get('/getTopicById/:id', topicController.getTopicById);
-router.put('/updateTopic/:id', topicController.updateTopic);
-router.delete('/deleteTopic/:id', topicController.deleteTopic);
+router.post('/topic',verifyToken, topicController.createTopic);
+router.get('/topics',verifyToken, topicController.getAllTopics);
+router.get('/topic/:id',verifyToken, topicController.getTopicById);
+router.put('/topic/:id',verifyToken, topicController.updateTopic);
+router.delete('/topic/:id',verifyToken, topicController.deleteTopic);
 
 // Comment routes
-router.post('/createComment', commentController.createComment);
-router.get('/getAllComments', commentController.getAllComments);
-router.get('/getCommentById/:id', commentController.getCommentById);
-router.put('/updateComment/:id', commentController.updateComment);
-router.delete('/deleteComment/:id', commentController.deleteComment);
+router.post('/comment',verifyToken, commentController.createComment);
+router.get('/comments',verifyToken, commentController.getAllComments);
+router.get('/comment/:id',verifyToken, commentController.getCommentById);
+router.put('/comment/:id',verifyToken, commentController.updateComment);
+router.delete('/comment/:id',verifyToken, commentController.deleteComment);
+router.delete('/comments',verifyToken, commentController.deleteAllComments);
 
 // Category routes
-router.post('/createCategory', categoriesController.createCategory);
-router.get('/getAllCategories', categoriesController.getAllCategories);
-router.get('/getCategoryById/:id', categoriesController.getCategoryById);
-router.put('/updateCategory/:id', categoriesController.updateCategory);
-router.delete('/deleteCategory/:id', categoriesController.deleteCategory);
+router.post('/category',verifyToken, categoriesController.createCategory);
+router.get('/categories',verifyToken, categoriesController.getAllCategories);
+router.get('/category/:id',verifyToken, categoriesController.getCategoryById);
+router.put('/category/:id',verifyToken, categoriesController.updateCategory);
+router.delete('/category/:id',verifyToken, categoriesController.deleteCategory);
 
+// Forum routes
+router.post('/',verifyToken, forumControllers.createForum);
+router.get('/',verifyToken, forumControllers.getAllForums);
+router.get('/:id',verifyToken, forumControllers.getForumById); 
+router.put('/:id',verifyToken, forumControllers.updateForum);
+router.delete('/:id',verifyToken, forumControllers.deleteForum);
 
 export const forumRouter = router;

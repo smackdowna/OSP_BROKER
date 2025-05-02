@@ -144,7 +144,7 @@ model Topic{
 
 model Comment{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    content String
+    comment String
     author String
     topicId String @db.ObjectId
     Topic Topic @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)

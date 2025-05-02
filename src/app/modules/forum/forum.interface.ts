@@ -21,7 +21,7 @@ export type TCategory = {
   };
   
   export type TComment = {
-    content: string;
+    comment: string;
     topicId: string;
     author: string;
   };
