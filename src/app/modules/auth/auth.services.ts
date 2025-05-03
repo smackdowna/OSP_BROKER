@@ -196,7 +196,7 @@ const getUsers = async () => {
     if (!users || users.length === 0) {
         throw new AppError(404, "No users found");
     }
-    return users.map((user) => {
+    return users.map((user:TUser) => {
         const { password, ...userWithoutPassword } = user;
         return userWithoutPassword;
     });
