@@ -120,7 +120,6 @@ model Forum{
     topics Topic[] @relation("forumToTopic")
     author String
     comments Int @default(0)
-    views Int @default(0)
     categoryId String @db.ObjectId
     Categories Categories @relation("forumToCategory",fields: [categoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
@@ -133,10 +132,11 @@ model Topic{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
     content String
+    author String
+    views Int @default(0)
     forumId String @db.ObjectId
     Forum Forum @relation("forumToTopic",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     comments Comment[] @relation("topicToComment")
-    author String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

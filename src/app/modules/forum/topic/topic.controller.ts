@@ -30,7 +30,7 @@ const getAllTopics = catchAsyncError(async (req: Request, res: Response, next: N
 // get topic by id
 const getTopicById = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const topic = await topicServices.getTopicById(id , res);
+    const  topic = await topicServices.getTopicById(id , res);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -38,6 +38,7 @@ const getTopicById = catchAsyncError(async (req: Request, res: Response, next: N
         data: topic,
     });
 });
+
 
 // update topic
 const updateTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -67,5 +68,5 @@ export const topicController = {
     getAllTopics,
     getTopicById,
     updateTopic,
-    deleteTopic,
+    deleteTopic
 };

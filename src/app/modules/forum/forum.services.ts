@@ -31,35 +31,61 @@ const createForum = async (forum: TForum) => {
 
 // get all forums 
 const getAllForums = async () => {
-    const forums = await prismadb.forum.findMany({
+    let forums = await prismadb.forum.findMany({
         include: {
             topics: {
                 select:{
-                    forumId: true
+                    forumId: true,
+                    comments: {
+                        select:{
+                            topicId: true
+                        }
+                    }
                 }
             },
+            _count:{
+                select: {
+                    topics: true,
+                }
+            }
         },
     });
     if (!forums) {
         throw new AppError(404, "No forums found");
     }
+    forums.map(async(forum)=>{
+        forum.comments= forum.topics.map((topic)=> topic.comments).reduce((acc, curr) => acc + curr.length, 0);
+    })
     return {forums};
 }
 
 // get forum by id 
 const getForumById= async (forumId: string , res: Response ) => {
-    const forum = await prismadb.forum.findFirst({
+    let forum = await prismadb.forum.findFirst({
         where: {
             id: forumId,
         },
         include: {
             topics:{
                 select:{
-                    forumId: true
+                    forumId: true , 
+                    comments:{
+                        select:{
+                            topicId: true
+                        }
+                    }
+                },
+            },
+            _count:{
+                select: {
+                    topics: true,
                 }
             }
         },
     });
+    if (forum) {
+        forum.comments = forum.topics.map((topic) => topic.comments).reduce((acc, curr) => acc + curr.length, 0);
+    }
     if (!forum) {
         sendResponse(res, {
             statusCode: 404,

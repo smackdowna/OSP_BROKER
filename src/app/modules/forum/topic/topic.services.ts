@@ -47,31 +47,47 @@ const getAllTopics = async () => {
     return {topics};
 }
 
+
+
 // get topic by id
-const getTopicById= async (topicId: string , res:Response) => {
-    const topic = await prismadb.topic.findFirst({
-        where: {
-            id: topicId,
-        },
-        include: {
-            comments: {
-                select:{
-                    topicId: true
-                }
-            }
-        },
+const getTopicById = async (topicId: string, res: Response) => {
+    // First increment views
+    await prismadb.topic.update({
+      where: {
+        id: topicId,
+      },    
+      data: {
+        views: {
+            increment: 1,
+        }
+      },
     });
+  
+    // Now fetch updated topic with comments
+    const topic = await prismadb.topic.findFirst({
+      where: {
+        id: topicId,
+      },
+      include: {
+        comments: {
+          select: {
+            topicId: true,
+          },
+        },
+      },
+    });
+  
     if (!topic) {
-        return(
-            sendResponse(res, {
-                statusCode: 404,
-                success: false,
-                message: "Topic not found with this id",
-            })  
-        )
+      return sendResponse(res, {
+        statusCode: 404,
+        success: false,
+        message: "Topic not found with this id",
+      });
     }
-    return {topic};
-}
+  
+    return { topic };
+  };
+  
 
 // update topic
 const updateTopic = async (topicId: string, res: Response ,topic: Partial<TTopic>) => {
