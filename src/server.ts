@@ -6,6 +6,8 @@ import config from "./app/config";
 import cookieParser from "cookie-parser";
 
 import router from "./app/routes";
+import notFoundHandler from "./app/middlewares/notFoundHandler";
+import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 
 const app = express();
 
@@ -43,6 +45,10 @@ app.get("/", (req, res) => {
   });
 
 app.use("/api", router);
+
+app.use(notFoundHandler);
+
+app.use(globalErrorHandler)
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${config.port}`);

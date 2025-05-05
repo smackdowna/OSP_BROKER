@@ -28,7 +28,8 @@ model User{
     representative Representative? @relation("userToRepresentative")
     businessAdmin BusinessAdmin? @relation("userToBusinessAdmin")
     moderator Moderator? @relation("userToModerator")
-    admin Admin? @relation("userToAdmin")  
+    admin Admin? @relation("userToAdmin") 
+    userMembership userMembership[] @relation("userToUserMembership")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -157,6 +158,47 @@ model Categories{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     forums Forum[] @relation("forumToCategory")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// membership models
+model MembershipPlan{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    description String
+    price Float
+    duration Int
+    userMembership userMembership[] @relation("membershipToUserMembership")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model userMembership{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    membershipPlanId String @db.ObjectId
+    startDate DateTime
+    endDate DateTime
+    status String
+    User User @relation("userToUserMembership",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    MembershipPlan MembershipPlan @relation("membershipToUserMembership",fields: [membershipPlanId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    paymentRecord paymentRecord[] @relation("userMembershipToPaymentRecord")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model paymentRecord{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userMembershipId String @db.ObjectId
+    amount Float
+    paymentMethod String
+    status String
+    transactionId String @unique
+    UserMembership userMembership @relation("userMembershipToPaymentRecord",fields: [userMembershipId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
