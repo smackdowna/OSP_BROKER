@@ -74,5 +74,5 @@ exports.topicController = {
     getAllTopics,
     getTopicById,
     updateTopic,
-    deleteTopic,
+    deleteTopic
 };

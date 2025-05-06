@@ -42,34 +42,60 @@ const createForum = (forum) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // get all forums 
 const getAllForums = () => __awaiter(void 0, void 0, void 0, function* () {
-    const forums = yield prismaDb_1.default.forum.findMany({
+    let forums = yield prismaDb_1.default.forum.findMany({
         include: {
             topics: {
                 select: {
-                    forumId: true
+                    forumId: true,
+                    comments: {
+                        select: {
+                            topicId: true
+                        }
+                    }
                 }
             },
+            _count: {
+                select: {
+                    topics: true,
+                }
+            }
         },
     });
     if (!forums) {
         throw new appError_1.default(404, "No forums found");
     }
+    forums.map((forum) => __awaiter(void 0, void 0, void 0, function* () {
+        forum.comments = forum.topics.map((topic) => topic.comments).reduce((acc, curr) => acc + curr.length, 0);
+    }));
     return { forums };
 });
 // get forum by id 
 const getForumById = (forumId, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const forum = yield prismaDb_1.default.forum.findFirst({
+    let forum = yield prismaDb_1.default.forum.findFirst({
         where: {
             id: forumId,
         },
         include: {
             topics: {
                 select: {
-                    forumId: true
+                    forumId: true,
+                    comments: {
+                        select: {
+                            topicId: true
+                        }
+                    }
+                },
+            },
+            _count: {
+                select: {
+                    topics: true,
                 }
             }
         },
     });
+    if (forum) {
+        forum.comments = forum.topics.map((topic) => topic.comments).reduce((acc, curr) => acc + curr.length, 0);
+    }
     if (!forum) {
         (0, sendResponse_1.default)(res, {
             statusCode: 404,

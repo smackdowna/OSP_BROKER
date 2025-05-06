@@ -58,6 +58,18 @@ const getAllTopics = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 // get topic by id
 const getTopicById = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // First increment views
+    yield prismaDb_1.default.topic.update({
+        where: {
+            id: topicId,
+        },
+        data: {
+            views: {
+                increment: 1,
+            }
+        },
+    });
+    // Now fetch updated topic with comments
     const topic = yield prismaDb_1.default.topic.findFirst({
         where: {
             id: topicId,
@@ -65,17 +77,17 @@ const getTopicById = (topicId, res) => __awaiter(void 0, void 0, void 0, functio
         include: {
             comments: {
                 select: {
-                    topicId: true
-                }
-            }
+                    topicId: true,
+                },
+            },
         },
     });
     if (!topic) {
-        return ((0, sendResponse_1.default)(res, {
+        return (0, sendResponse_1.default)(res, {
             statusCode: 404,
             success: false,
             message: "Topic not found with this id",
-        }));
+        });
     }
     return { topic };
 });

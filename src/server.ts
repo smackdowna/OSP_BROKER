@@ -43,7 +43,7 @@ if (config.node_env === "development") {
     app.use(morgan("tiny"));
 }
 
-// api routezz
+// api route
 app.get("/", (req, res) => {
     res.send("Welcome to the OSP_broker API");
   });
