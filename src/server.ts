@@ -26,11 +26,13 @@ app.use((req, res, next) => {
  next();
 });
 
-app.use(cors({
-  origin: ["http://localhost:8080" , "https://osp-broker.web.app" , "https://osp-broker.firebaseapp.com" ],
+const corsOptions = {
+  origin: ["http://localhost:8080", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"],
   credentials: true,
   methods: ["GET", "POST", "DELETE", "PUT"],
-}));
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); 
 
 
 app.use(express.json());
