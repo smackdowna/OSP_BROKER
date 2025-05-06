@@ -16,7 +16,7 @@ export type TLoginAuth = {
       about?: string;
       profileImageUrl?: string;
       skills: string[];
-      socialLinks?: Record<string, any>; // Can be refined if structure is known
+      socialLinks?: Record<string, any>;
       education: {
         school: string;
         degree: string;
@@ -29,8 +29,8 @@ export type TLoginAuth = {
         company: string;
         title: string;
         location: string;
-        startDate: string; // or Date if you parse it
-        endDate: string;   // or Date if you parse it
+        startDate: string;
+        endDate: string;
         description: string;
       }[];
     };
@@ -40,7 +40,30 @@ export type TLoginAuth = {
       message: string;
     };
     businessAdmin?: {
-      id: string;
+      authorizedUser: boolean;
+      editors: string[];
+      businessName: string;
+      slogan: string;
+      mission: string;
+      industry: string;
+      isIsp: boolean;
+      products: string[];
+      services: string[];
+      companyType: string;
+      foundedYear: string;
+      history: string;
+      hqLocation?: Record<string, any>; // Assuming JSON format
+      servingAreas: string[];
+      keyPeople: string[];
+      ownership: string[];
+      lastYearRevenue: string;
+      employeeCount: number;
+      acquisitions: string[];
+      strategicPartners: string[];
+      saleDeckUrl?: string;
+      websiteLinks: string[];
+      accountOwnerUsername: string;
+      userId: string;
     };
     moderator?: {
       id: string;

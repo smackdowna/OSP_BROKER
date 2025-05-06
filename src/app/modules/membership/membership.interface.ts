@@ -12,8 +12,6 @@ export type TMembershipPlan = {
     startDate: string; 
     endDate: string; 
     status: string;
-    User: TUser;
-    MembershipPlan: TMembershipPlan; 
     paymentRecord?: TPaymentRecord[]; 
   };
   
@@ -34,4 +32,3 @@ export type TMembershipPlan = {
     role: "USER" | "REPRESENTATIVE" | "BUSINESS_ADMIN" | "MODERATOR" | "ADMIN";
     phone: string;
   };
-  

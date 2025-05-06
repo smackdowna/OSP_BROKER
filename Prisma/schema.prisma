@@ -87,6 +87,29 @@ model Moderator{
 
 model BusinessAdmin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
+    authorizedUser Boolean @default(false)
+    editors String[]
+    businessName String
+    slogan String
+    mission String
+    industry String
+    isIsp Boolean @default(false)
+    products String[]
+    services String[]
+    companyType String
+    foundedYear String
+    history String
+    hqLocation Json?
+    servingAreas String[]
+    keyPeople String[]
+    ownership String[]
+    lastYearRevenue String
+    employeeCount  Int @default(0)
+    acquisitions String[]
+    strategicPartners String[]
+    saleDeckUrl String?
+    websiteLinks String[]
+    accountOwnerUsername String
     userId String @db.ObjectId @unique
     user User @relation("userToBusinessAdmin",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     createdAt DateTime @default(now())
