@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors({
-  origin: ["http://localhost:3000" ],
+  origin: ["http://localhost:8080" , "https://osp-broker.web.app" , "https://osp-broker.firebaseapp.com" ],
   credentials: true,
   methods: ["GET", "POST", "DELETE", "PUT"],
 }));
