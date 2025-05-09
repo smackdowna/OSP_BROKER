@@ -65,8 +65,7 @@ const deleteMembershipPlan = catchAsyncError(async (req: Request, res: Response,
 
 // create user membership
 const createUserMembership = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const userId= req.params.id;
-    const {membershipPlanId,   startDate, endDate , status } = req.body;
+    const {membershipPlanId,   startDate, endDate , status , userId } = req.body;
     const userMembership = await membershipServices.createUserMembership({ userId, membershipPlanId, startDate, endDate, status });
     sendResponse(res, {
         statusCode: 200,

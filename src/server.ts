@@ -9,6 +9,7 @@ import router from "./app/routes";
 import notFoundHandler from "./app/middlewares/notFoundHandler";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 
+
 const app = express();
 
 // middlewares
@@ -26,15 +27,8 @@ app.use((req, res, next) => {
  next();
 });
 
-// const corsOptions = {
-//   origin: ["http://localhost:8080", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"],
-//   credentials: true,
-//   methods: ["GET", "POST", "DELETE", "PUT"],
-// };
-// app.use(cors(corsOptions));
-// app.options("*", cors(corsOptions)); 
 
-app.use(cors({ origin: ["http://localhost:8080","http://localhost:5173", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
+app.use(cors({ origin: ["http://localhost:8080", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
 
 
 app.use(express.json());
@@ -57,3 +51,5 @@ app.use(globalErrorHandler)
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${config.port}`);
 });
+
+export default app;

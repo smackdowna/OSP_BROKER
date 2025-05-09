@@ -169,18 +169,6 @@ const createUserMembership= async(userMembershipInterface: TUserMembership) => {
 // get all user memberships
 const getAllUserMemberships = async() => {
     const userMemberships = await prismadb.userMembership.findMany({
-        include: {
-            User: {
-                select:{
-                    fullName: true
-                }
-            },
-            MembershipPlan: {
-                select:{
-                    name: true
-                }
-            }
-        },
     });
     if(!userMemberships) {
         throw new AppError(404, "No user memberships found");
@@ -196,19 +184,7 @@ const getUserMembershipById = async(id: string , res:Response) => {
     const userMembership = await prismadb.userMembership.findFirst({
         where: {
             id: id,
-        },
-        include: {
-            User: {
-                select:{
-                    fullName: true
-                }
-            },
-            MembershipPlan: {
-                select:{
-                    name: true
-                }
-            }
-        },
+        }
     });
     if(!userMembership) {
         sendResponse(res, {

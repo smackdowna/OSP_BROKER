@@ -6,8 +6,8 @@ import {forumServices} from "./forum.services";
 
 // create forum
 const createForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { title, description, author, categoryId } = req.body;
-    const forum = await forumServices.createForum({title, description, author, categoryId});
+    const { title, description, author, categoryId , userId } = req.body;
+    const forum = await forumServices.createForum({title, description, author, categoryId , userId });
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -62,10 +62,22 @@ const deleteForum = catchAsyncError(async (req: Request, res: Response, next: Ne
     });
 });
 
+// delete all forums
+const deleteAllForums = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const forums = await forumServices.deleteAllForums();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All forums deleted successfully",
+        data: forums,
+    });
+});
+
 export const forumControllers = {
     createForum,
     getAllForums,
     getForumById,
     updateForum,
     deleteForum,
+    deleteAllForums
 };

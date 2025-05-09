@@ -7,6 +7,7 @@ export type TCategory = {
     description: string;
     author: string;
     comments?: number;
+    userId: string;
     categoryId: string;
     topics?: TTopic[];
   };
@@ -23,6 +24,7 @@ export type TCategory = {
   export type TComment = {
     comment: string;
     topicId: string;
+    commenterId?: string;
     author: string;
   };
   

@@ -17,9 +17,10 @@ router.put('/topic/:id',verifyToken, topicController.updateTopic);
 router.delete('/topic/:id',verifyToken, topicController.deleteTopic);
 
 // Comment routes
-router.post('/comment',verifyToken, commentController.createComment);
+router.post('/comment/:commenterId',verifyToken, commentController.createComment);
 router.get('/comments',verifyToken, commentController.getAllComments);
 router.get('/comment/:id',verifyToken, commentController.getCommentById);
+router.get('/notifications/:senderId',verifyToken, commentController.getAllNotifications);
 router.put('/comment/:id',verifyToken, commentController.updateComment);
 router.delete('/comment/:id',verifyToken, commentController.deleteComment);
 router.delete('/comments',verifyToken, commentController.deleteAllComments);
@@ -37,5 +38,6 @@ router.get('/',verifyToken, forumControllers.getAllForums);
 router.get('/:id',verifyToken, forumControllers.getForumById); 
 router.put('/:id',verifyToken, forumControllers.updateForum);
 router.delete('/:id',verifyToken, forumControllers.deleteForum);
+router.delete('/',verifyToken, forumControllers.deleteAllForums);
 
 export const forumRouter = router;

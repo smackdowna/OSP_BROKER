@@ -6,13 +6,26 @@ import { commentServices } from "./comment.services";
 
 // create comment
 const createComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { comment, author, topicId } = req.body;
-    const newComment = await commentServices.createComment({ comment, author, topicId });
+    const {commenterId} = req.params;
+    const { comment, author, topicId  } = req.body;
+    const newComment = await commentServices.createComment({ comment, author, topicId , commenterId });
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Comment created successfully",
         data: newComment,
+    });
+});
+
+// get all notifications
+const getAllNotifications = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = req.params;
+    const notifications = await commentServices.getAllNotifications(userId);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All notifications fetched successfully",
+        data: notifications,
     });
 });
 
@@ -81,4 +94,5 @@ export const commentController = {
     getCommentById,
     updateComment,
     deleteComment,
+    getAllNotifications,
 };

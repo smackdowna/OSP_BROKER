@@ -6,8 +6,8 @@ import sendResponse from "../../middlewares/sendResponse";
 
 // create forum 
 const createForum = async (forum: TForum) => {
-    const { title, description, author , categoryId } = forum;
-    if (!title || !description || !author || !categoryId) {
+    const { title, description, author , categoryId  , userId } = forum;
+    if (!title || !description || !author || !categoryId || !userId) {
         throw new AppError(400, "please provide all fields");
     }
     const existingForum = await prismadb.forum.findFirst({
@@ -24,6 +24,7 @@ const createForum = async (forum: TForum) => {
             description,
             author,
             categoryId,
+            userId
         },
     });
     return {forum:forumBody};
@@ -148,10 +149,20 @@ const deleteForum = async (forumId: string , res:Response) => {
     return {deletedForum};
 }
 
+// delete all forums
+const deleteAllForums = async () => {
+    const deletedForums = await prismadb.forum.deleteMany();
+    if (!deletedForums) {
+        throw new AppError(404, "No forums found");
+    }
+    return {deletedForums};
+}
+
 export const forumServices = {
     createForum,
     getAllForums,
     getForumById,
     updateForum,
     deleteForum,
+    deleteAllForums
 };

@@ -4,11 +4,13 @@ import AppError from "../../../errors/appError";
 import sendResponse from "../../../middlewares/sendResponse";
 import { Response } from "express";
 
+import { notifyUser } from "../../../utils/notifyUser";
+
 // create comment 
 const createComment = async (commentBody: TComment) => {
-    const { comment, topicId, author } = commentBody;
+    const { comment, topicId, author , commenterId } = commentBody;
 
-    if (!comment || !topicId || !author) {
+    if (!comment || !topicId || !author || !commenterId) {
         throw new AppError(400, "please provide all fields");
     }
     
@@ -20,14 +22,69 @@ const createComment = async (commentBody: TComment) => {
     if (existingComment) {
         throw new AppError(400, "Comment already exists with this content");
     }
+
+    const topic= await prismadb.topic.findFirst({
+        where: {
+            id: topicId,
+        },
+    });
+
+    console.log("this is topic from comment", topic);
+
+    const id= topic?.forumId;
+    console.log("this is  forum id from topic", id);
+    
+    const forum= await prismadb.forum.findFirst({
+        where: {
+            id: id
+        },
+    });
+    console.log("this is forum from comment", forum);
+
+  if (forum?.userId && forum.userId !== commenterId) {
+    console.log("hello from creating notificaitons")
+    await prismadb.notification.create({
+      data: {
+        type: "COMMENT",
+        message: `Someone commented on your topic "${topic?.title}"`,
+        recipient: forum.userId,
+        sender: commenterId
+      },
+        })
+    };
+
+    // send real time notification to the user
+    if(forum){
+        notifyUser(forum?.userId, {
+            type: "COMMENT",
+            message: `Someone commented on your topic "${topic?.title}"`,
+            recipient: forum.userId,
+            sender: commenterId
+        });
+    }
+
     const newComment = await prismadb.comment.create({
         data: {
             comment,
             topicId,
             author,
+            commenterId
         },
     });
     return {comment:newComment};
+}
+
+// get all notifications
+const getAllNotifications = async (userId: string) => {
+    const notifications = await prismadb.notification.findMany({
+        where: {
+            sender: userId,
+        },
+    });
+    if (!notifications) {
+        throw new AppError(404, "No notifications found");
+    }
+    return {notifications};
 }
 
 // get all comments
@@ -54,7 +111,7 @@ const deleteAllComments = async () => {
     if (!comments) {
         throw new AppError(404, "No comments found");
     }
-    return {comments};
+    return {comments}; 
 }
 
 
@@ -152,4 +209,5 @@ export const commentServices = {
     getCommentById,
     updateComment,
     deleteComment,
+    getAllNotifications,
 };
