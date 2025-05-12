@@ -29,20 +29,16 @@ const createComment = async (commentBody: TComment) => {
         },
     });
 
-    console.log("this is topic from comment", topic);
 
     const id= topic?.forumId;
-    console.log("this is  forum id from topic", id);
     
     const forum= await prismadb.forum.findFirst({
         where: {
             id: id
         },
     });
-    console.log("this is forum from comment", forum);
 
   if (forum?.userId && forum.userId !== commenterId) {
-    console.log("hello from creating notificaitons")
     await prismadb.notification.create({
       data: {
         type: "COMMENT",

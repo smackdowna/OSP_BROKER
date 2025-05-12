@@ -16,4 +16,7 @@ export default {
   cloudinary_api_secret:process.env.CLOUDINARY_API_SCERET,
   payment_verify_url:process.env.PAYMENT_VERIFY_URL,
   reset_password_ui_url:process.env.RESET_PASSWORD_UI_URL,
+  google_client_id:process.env.GOOGLE_CLIENT_ID,
+  google_client_secret:process.env.GOOGLE_CLIENT_SECRET,
+  google_redirect_url:process.env.GOOGLE_REDIRECT_URL
 };
