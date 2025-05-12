@@ -97,11 +97,47 @@ const getSingleUser = catchAsyncError(async (req: Request, res: Response, next: 
     });
 })
 
+// google signin
+const googleSignIn = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const {code} = req.body;
+    if(!code) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Please provide code",
+            data: null,
+        });
+    }
+    const result = await authServices.googleSignIn(code);
+    const { accessToken, user} = result;
+
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: config.node_env === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return (
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Login successful",
+            data: {
+                user: user,
+                accessToken: accessToken,
+            }
+        })
+    )
+});
+    
+
 
 export const authControllers = {
     createUser,
     loginUser,
     refreshToken,
     getAllUsers,
-    getSingleUser
+    getSingleUser,
+    googleSignIn,
 };

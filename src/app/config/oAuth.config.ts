@@ -4,7 +4,7 @@ import config from "./index"
 const oauth2Client = new google.auth.OAuth2(
     config.google_client_id,
     config.google_client_secret,
-    "postmessage"
+    config.google_redirect_uri
 );
 
 

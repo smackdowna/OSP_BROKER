@@ -3,6 +3,8 @@ import bcrypt from "bcrypt";
 import AppError from "../../errors/appError";
 import {createToken} from "./auth.utils"
 import jwt , {JwtPayload}from "jsonwebtoken";
+import oauth2Client from "../../config/oAuth.config";
+import axios from "axios";
 
 import prismadb from "../../db/prismaDb";
 import config from "../../config";
@@ -218,11 +220,77 @@ const getUserById = async (id: string) => {
     return userWithoutPassword;
 }
 
+// google authentication
+const googleSignIn= async (code: string) => {
+  if(!code) {
+    throw new AppError(400, "Please provide code");
+  }
+
+  console.log("This is code", code)
+
+  const {tokens}= await oauth2Client.getToken({
+    code,
+    redirect_uri: config.google_redirect_uri
+  });
+  oauth2Client.setCredentials(tokens);
+
+  const userRes= await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokens.access_token}`)
+  console.log("This is userRes" , userRes)
+
+  if(!userRes){
+    throw new AppError(400, "Unable to fetch user data from google");
+  }
+
+  // check existing user
+  let user= await prismadb.user.findFirst({
+    where: {
+      email: userRes.data.email
+    }
+  })
+
+  if(!user){
+    user= await prismadb.user.create({
+      data: {
+        fullName: userRes.data.name,
+        email: userRes.data.email,
+        password: "",
+        role: "USER",
+        phone: "",
+        userProfile: {
+          create: {
+            headLine: "",
+            location: "",
+            about: "",
+            profileImageUrl: userRes.data.picture,
+            skills: [],
+            socialLinks: [],
+            education: {
+              create: []
+            },
+            experience: {
+              create:[]
+            }
+          }
+        }
+      }
+    })}
+    const accessToken= createToken({
+      userId: user.id.toString(),
+      email: user.email,
+      role: user.role
+    }, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
+
+    return {
+      accessToken,
+      user
+    }
+}
 
 export const authServices = {
     createUser,
     loginUser,
     refreshToken,
     getUsers,
-    getUserById
+    getUserById,
+    googleSignIn
 };

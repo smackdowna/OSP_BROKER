@@ -32,4 +32,9 @@ router.get(
     authControllers.getSingleUser
 )
 
+router.post(
+    "/google",
+    authControllers.googleSignIn
+)
+
 export const authRouter = router;
