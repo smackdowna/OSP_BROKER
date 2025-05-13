@@ -5,6 +5,7 @@ import {createToken} from "./auth.utils"
 import jwt , {JwtPayload}from "jsonwebtoken";
 import oauth2Client from "../../config/oAuth.config";
 import axios from "axios";
+import appleSignin from "apple-signin-auth";
 
 import prismadb from "../../db/prismaDb";
 import config from "../../config";
@@ -286,11 +287,78 @@ const googleSignIn= async (code: string) => {
     }
 }
 
+const appleSignIn = async (id_token: string)=>{
+  if(!id_token){
+    throw new AppError(400, "Please provide code");
+  }
+
+  const userData = await appleSignin.verifyIdToken(id_token, {
+    audience: config.apple_client_id,
+    ignoreExpiration: true,
+  });
+
+  if(!userData || !userData.email){
+    throw new AppError(400, "Unable to fetch user data from apple");
+  }
+
+  console.log("This is userData", userData)
+
+  const email= userData.email;
+  
+  let user= await prismadb.user.findFirst({
+    where: {
+      email: email
+    }
+  })
+
+  if(!user){
+    user= await prismadb.user.create({
+      data: {
+        fullName: "apple user",
+        email: userData.email,
+        password: "",
+        role: "USER",
+        phone: "",
+        userProfile: {
+          create: {
+            headLine: "",
+            location: "",
+            about: "",
+            profileImageUrl: "",
+            skills: [],
+            socialLinks: [],
+            education: {
+              create: []
+            },
+            experience: {
+              create:[]
+            }
+          }
+        }
+      }
+    })
+  }
+
+  const accessToken= createToken({
+    userId: user.id.toString(),
+    email: user.email,
+    role: user.role
+  }, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
+
+  return {
+    accessToken,
+    user
+  }
+}
+
+
+
 export const authServices = {
     createUser,
     loginUser,
     refreshToken,
     getUsers,
     getUserById,
-    googleSignIn
+    googleSignIn,
+    appleSignIn
 };

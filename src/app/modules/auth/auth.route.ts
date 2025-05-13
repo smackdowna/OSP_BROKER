@@ -37,4 +37,9 @@ router.post(
     authControllers.googleSignIn
 )
 
+router.post(
+    "/apple",
+    authControllers.appleSignIn
+)
+
 export const authRouter = router;

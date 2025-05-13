@@ -38,32 +38,10 @@ export type TLoginAuth = {
       id: string;
       department: string;
       message: string;
+      businessId: string;
     };
     businessAdmin?: {
-      authorizedUser: boolean;
-      editors: string[];
-      businessName: string;
-      slogan: string;
-      mission: string;
-      industry: string;
-      isIsp: boolean;
-      products: string[];
-      services: string[];
-      companyType: string;
-      foundedYear: string;
-      history: string;
-      hqLocation?: Record<string, any>; // Assuming JSON format
-      servingAreas: string[];
-      keyPeople: string[];
-      ownership: string[];
-      lastYearRevenue: string;
-      employeeCount: number;
-      acquisitions: string[];
-      strategicPartners: string[];
-      saleDeckUrl?: string;
-      websiteLinks: string[];
-      accountOwnerUsername: string;
-      userId: string;
+      id: string;
     };
     moderator?: {
       id: string;

@@ -126,7 +126,6 @@ model business{
 }
 
 
-
 // this representative may have relation with business admin.
 model Representative{
     id String @id @default(auto()) @map("_id") @db.ObjectId
