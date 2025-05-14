@@ -84,8 +84,7 @@ model Moderator{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String @db.ObjectId @unique
     user User @relation("userToModerator",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
-    categoryId String @db.ObjectId
-    Categories Categories @relation("moderatorToCategory",fields: [categoryId], references: [id])
+    categoryIds String[] @db.ObjectId
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -199,7 +198,6 @@ model Categories{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     forums Forum[] @relation("forumToCategory")
-    moderator Moderator[] @relation("moderatorToCategory")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -27,7 +27,7 @@ router.delete('/comments',verifyToken,verifyMembership, commentController.delete
 
 // Category routes
 router.post('/category',verifyToken,authorizeRole("ADMIN"), categoriesController.createCategory);
-router.get('/categories',verifyToken,authorizeRole("ADMIN"), categoriesController.getAllCategories);
+router.get('/categories',verifyToken, categoriesController.getAllCategories);
 router.get('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.getCategoryById);
 router.put('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.updateCategory);
 router.delete('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.deleteCategory);

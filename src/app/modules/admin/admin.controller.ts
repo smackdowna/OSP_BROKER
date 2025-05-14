@@ -8,8 +8,7 @@ import { adminServices } from "./admin.services";
 const assignModerator = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
     const { categoryId } = req.body;
-    const { user , moderator } = await adminServices.assignModerator(userId , categoryId);
-
+    const { user , moderator } = await adminServices.assignModerator(res ,userId , categoryId);
 
     sendResponse(res, {
         statusCode: 200,

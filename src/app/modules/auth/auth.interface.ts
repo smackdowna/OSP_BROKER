@@ -44,7 +44,7 @@ export type TLoginAuth = {
       id: string;
     };
     moderator?: {
-      id: string;
+      categoryId: string;
     };
     admin?: {
       id: string;

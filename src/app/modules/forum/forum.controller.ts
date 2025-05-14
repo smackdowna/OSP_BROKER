@@ -3,6 +3,8 @@ import { Request, Response  ,NextFunction } from "express";
 import sendResponse from "../../middlewares/sendResponse";
 
 import {forumServices} from "./forum.services";
+import { getCategoryId } from "../../utils/getCategoryId";
+import prismadb from "../../db/prismaDb";
 
 // create forum
 const createForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -41,19 +43,78 @@ const getForumById = catchAsyncError(async (req: Request, res: Response, next: N
 
 // update forum
 const updateForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const categoryIds = await getCategoryId(req, res);
+    console.log("this is category ids", categoryIds);
     const { id } = req.params;
-    const forum = await forumServices.updateForum(id,res , req.body);
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Forum id is required",
+        });
+    }
+    const categoryIdfromForum = await prismadb.forum.findFirst({
+        where: {
+            id: id,
+        }
+    });
+    let categoryId: string[] = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId: string) => 
+            categoryId === categoryIdfromForum?.categoryId
+        );
+    }
+    console.log("this is category id", categoryId);
+
+    if(categoryId.length === 0) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to update this forum of this category",
+        });
+    }
+    const forum = await forumServices.updateForum(id,req,res , req.body);
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Forum updated successfully",
         data: forum,
     });
-});
+})
+
 
 // delete forum
 const deleteForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const categoryIds = await getCategoryId(req, res);
+    console.log("this is category ids", categoryIds);
     const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Forum id is required",
+        });
+    }
+    const categoryIdfromForum = await prismadb.forum.findFirst({
+        where: {
+            id: id,
+        }
+    });
+    let categoryId: string[] = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId: string) => 
+            categoryId === categoryIdfromForum?.categoryId
+        );
+    }
+    console.log("this is category id", categoryId);
+
+    if(categoryId.length === 0) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to update this forum of this category",
+        });
+    }
     await forumServices.deleteForum(id , res);
     sendResponse(res, {
         statusCode: 200,

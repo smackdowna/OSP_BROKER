@@ -6,7 +6,7 @@ import { adminController } from './admin.controller';
 const router = express.Router();
 
 // Admin routes
-router.post('/assignModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.assignModerator);
+router.post('/assignModerator/:userId', verifyToken, adminController.assignModerator);
 router.delete('/removeModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.removeModerator);
 
 export const adminRouter = router;

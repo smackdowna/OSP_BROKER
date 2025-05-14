@@ -16,7 +16,7 @@ export const verifyMembership = catchAsyncError(async (req: Request, res: Respon
     const token = req.cookies.membership || "";
     if (!token) return res.status(401).json({ message: "unauthorized access" });
 
-    const decoded = jwt.verify(token, config.jwt_access_secret as string) as DecodedToken;
+    const decoded = jwt.verify(token, config.jwt_membership_secret as string) as DecodedToken;
     req.cookies.user=decoded;
 
     const user = await prismadb.user.findFirst({
