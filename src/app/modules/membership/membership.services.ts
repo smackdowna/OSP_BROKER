@@ -3,6 +3,8 @@ import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
 import { Request, Response, NextFunction } from "express";
 import sendResponse from "../../middlewares/sendResponse";
+import { createToken } from "../auth/auth.utils";
+import config from "../../config";
 
 // create membership plan
 const createMembershipPlan = async(membershipPlanInterface: TMembershipPlan) => {
@@ -163,7 +165,18 @@ const createUserMembership= async(userMembershipInterface: TUserMembership) => {
             status,
         },
     })
-    return {userMembership};
+
+    const jwtPayload = {
+        userId: userMembership.userId.toString()
+    };
+
+    const membershipToken = createToken(
+        jwtPayload,
+        config.jwt_access_secret as string,
+        config.jwt_access_expires_in as string
+    );
+
+    return {userMembership , membershipToken};
 }
 
 // get all user memberships
@@ -193,7 +206,7 @@ const getUserMembershipById = async(id: string , res:Response) => {
             message: "No user membership found with this id",
         });
     }
-    return {userMembership};
+    return userMembership;
 }
 
 // update user membership

@@ -51,7 +51,18 @@ const createUser = async (payload: Partial<TUser>) => {
 
   // Set dynamic include option based on the role
   const relationName = roleToRelation[role];
-  const includeOption = relationName ? { [relationName]: true } : {};
+  let includeOption = {};
+
+  if(relationName==="representative" ){
+    includeOption={
+      representative: true,
+      userProfile: true
+    }
+  }else{
+    includeOption = relationName ? { 
+     [relationName]: true
+    } : {};
+  }
 
   const user = await prismadb.user.create({
     data: {

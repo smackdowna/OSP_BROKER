@@ -1,5 +1,5 @@
 import catchAsyncError from "../../utils/catchAsyncError";
-import { Request, Response  ,NextFunction, response } from "express";
+import { Request, Response  ,NextFunction } from "express";
 import sendResponse from "../../middlewares/sendResponse";
 
 import {forumServices} from "./forum.services";
