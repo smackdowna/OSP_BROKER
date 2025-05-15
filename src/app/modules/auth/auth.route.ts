@@ -2,6 +2,7 @@ import express from "express";
 import validateRequest from "../../middlewares/validateRequest";
 import { AuthValidations } from "./auth.validation";
 import {authControllers} from "./auth.controller";
+import { authorizeRole } from "../../middlewares/authorizeRole";
 
 const router = express.Router();
 
@@ -24,11 +25,13 @@ router.post(
 
 router.get(
     "/getAllUsers",
+    authorizeRole("ADMIN"),
     authControllers.getAllUsers
 )
 
 router.get(
     "/getSingleUser/:id",
+    authorizeRole("ADMIN"),
     authControllers.getSingleUser
 )
 

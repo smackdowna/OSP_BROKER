@@ -1,9 +1,8 @@
 import {  TForum } from "./forum.interface";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import sendResponse from "../../middlewares/sendResponse";
-import { getCategoryId } from "../../utils/getCategoryId";
 
 // create forum 
 const createForum = async (forum: TForum) => {

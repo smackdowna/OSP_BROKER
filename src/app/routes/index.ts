@@ -4,6 +4,8 @@ import { forumRouter } from "../modules/forum/forum.routes";
 import { membershipRouter } from "../modules/membership/membership.routes";
 import { businessRouter } from "../modules/business/business.routes";
 import { adminRouter } from "../modules/admin/admin.router";
+import { moderatorRouter } from "../modules/moderator/moderator.router";
+import { flagContentRouter } from "../modules/flagContent/flagContent.router";
 
 const router = Router();
 
@@ -29,6 +31,14 @@ const moduleRoutes=[
     {
         path: "/admin",
         route: adminRouter
+    },
+    {
+        path: "/moderator",
+        route: moderatorRouter
+    },
+    {
+        path:"/flag",
+        route: flagContentRouter
     }
 
 ]

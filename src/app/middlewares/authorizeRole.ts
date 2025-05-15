@@ -7,6 +7,11 @@ export const authorizeRole = (role: string): RequestHandler => {
       return; // End the function with void
     }
 
+    if(req.cookies.user.role==="ADMIN") {
+      next();
+      return; // End the function with void
+    }
+
     if (req.cookies.user.role !== role) {
       res.status(403).json({ error: `Forbidden: You do not have permission , you must be an ${role}` });
       return; // End the function with void

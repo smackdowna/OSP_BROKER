@@ -44,7 +44,6 @@ const getForumById = catchAsyncError(async (req: Request, res: Response, next: N
 // update forum
 const updateForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const categoryIds = await getCategoryId(req, res);
-    console.log("this is category ids", categoryIds);
     const { id } = req.params;
     if (!id) {
         return sendResponse(res, {
@@ -53,7 +52,7 @@ const updateForum = catchAsyncError(async (req: Request, res: Response, next: Ne
             message: "Forum id is required",
         });
     }
-    const categoryIdfromForum = await prismadb.forum.findFirst({
+    const forumWithCategoryId = await prismadb.forum.findFirst({
         where: {
             id: id,
         }
@@ -61,10 +60,9 @@ const updateForum = catchAsyncError(async (req: Request, res: Response, next: Ne
     let categoryId: string[] = [];
     if (Array.isArray(categoryIds)) {
         categoryId = categoryIds.filter((categoryId: string) => 
-            categoryId === categoryIdfromForum?.categoryId
+            categoryId === forumWithCategoryId?.categoryId
         );
     }
-    console.log("this is category id", categoryId);
 
     if(categoryId.length === 0) {
         return sendResponse(res, {
@@ -86,7 +84,6 @@ const updateForum = catchAsyncError(async (req: Request, res: Response, next: Ne
 // delete forum
 const deleteForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const categoryIds = await getCategoryId(req, res);
-    console.log("this is category ids", categoryIds);
     const { id } = req.params;
     if (!id) {
         return sendResponse(res, {
@@ -106,13 +103,12 @@ const deleteForum = catchAsyncError(async (req: Request, res: Response, next: Ne
             categoryId === categoryIdfromForum?.categoryId
         );
     }
-    console.log("this is category id", categoryId);
 
     if(categoryId.length === 0) {
         return sendResponse(res, {
             statusCode: 403,
             success: false,
-            message: "You are not authorized to update this forum of this category",
+            message: "You are not authorized to delete this forum of this category",
         });
     }
     await forumServices.deleteForum(id , res);

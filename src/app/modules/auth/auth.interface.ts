@@ -9,6 +9,7 @@ export type TLoginAuth = {
     email: string;
     password: string;
     role: "USER" | "REPRESENTATIVE" | "BUSINESS_ADMIN" | "MODERATOR" | "ADMIN";
+    isBanned?: boolean | null;
     phone: string;
     userProfile?: {
       headLine: string;

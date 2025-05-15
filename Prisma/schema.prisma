@@ -24,6 +24,7 @@ model User{
     password String
     role    ROLE @default(USER)
     phone   String
+    isBanned Boolean? @default(false)
     userProfile UserProfile? @relation("userToUserProfile")
     representative Representative? @relation("userToRepresentative")
     businessAdmin BusinessAdmin? @relation("userToBusinessAdmin")
@@ -31,6 +32,7 @@ model User{
     admin Admin? @relation("userToAdmin") 
     userMembership userMembership[] @relation("userToUserMembership")
     forum Forum[] @relation("userToForum")
+    flaggedContent FlaggedContent[] @relation("userToFlaggedContent")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -177,6 +179,7 @@ model Topic{
     forumId String @db.ObjectId
     Forum Forum @relation("forumToTopic",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     comments Comment[] @relation("topicToComment")
+    flaggedContent FlaggedContent[] @relation("topicToFlaggedContent")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -189,6 +192,7 @@ model Comment{
     topicId String @db.ObjectId
     commenterId String? @db.ObjectId
     Topic Topic @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -251,6 +255,25 @@ model paymentRecord{
     status String
     transactionId String @unique
     UserMembership userMembership @relation("userMembershipToPaymentRecord",fields: [userMembershipId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// content flagging model
+model FlaggedContent{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    flaggedBy String @db.ObjectId
+    contentType String
+    reason String
+    isDeleted Boolean? @default(false)
+    categoryId String? @db.ObjectId
+    topicId String? @db.ObjectId 
+    topic Topic? @relation("topicToFlaggedContent",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    commentId String? @db.ObjectId
+    comment Comment? @relation("commentToFlaggedContent",fields: [commentId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    userId String? @db.ObjectId
+    user User? @relation("userToFlaggedContent",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

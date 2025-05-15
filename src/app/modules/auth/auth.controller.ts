@@ -35,7 +35,6 @@ const loginUser = catchAsyncError(async (req: Request, res: Response, next: Next
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    // res.setHeader("Authorization", `Bearer ${accessToken}`);
 
     sendResponse(res, {
         statusCode: 200,

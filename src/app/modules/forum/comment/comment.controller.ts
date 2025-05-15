@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import sendResponse from "../../../middlewares/sendResponse";
 
 import { commentServices } from "./comment.services";
+import { getCategoryId } from "../../../utils/getCategoryId";
+import prismadb from "../../../db/prismaDb";
 
 // create comment
 const createComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -64,8 +66,15 @@ const deleteAllComments = catchAsyncError(async (req: Request, res: Response, ne
 });
 
 // update comment
-const updateComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+const updateComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {    
     const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        });
+    }
     const updatedComment = await commentServices.updateComment(id,res, req.body);
     sendResponse(res, {
         statusCode: 200,
@@ -78,12 +87,79 @@ const updateComment = catchAsyncError(async (req: Request, res: Response, next: 
 // delete comment
 const deleteComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const comment = await commentServices.deleteComment(id , res);
+    if(!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        });
+    }
+
+    const checkFlagged = await prismadb.flaggedContent.findFirst({
+        where: {
+            commentId: id
+        }
+    });
+
+    if(checkFlagged?.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "Flagged comment is already deleted",
+        });
+    }
+
+    const categoryIds = await getCategoryId(req, res);  
+
+    const comment = await prismadb.comment.findFirst({
+        where: {
+            id: id,
+        }
+    });
+
+    const topic = await prismadb.topic.findFirst({
+        where: {
+            id: comment?.topicId,
+        }
+    });
+
+    const forum = await prismadb.forum.findFirst({
+        where: {
+            id: topic?.forumId,
+        }
+    });
+
+    let categoryId: string[] = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId: string) => 
+            categoryId === forum?.categoryId
+        );
+    }   
+
+    if(categoryId.length === 0) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to delete this forum of this category",
+        });
+    }
+
+    const deletedCommnet = await commentServices.deleteComment(id , res);
+
+    await prismadb.flaggedContent.update({
+        where: {
+            id: checkFlagged?.id
+        },
+        data: {
+            isDeleted: true
+        }
+    });
+    
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: "Comment deleted successfully",
-        data: comment,
+        data: {comment: deletedCommnet},
     });
 });
 

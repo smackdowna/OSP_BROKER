@@ -3,6 +3,8 @@ import { Request, Response, NextFunction } from "express";
 import sendResponse from "../../../middlewares/sendResponse";
 
 import { topicServices } from "./topic.services";
+import { getCategoryId } from "../../../utils/getCategoryId";
+import prismadb from "../../../db/prismaDb";
 
 // create topic
 const createTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -43,6 +45,42 @@ const getTopicById = catchAsyncError(async (req: Request, res: Response, next: N
 // update topic
 const updateTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic id is required",
+        });
+    }
+    if(req.cookies.user.role==="MODERATOR") {
+    const categoryIds = await getCategoryId(req, res);
+    const topic= await prismadb.topic.findFirst({
+        where: {
+            id: id,
+        }
+    });
+    const forum= await prismadb.forum.findFirst({
+        where: {
+            id: topic?.forumId,
+        }
+    });
+    let categoryId: string[] = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId: string) => 
+            categoryId === forum?.categoryId
+        );
+    }   
+    console.log("this is the category id", categoryId);
+
+    if(categoryId.length === 0) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to update this topic of this category",
+        });
+    }
+}
+
     const updatedTopic = await topicServices.updateTopic(id, res , req.body);
     sendResponse(res, {
         statusCode: 200,
@@ -55,7 +93,63 @@ const updateTopic = catchAsyncError(async (req: Request, res: Response, next: Ne
 // delete topic
 const deleteTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic id is required",
+        });
+    }
+    const checkFlagged= await prismadb.flaggedContent.findFirst({
+        where: {
+            topicId: id
+        }
+    })
+
+    if(checkFlagged?.isDeleted===true){
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "flagged topic is already deleted",
+        });
+    }
+    const categoryIds = await getCategoryId(req, res);
+    const topic= await prismadb.topic.findFirst({
+        where: {
+            id: id,
+        }
+    });
+    const forum= await prismadb.forum.findFirst({
+        where: {
+            id: topic?.forumId,
+        }
+    });
+    let categoryId: string[] = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId: string) => 
+            categoryId === forum?.categoryId
+        );
+    }   
+    console.log("this is the category id", categoryId);
+
+    if(categoryId.length === 0) {
+        return sendResponse(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to update this topic of this category",
+        });
+    }
     await topicServices.deleteTopic(id , res);
+
+    await prismadb.flaggedContent.update({
+        where: {
+            id: checkFlagged?.id
+        },
+        data: {
+            isDeleted: true
+        }
+    });
+
     sendResponse(res, {
         statusCode: 200,
         success: true,

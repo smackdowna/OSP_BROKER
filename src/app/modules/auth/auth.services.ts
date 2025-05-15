@@ -132,6 +132,10 @@ const loginUser = async (payload: TLoginAuth) => {
         throw new AppError(401, "Invalid credentials");
     }
 
+    if(user.isBanned) {
+        throw new AppError(401, "You are banned from this platform");
+    }
+
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {

@@ -17,12 +17,6 @@ const assignModerator = async (res: Response,userId: string,categoryId: string) 
     throw new AppError(404, "User not found");
   }
 
-  if (user.role === "MODERATOR") {
-    throw new AppError(400, "User is already a moderator");
-  }
-
-  
-
 const existingModerator = await prismadb.moderator.findFirst({
   where: {
     userId: user.id,
@@ -32,7 +26,6 @@ const existingModerator = await prismadb.moderator.findFirst({
 let moderator;
 
 if (!existingModerator) {
-  // If no moderator exists, create a new one
    moderator = await prismadb.moderator.create({
     data: {
       userId: user.id,
@@ -40,13 +33,12 @@ if (!existingModerator) {
     },
   });
 } else {
-  // If moderator exists, update by appending the new categoryId
    moderator = await prismadb.moderator.update({
     where: {
       userId: user.id,
     },
     data: {
-      categoryIds: [...existingModerator.categoryIds, categoryId], // Spread existing and add new
+      categoryIds: [...existingModerator.categoryIds, categoryId], 
     },
   });
 }
