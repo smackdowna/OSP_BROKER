@@ -7,5 +7,7 @@ const router = express.Router();
 
 // Moderator routes
 router.post('/banUser/:userId', verifyToken, authorizeRole("MODERATOR"), moderatorController.banUser);
+router.get('/', verifyToken, authorizeRole("MODERATOR"), moderatorController.getAllModerators);
+
 
 export const moderatorRouter = router;

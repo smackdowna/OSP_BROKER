@@ -16,6 +16,8 @@ exports.membershipServices = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
+const auth_utils_1 = require("../auth/auth.utils");
+const config_1 = __importDefault(require("../../config"));
 // create membership plan
 const createMembershipPlan = (membershipPlanInterface) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, price, duration } = membershipPlanInterface;
@@ -167,24 +169,15 @@ const createUserMembership = (userMembershipInterface) => __awaiter(void 0, void
             status,
         },
     });
-    return { userMembership };
+    const jwtPayload = {
+        userId: userMembership.userId.toString()
+    };
+    const membershipToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_membership_secret, config_1.default.jwt_membership_expires_in);
+    return { userMembership, membershipToken };
 });
 // get all user memberships
 const getAllUserMemberships = () => __awaiter(void 0, void 0, void 0, function* () {
-    const userMemberships = yield prismaDb_1.default.userMembership.findMany({
-        include: {
-            User: {
-                select: {
-                    fullName: true
-                }
-            },
-            MembershipPlan: {
-                select: {
-                    name: true
-                }
-            }
-        },
-    });
+    const userMemberships = yield prismaDb_1.default.userMembership.findMany({});
     if (!userMemberships) {
         throw new appError_1.default(404, "No user memberships found");
     }
@@ -198,19 +191,7 @@ const getUserMembershipById = (id, res) => __awaiter(void 0, void 0, void 0, fun
     const userMembership = yield prismaDb_1.default.userMembership.findFirst({
         where: {
             id: id,
-        },
-        include: {
-            User: {
-                select: {
-                    fullName: true
-                }
-            },
-            MembershipPlan: {
-                select: {
-                    name: true
-                }
-            }
-        },
+        }
     });
     if (!userMembership) {
         (0, sendResponse_1.default)(res, {
@@ -219,7 +200,7 @@ const getUserMembershipById = (id, res) => __awaiter(void 0, void 0, void 0, fun
             message: "No user membership found with this id",
         });
     }
-    return { userMembership };
+    return userMembership;
 });
 // update user membership
 const updateUserMembership = (id, res, userMembershipInterface) => __awaiter(void 0, void 0, void 0, function* () {

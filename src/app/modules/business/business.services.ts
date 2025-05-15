@@ -261,21 +261,11 @@ const createRepresentative = async (representative: TRepresentative) => {
         throw new AppError(400, "Representative already exists with this id");
     }
 
-    await prismadb.user.update({
-        where:{
-            id: userId
-        },
-        data:{
-            role: "REPRESENTATIVE",
-            representative:{
-                create:{
-                    department,
-                    message,
-                    businessId
-                }
-            }
-        }
-    })
+    const user = await prismadb.user.findFirst({ where: { id: userId } });
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
+
 
     const representativeBody = await prismadb.representative.create({
         data: {
@@ -292,13 +282,13 @@ const createRepresentative = async (representative: TRepresentative) => {
 // get all representatives
 const getAllRepresentatives = async () => {
     const representatives = await prismadb.representative.findMany({
-        include: {
-            Business: {
-                select: {
-                    businessName: true
-                }
-            }
-        }
+        // include: {
+        //     Business: {
+        //         select: {
+        //             businessName: true
+        //         }
+        //     }
+        // }
     });
 
     if (!representatives) {
@@ -404,6 +394,17 @@ const deleteRepresentative = async (id: string, res: Response) => {
     return { representative: deletedRepresentative };
 }
 
+// delete all representatives
+const deleteAllRepresentatives = async () => {
+    const representatives = await prismadb.representative.deleteMany();
+
+    if (!representatives) {
+        throw new AppError(404, "No representatives found");
+    }
+
+    return { representatives };
+}
+
 export const businessServices = {
     createBusiness,
     getAllBusinesses,
@@ -414,5 +415,6 @@ export const businessServices = {
     getAllRepresentatives,
     getRepresentativeById,
     updateRepresentative,
-    deleteRepresentative
+    deleteRepresentative,
+    deleteAllRepresentatives
 }

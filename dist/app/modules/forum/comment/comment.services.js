@@ -16,10 +16,11 @@ exports.commentServices = void 0;
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
+const notifyUser_1 = require("../../../utils/notifyUser");
 // create comment 
 const createComment = (commentBody) => __awaiter(void 0, void 0, void 0, function* () {
-    const { comment, topicId, author } = commentBody;
-    if (!comment || !topicId || !author) {
+    const { comment, topicId, author, commenterId } = commentBody;
+    if (!comment || !topicId || !author || !commenterId) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingComment = yield prismaDb_1.default.comment.findFirst({
@@ -30,14 +31,58 @@ const createComment = (commentBody) => __awaiter(void 0, void 0, void 0, functio
     if (existingComment) {
         throw new appError_1.default(400, "Comment already exists with this content");
     }
+    const topic = yield prismaDb_1.default.topic.findFirst({
+        where: {
+            id: topicId,
+        },
+    });
+    const id = topic === null || topic === void 0 ? void 0 : topic.forumId;
+    const forum = yield prismaDb_1.default.forum.findFirst({
+        where: {
+            id: id
+        },
+    });
+    if ((forum === null || forum === void 0 ? void 0 : forum.userId) && forum.userId !== commenterId) {
+        yield prismaDb_1.default.notification.create({
+            data: {
+                type: "COMMENT",
+                message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
+                recipient: forum.userId,
+                sender: commenterId
+            },
+        });
+    }
+    ;
+    // send real time notification to the user
+    if (forum) {
+        (0, notifyUser_1.notifyUser)(forum === null || forum === void 0 ? void 0 : forum.userId, {
+            type: "COMMENT",
+            message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
+            recipient: forum.userId,
+            sender: commenterId
+        });
+    }
     const newComment = yield prismaDb_1.default.comment.create({
         data: {
             comment,
             topicId,
             author,
+            commenterId
         },
     });
     return { comment: newComment };
+});
+// get all notifications
+const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const notifications = yield prismaDb_1.default.notification.findMany({
+        where: {
+            sender: userId,
+        },
+    });
+    if (!notifications) {
+        throw new appError_1.default(404, "No notifications found");
+    }
+    return { notifications };
 });
 // get all comments
 const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -147,4 +192,5 @@ exports.commentServices = {
     getCommentById,
     updateComment,
     deleteComment,
+    getAllNotifications,
 };

@@ -23,14 +23,7 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
-// const corsOptions = {
-//   origin: ["http://localhost:8080", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"],
-//   credentials: true,
-//   methods: ["GET", "POST", "DELETE", "PUT"],
-// };
-// app.use(cors(corsOptions));
-// app.options("*", cors(corsOptions)); 
-app.use((0, cors_1.default)({ origin: ["http://localhost:8080", "http://localhost:5173", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
+app.use((0, cors_1.default)({ origin: ["http://localhost:8080", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
 app.use(express_1.default.json());
 if (config_1.default.node_env === "development") {
     app.use((0, morgan_1.default)("tiny"));
@@ -45,3 +38,4 @@ app.use(globalErrorHandler_1.default);
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${config_1.default.port}`);
 });
+exports.default = app;

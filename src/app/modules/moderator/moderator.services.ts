@@ -33,7 +33,27 @@ const banUser = async (res: Response, userId: string) => {
   return updatedUser;
 };
 
+// get all moderators
+const getAllModerators = async (res: Response) => {
+  const moderators = await prismadb.moderator.findMany();
+
+  if (!moderators) {
+    return(
+        sendResponse( res,
+            {
+                statusCode: 404,
+                success: false,
+                message: "No moderators found"
+            }
+        )
+    )
+  }
+
+  return moderators;
+}
+
 
 export const moderatorServices = {
   banUser,
+  getAllModerators
 };

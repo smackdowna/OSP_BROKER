@@ -178,6 +178,16 @@ const deleteRepresentative = catchAsyncError(async (req: Request, res: Response,
     });
 });
 
+// delete all representatives
+const deleteAllRepresentatives = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    await businessServices.deleteAllRepresentatives();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All representatives deleted successfully",
+    });
+});
+
 export const businessController = {
     createBusiness,
     getAllBusinesses,
@@ -188,5 +198,6 @@ export const businessController = {
     getAllRepresentatives,
     getRepresentativeById,
     updateRepresentative,
-    deleteRepresentative
+    deleteRepresentative,
+    deleteAllRepresentatives
 }

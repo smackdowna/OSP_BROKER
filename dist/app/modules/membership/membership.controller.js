@@ -19,7 +19,12 @@ const membership_services_1 = require("./membership.services");
 // create membership plan
 const createMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, description, price, duration } = req.body;
-    const membershipPlan = yield membership_services_1.membershipServices.createMembershipPlan({ name, description, price, duration });
+    const membershipPlan = yield membership_services_1.membershipServices.createMembershipPlan({
+        name,
+        description,
+        price,
+        duration,
+    });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -71,9 +76,20 @@ const deleteMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => 
 }));
 // create user membership
 const createUserMembership = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.params.id;
-    const { membershipPlanId, startDate, endDate, status } = req.body;
-    const userMembership = yield membership_services_1.membershipServices.createUserMembership({ userId, membershipPlanId, startDate, endDate, status });
+    const { membershipPlanId, startDate, endDate, status, userId } = req.body;
+    const { userMembership, membershipToken } = yield membership_services_1.membershipServices.createUserMembership({
+        userId,
+        membershipPlanId,
+        startDate,
+        endDate,
+        status,
+    });
+    res.cookie("membership", membershipToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
+    });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

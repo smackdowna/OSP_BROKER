@@ -28,6 +28,9 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const appError_1 = __importDefault(require("../../errors/appError"));
 const auth_utils_1 = require("./auth.utils");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const oAuth_config_1 = __importDefault(require("../../config/oAuth.config"));
+const axios_1 = __importDefault(require("axios"));
+const apple_signin_auth_1 = __importDefault(require("apple-signin-auth"));
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const config_1 = __importDefault(require("../../config"));
 const zod_1 = __importDefault(require("zod"));
@@ -62,7 +65,18 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     };
     // Set dynamic include option based on the role
     const relationName = roleToRelation[role];
-    const includeOption = relationName ? { [relationName]: true } : {};
+    let includeOption = {};
+    if (relationName === "representative") {
+        includeOption = {
+            representative: true,
+            userProfile: true
+        };
+    }
+    else {
+        includeOption = relationName ? {
+            [relationName]: true
+        } : {};
+    }
     const user = yield prismaDb_1.default.user.create({
         data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ fullName,
             email, password: hashedPassword, role,
@@ -114,6 +128,9 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     });
     if (!user) {
         throw new appError_1.default(401, "Invalid credentials");
+    }
+    if (user.isBanned) {
+        throw new appError_1.default(401, "You are banned from this platform");
     }
     const isPasswordMatch = yield bcrypt_1.default.compare(password, user.password);
     if (!isPasswordMatch) {
@@ -185,10 +202,126 @@ const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const { password } = user, userWithoutPassword = __rest(user, ["password"]);
     return userWithoutPassword;
 });
+// google authentication
+const googleSignIn = (code) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!code) {
+        throw new appError_1.default(400, "Please provide code");
+    }
+    console.log("This is code", code);
+    const { tokens } = yield oAuth_config_1.default.getToken({
+        code,
+        redirect_uri: config_1.default.google_redirect_uri
+    });
+    oAuth_config_1.default.setCredentials(tokens);
+    const userRes = yield axios_1.default.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${tokens.access_token}`);
+    console.log("This is userRes", userRes);
+    if (!userRes) {
+        throw new appError_1.default(400, "Unable to fetch user data from google");
+    }
+    // check existing user
+    let user = yield prismaDb_1.default.user.findFirst({
+        where: {
+            email: userRes.data.email
+        }
+    });
+    if (!user) {
+        user = yield prismaDb_1.default.user.create({
+            data: {
+                fullName: userRes.data.name,
+                email: userRes.data.email,
+                password: "",
+                role: "USER",
+                phone: "",
+                userProfile: {
+                    create: {
+                        headLine: "",
+                        location: "",
+                        about: "",
+                        profileImageUrl: userRes.data.picture,
+                        skills: [],
+                        socialLinks: [],
+                        education: {
+                            create: []
+                        },
+                        experience: {
+                            create: []
+                        }
+                    }
+                }
+            }
+        });
+    }
+    const accessToken = (0, auth_utils_1.createToken)({
+        userId: user.id.toString(),
+        email: user.email,
+        role: user.role
+    }, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    return {
+        accessToken,
+        user
+    };
+});
+const appleSignIn = (id_token) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id_token) {
+        throw new appError_1.default(400, "Please provide code");
+    }
+    const userData = yield apple_signin_auth_1.default.verifyIdToken(id_token, {
+        audience: config_1.default.apple_client_id,
+        ignoreExpiration: true,
+    });
+    if (!userData || !userData.email) {
+        throw new appError_1.default(400, "Unable to fetch user data from apple");
+    }
+    console.log("This is userData", userData);
+    const email = userData.email;
+    let user = yield prismaDb_1.default.user.findFirst({
+        where: {
+            email: email
+        }
+    });
+    if (!user) {
+        user = yield prismaDb_1.default.user.create({
+            data: {
+                fullName: "apple user",
+                email: userData.email,
+                password: "",
+                role: "USER",
+                phone: "",
+                userProfile: {
+                    create: {
+                        headLine: "",
+                        location: "",
+                        about: "",
+                        profileImageUrl: "",
+                        skills: [],
+                        socialLinks: [],
+                        education: {
+                            create: []
+                        },
+                        experience: {
+                            create: []
+                        }
+                    }
+                }
+            }
+        });
+    }
+    const accessToken = (0, auth_utils_1.createToken)({
+        userId: user.id.toString(),
+        email: user.email,
+        role: user.role
+    }, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    return {
+        accessToken,
+        user
+    };
+});
 exports.authServices = {
     createUser,
     loginUser,
     refreshToken,
     getUsers,
-    getUserById
+    getUserById,
+    googleSignIn,
+    appleSignIn
 };

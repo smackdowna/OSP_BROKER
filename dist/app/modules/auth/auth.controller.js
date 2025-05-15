@@ -45,7 +45,6 @@ const loginUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-    // res.setHeader("Authorization", `Bearer ${accessToken}`);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -99,10 +98,70 @@ const getSingleUser = (0, catchAsyncError_1.default)((req, res, next) => __await
         data: user,
     });
 }));
+// google signin
+const googleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { code } = req.body;
+    if (!code) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Please provide code",
+            data: null,
+        });
+    }
+    const result = yield auth_services_1.authServices.googleSignIn(code);
+    const { accessToken, user } = result;
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: config_1.default.node_env === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    return ((0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Login successful",
+        data: {
+            user: user,
+            accessToken: accessToken,
+        }
+    }));
+}));
+// apple signin
+const appleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { code } = req.body;
+    if (!code) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Please provide code",
+            data: null,
+        });
+    }
+    const result = yield auth_services_1.authServices.appleSignIn(code);
+    const { accessToken, user } = result;
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: config_1.default.node_env === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+    return ((0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Login successful",
+        data: {
+            user: user,
+            accessToken: accessToken,
+        }
+    }));
+}));
 exports.authControllers = {
     createUser,
     loginUser,
     refreshToken,
     getAllUsers,
-    getSingleUser
+    getSingleUser,
+    googleSignIn,
+    appleSignIn
 };

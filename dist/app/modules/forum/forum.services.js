@@ -18,8 +18,8 @@ const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create forum 
 const createForum = (forum) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, description, author, categoryId } = forum;
-    if (!title || !description || !author || !categoryId) {
+    const { title, description, author, categoryId, userId } = forum;
+    if (!title || !description || !author || !categoryId || !userId) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingForum = yield prismaDb_1.default.forum.findFirst({
@@ -36,6 +36,7 @@ const createForum = (forum) => __awaiter(void 0, void 0, void 0, function* () {
             description,
             author,
             categoryId,
+            userId
         },
     });
     return { forum: forumBody };
@@ -106,7 +107,7 @@ const getForumById = (forumId, res) => __awaiter(void 0, void 0, void 0, functio
     return { forum };
 });
 // update forum 
-const updateForum = (forumId, res, forum) => __awaiter(void 0, void 0, void 0, function* () {
+const updateForum = (forumId, req, res, forum) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, description } = forum;
     if (!title || !description) {
         throw new appError_1.default(400, "please provide all fields");
@@ -155,10 +156,19 @@ const deleteForum = (forumId, res) => __awaiter(void 0, void 0, void 0, function
     });
     return { deletedForum };
 });
+// delete all forums
+const deleteAllForums = () => __awaiter(void 0, void 0, void 0, function* () {
+    const deletedForums = yield prismaDb_1.default.forum.deleteMany();
+    if (!deletedForums) {
+        throw new appError_1.default(404, "No forums found");
+    }
+    return { deletedForums };
+});
 exports.forumServices = {
     createForum,
     getAllForums,
     getForumById,
     updateForum,
     deleteForum,
+    deleteAllForums
 };

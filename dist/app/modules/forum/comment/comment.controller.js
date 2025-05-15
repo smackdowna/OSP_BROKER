@@ -16,15 +16,29 @@ exports.commentController = void 0;
 const catchAsyncError_1 = __importDefault(require("../../../utils/catchAsyncError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 const comment_services_1 = require("./comment.services");
+const getCategoryId_1 = require("../../../utils/getCategoryId");
+const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 // create comment
 const createComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { commenterId } = req.params;
     const { comment, author, topicId } = req.body;
-    const newComment = yield comment_services_1.commentServices.createComment({ comment, author, topicId });
+    const newComment = yield comment_services_1.commentServices.createComment({ comment, author, topicId, commenterId });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
         message: "Comment created successfully",
         data: newComment,
+    });
+}));
+// get all notifications
+const getAllNotifications = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    const notifications = yield comment_services_1.commentServices.getAllNotifications(userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All notifications fetched successfully",
+        data: notifications,
     });
 }));
 // get all comments
@@ -61,6 +75,13 @@ const deleteAllComments = (0, catchAsyncError_1.default)((req, res, next) => __a
 // update comment
 const updateComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        });
+    }
     const updatedComment = yield comment_services_1.commentServices.updateComment(id, res, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -72,12 +93,66 @@ const updateComment = (0, catchAsyncError_1.default)((req, res, next) => __await
 // delete comment
 const deleteComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const comment = yield comment_services_1.commentServices.deleteComment(id, res);
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        });
+    }
+    const checkFlagged = yield prismaDb_1.default.flaggedContent.findFirst({
+        where: {
+            commentId: id
+        }
+    });
+    if ((checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.isDeleted) === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 403,
+            success: false,
+            message: "Flagged comment is already deleted",
+        });
+    }
+    const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
+    const comment = yield prismaDb_1.default.comment.findFirst({
+        where: {
+            id: id,
+        }
+    });
+    const topic = yield prismaDb_1.default.topic.findFirst({
+        where: {
+            id: comment === null || comment === void 0 ? void 0 : comment.topicId,
+        }
+    });
+    const forum = yield prismaDb_1.default.forum.findFirst({
+        where: {
+            id: topic === null || topic === void 0 ? void 0 : topic.forumId,
+        }
+    });
+    let categoryId = [];
+    if (Array.isArray(categoryIds)) {
+        categoryId = categoryIds.filter((categoryId) => categoryId === (forum === null || forum === void 0 ? void 0 : forum.categoryId));
+    }
+    if (categoryId.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to delete this forum of this category",
+        });
+    }
+    const deletedCommnet = yield comment_services_1.commentServices.deleteComment(id, res);
+    yield prismaDb_1.default.flaggedContent.update({
+        where: {
+            id: checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.id
+        },
+        data: {
+            isDeleted: true
+        }
+    });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
         message: "Comment deleted successfully",
-        data: comment,
+        data: { comment: deletedCommnet },
     });
 }));
 exports.commentController = {
@@ -87,4 +162,5 @@ exports.commentController = {
     getCommentById,
     updateComment,
     deleteComment,
+    getAllNotifications,
 };
