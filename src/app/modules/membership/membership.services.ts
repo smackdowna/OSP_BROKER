@@ -1,15 +1,13 @@
 import { TMembershipPlan , TUserMembership , TPaymentRecord } from "./membership.interface";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
-import { Request, Response, NextFunction } from "express";
+import {  Response } from "express";
 import sendResponse from "../../middlewares/sendResponse";
-import { createToken } from "../auth/auth.utils";
-import config from "../../config";
 
 // create membership plan
 const createMembershipPlan = async(membershipPlanInterface: TMembershipPlan) => {
-    const {name , description, price, duration} = membershipPlanInterface;
-    if(!name || !description || !price || !duration) {
+    const {name , description, price, billingCycle , features} = membershipPlanInterface;
+    if(!name || !description || !price || !billingCycle || !features) {
         throw new AppError(400, "please provide all fields");
     }
     const existingMembershipPlan = await prismadb.membershipPlan.findFirst({
@@ -25,7 +23,8 @@ const createMembershipPlan = async(membershipPlanInterface: TMembershipPlan) => 
             name,
             description,
             price,
-            duration,
+            billingCycle,
+            features
         },
     })
     return {membershipPlan};
@@ -78,11 +77,11 @@ const getMembershipPlanById = async(id: string  , res:Response) => {
 
 // update membership plan
 const updateMembershipPlan = async(id: string,res:Response, membershipPlanInterface: TMembershipPlan) => {
-    const {name , description, price, duration} = membershipPlanInterface;
+    const {name , description, price, billingCycle, features} = membershipPlanInterface;
     if(!id) {
         throw new AppError(400, "please provide id");
     }
-    if(!name || !description || !price || !duration) {
+    if(!name || !description || !price || !billingCycle || !features) {
         throw new AppError(400, "please provide all fields");
     }
     const existingMembershipPlan = await prismadb.membershipPlan.findFirst({
@@ -105,7 +104,8 @@ const updateMembershipPlan = async(id: string,res:Response, membershipPlanInterf
             name,
             description,
             price,
-            duration,
+            billingCycle,
+            features,
         },
     })
     return {membershipPlan};
@@ -140,11 +140,10 @@ const deleteMembershipPlan = async(id: string , res:Response) => {
     return {membershipPlan};
 };
 
-
 // create user membership
 const createUserMembership= async(userMembershipInterface: TUserMembership) => {
     const {userId , membershipPlanId, startDate, endDate, status} = userMembershipInterface;
-    if(!userId || !membershipPlanId || !startDate || !endDate || !status) {
+    if(!userId || !membershipPlanId || !startDate || !endDate ) {
         throw new AppError(400, "please provide all fields");
     }
     const existingUserMembership = await prismadb.userMembership.findFirst({
@@ -165,18 +164,7 @@ const createUserMembership= async(userMembershipInterface: TUserMembership) => {
             status,
         },
     })
-
-    const jwtPayload = {
-        userId: userMembership.userId.toString()
-    };
-
-    const membershipToken = createToken(
-        jwtPayload,
-        config.jwt_membership_secret as string,
-        config.jwt_membership_expires_in as string
-    );
-
-    return {userMembership , membershipToken};
+    return {userMembership };
 }
 
 // get all user memberships
@@ -210,12 +198,11 @@ const getUserMembershipById = async(id: string , res:Response) => {
 }
 
 // update user membership
-const updateUserMembership = async(id: string , res:Response, userMembershipInterface: TUserMembership) => {
-    const {  startDate, endDate, status} = userMembershipInterface;
+const updateUserMembership = async(id: string , res:Response, status: string) => {
     if(!id) {
         throw new AppError(400, "please provide id");
     }
-    if( !startDate || !endDate || !status) {
+    if( !status ) {
         throw new AppError(400, "please provide all fields");
     }
     const existingUserMembership = await prismadb.userMembership.findFirst({
@@ -235,8 +222,6 @@ const updateUserMembership = async(id: string , res:Response, userMembershipInte
             id: id,
         },
         data: {
-            startDate,
-            endDate,
             status,
         },
     })

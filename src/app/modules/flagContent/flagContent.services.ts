@@ -122,7 +122,8 @@ const getAllFlaggedContent = async (req: Request, res: Response) => {
         const flaggedContent = await prismadb.flaggedContent.findMany({
             where: {
                 isDeleted: false,
-            },
+                userId: null
+            }
         });
 
         if (!flaggedContent || flaggedContent.length === 0) {
@@ -179,10 +180,34 @@ const getFlaggedContentById = async (res: Response, flaggedContentId: string) =>
     return flaggedContent;
 }
 
+// get flagged users
+const getFlaggedUsers = async (res: Response) => {
+    const flaggedUsers = await prismadb.flaggedContent.findMany({
+        where: {
+            isDeleted: false,
+            userId: {
+                not: null,
+            },
+        },
+    });
+
+    if (!flaggedUsers) {
+        return(
+            sendResponse(res,{
+                success: false,
+                statusCode: 404,
+                message: "No flagged users found",
+            })
+        )
+    }
+    return flaggedUsers;
+}
+
 export const flagContentServices = {
     flagTopic,
     flagComment,
     flagUser,
     getAllFlaggedContent,
-    getFlaggedContentById
+    getFlaggedContentById,
+    getFlaggedUsers
 }

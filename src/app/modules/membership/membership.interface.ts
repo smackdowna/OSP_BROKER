@@ -2,7 +2,8 @@ export type TMembershipPlan = {
     name: string;
     description: string;
     price: number;
-    duration: number;
+    billingCycle: string;
+    features: string[];
     userMembership?: TUserMembership[]; 
   };
   
@@ -11,7 +12,7 @@ export type TMembershipPlan = {
     membershipPlanId: string;
     startDate: string; 
     endDate: string; 
-    status: string;
+    status?: string;
     paymentRecord?: TPaymentRecord[]; 
   };
   

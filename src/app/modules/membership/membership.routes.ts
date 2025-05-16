@@ -20,5 +20,4 @@ router.get("/:id", verifyToken, membershipController.getMembershipPlanById);
 router.put("/:id", verifyToken,authorizeRole("ADMIN"), membershipController.updateMembershipPlan);
 router.delete("/:id", verifyToken,authorizeRole("ADMIN"), membershipController.deleteMembershipPlan);
 
-
 export const membershipRouter= router;

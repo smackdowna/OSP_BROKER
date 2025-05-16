@@ -73,10 +73,21 @@ const getFlaggedContentById = (0, catchAsyncError_1.default)((req, res, next) =>
         data: flaggedContent,
     });
 }));
+// get all flagged users
+const getAllFlaggedUsers = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const flaggedUsers = yield flagContent_services_1.flagContentServices.getFlaggedUsers(res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All flagged users",
+        data: flaggedUsers,
+    });
+}));
 exports.flagContentController = {
     flagTopic,
     flagComment,
     flagUser,
     getAllFlaggedContent,
-    getFlaggedContentById
+    getFlaggedContentById,
+    getAllFlaggedUsers
 };

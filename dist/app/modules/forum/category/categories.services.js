@@ -18,8 +18,8 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create category
 const createCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = category;
-    if (!name) {
+    const { name, description, moderatorId, icon, membership_access } = category;
+    if (!name || !description || !moderatorId || !membership_access) {
         throw new appError_1.default(400, "name field is required");
     }
     const existingCategory = yield prismaDb_1.default.categories.findFirst({
@@ -32,7 +32,11 @@ const createCategory = (category) => __awaiter(void 0, void 0, void 0, function*
     }
     const Category = yield prismaDb_1.default.categories.create({
         data: {
-            name
+            name,
+            description,
+            moderatorId,
+            icon,
+            membership_access
         },
     });
     return { Category };
@@ -78,8 +82,8 @@ const getCategoryById = (categoryId, res) => __awaiter(void 0, void 0, void 0, f
 });
 // update category
 const updateCategory = (categoryId, res, category) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name } = category;
-    if (!name) {
+    const { name, description, icon, membership_access } = category;
+    if (!name || !description || !icon || !membership_access) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingCategory = yield prismaDb_1.default.categories.findFirst({
@@ -100,6 +104,9 @@ const updateCategory = (categoryId, res, category) => __awaiter(void 0, void 0, 
         },
         data: {
             name,
+            description,
+            icon,
+            membership_access
         },
     });
     return { updatedCategory };

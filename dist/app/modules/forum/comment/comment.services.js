@@ -23,14 +23,6 @@ const createComment = (commentBody) => __awaiter(void 0, void 0, void 0, functio
     if (!comment || !topicId || !author || !commenterId) {
         throw new appError_1.default(400, "please provide all fields");
     }
-    const existingComment = yield prismaDb_1.default.comment.findFirst({
-        where: {
-            comment: comment,
-        },
-    });
-    if (existingComment) {
-        throw new appError_1.default(400, "Comment already exists with this content");
-    }
     const topic = yield prismaDb_1.default.topic.findFirst({
         where: {
             id: topicId,
@@ -165,18 +157,6 @@ const updateComment = (commentId, res, commentBody) => __awaiter(void 0, void 0,
 const deleteComment = (commentId, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to deleteTopic");
-    }
-    const existingComment = yield prismaDb_1.default.comment.findFirst({
-        where: {
-            id: commentId,
-        },
-    });
-    if (!existingComment) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 404,
-            success: false,
-            message: "Comment not found with this id",
-        }));
     }
     const deletedComment = yield prismaDb_1.default.comment.delete({
         where: {

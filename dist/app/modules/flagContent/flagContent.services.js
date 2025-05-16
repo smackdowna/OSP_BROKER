@@ -115,7 +115,8 @@ const getAllFlaggedContent = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const flaggedContent = yield prismaDb_1.default.flaggedContent.findMany({
             where: {
                 isDeleted: false,
-            },
+                userId: null
+            }
         });
         if (!flaggedContent || flaggedContent.length === 0) {
             return (0, sendResponse_1.default)(res, {
@@ -161,10 +162,30 @@ const getFlaggedContentById = (res, flaggedContentId) => __awaiter(void 0, void 
     }
     return flaggedContent;
 });
+// get flagged users
+const getFlaggedUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const flaggedUsers = yield prismaDb_1.default.flaggedContent.findMany({
+        where: {
+            isDeleted: false,
+            userId: {
+                not: null,
+            },
+        },
+    });
+    if (!flaggedUsers) {
+        return ((0, sendResponse_1.default)(res, {
+            success: false,
+            statusCode: 404,
+            message: "No flagged users found",
+        }));
+    }
+    return flaggedUsers;
+});
 exports.flagContentServices = {
     flagTopic,
     flagComment,
     flagUser,
     getAllFlaggedContent,
-    getFlaggedContentById
+    getFlaggedContentById,
+    getFlaggedUsers
 };

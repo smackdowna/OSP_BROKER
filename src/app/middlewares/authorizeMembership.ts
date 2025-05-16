@@ -13,11 +13,17 @@ interface DecodedToken extends JwtPayload {
   }
 
 export const verifyMembership = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.membership || "";
+
+
+    if(req.cookies.user.role==="ADMIN"){
+        return next();
+    }
+    const token = req.cookies.accessToken || "";
     if (!token) return res.status(401).json({ message: "unauthorized access" });
 
-    const decoded = jwt.verify(token, config.jwt_membership_secret as string) as DecodedToken;
+    const decoded = jwt.verify(token, config.jwt_access_secret as string) as DecodedToken;
     req.cookies.user=decoded;
+    console.log(req.cookies.user);
 
     const user = await prismadb.user.findFirst({
             where: {
@@ -28,9 +34,23 @@ export const verifyMembership = catchAsyncError(async (req: Request, res: Respon
     if(!user) return sendResponse(res, {
         statusCode: 401,
         success: false,
-        message: "Unauthorized",
+        message: "Unauthorized access",
         data: null,
     });
-    
+
+    console.log("user", user.id);
+
+    const membership = await prismadb.userMembership.findFirst({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    if(!membership) return sendResponse(res, {
+        statusCode: 401,
+        success: false,
+        message: "Unauthorized access",
+    });
+
     next();
 });

@@ -6,8 +6,8 @@ import sendResponse from "../../../middlewares/sendResponse";
 
 // create category
 const createCategory = async (category: TCategory) => {
-    const { name } = category;
-    if (!name) {
+    const { name , description , moderatorId , icon, membership_access} = category;
+    if (!name || !description || !moderatorId || !membership_access) {
         throw new AppError(400, "name field is required");
     }
     const existingCategory = await prismadb.categories.findFirst({
@@ -20,7 +20,11 @@ const createCategory = async (category: TCategory) => {
     }
     const Category = await prismadb.categories.create({
         data: {
-            name
+            name , 
+            description ,
+            moderatorId ,
+            icon,
+            membership_access
         },
     });
     return {Category};
@@ -71,8 +75,8 @@ const getCategoryById= async (categoryId: string , res: Response) => {
 
 // update category
 const updateCategory = async (categoryId: string,res: Response, category: Partial<TCategory>) => {
-    const { name } = category;
-    if (!name) {
+    const { name, description , icon , membership_access } = category;
+    if (!name || !description || !icon || !membership_access) {
         throw new AppError(400, "please provide all fields");
     }
     const existingCategory = await prismadb.categories.findFirst({
@@ -95,6 +99,9 @@ const updateCategory = async (categoryId: string,res: Response, category: Partia
         },
         data: {
             name,
+            description,
+            icon,
+            membership_access
         },
     });
     return {updatedCategory};
@@ -123,6 +130,7 @@ const deleteCategory = async (categoryId: string ,res: Response) => {
     });
     return {deletedCategory};
 }
+
 
 export const categoriesServices = {
     createCategory,

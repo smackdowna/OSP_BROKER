@@ -157,10 +157,22 @@ const deleteTopic = catchAsyncError(async (req: Request, res: Response, next: Ne
     });
 });
 
+// delete all topics
+const deleteAllTopics = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const deletedTopics = await topicServices.deleteAllTopics(res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All topics deleted successfully",
+        data: deletedTopics,
+    });
+});
+
 export const topicController = {
     createTopic,
     getAllTopics,
     getTopicById,
     updateTopic,
-    deleteTopic
+    deleteTopic,
+    deleteAllTopics,
 };

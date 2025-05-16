@@ -144,10 +144,23 @@ const deleteTopic = (topicId, res) => __awaiter(void 0, void 0, void 0, function
     });
     return { deletedTopic };
 });
+// delete all topics
+const deleteAllTopics = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const deletedTopics = yield prismaDb_1.default.topic.deleteMany();
+    if (!deletedTopics) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No topics found",
+        }));
+    }
+    return { deletedTopics };
+});
 exports.topicServices = {
     createTopic,
     getAllTopics,
     getTopicById,
     updateTopic,
     deleteTopic,
+    deleteAllTopics,
 };

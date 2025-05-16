@@ -7,8 +7,8 @@ import { categoriesServices } from "./categories.services";
 // create category
 const createCategory = catchAsyncError(
     async (req: Request, res: Response, next: NextFunction) => {
-        const { name } = req.body;
-        const category = await categoriesServices.createCategory({name});
+        const { name , description , moderatorId , icon, membership_access } = req.body;
+        const category = await categoriesServices.createCategory({name , description , moderatorId , icon, membership_access});
         sendResponse(res, {
             statusCode: 200,
             success: true,

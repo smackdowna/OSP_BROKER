@@ -19,11 +19,15 @@ const config_1 = __importDefault(require("../config"));
 const prismaDb_1 = __importDefault(require("../db/prismaDb"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.verifyMembership = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.membership || "";
+    if (req.cookies.user.role === "ADMIN") {
+        return next();
+    }
+    const token = req.cookies.accessToken || "";
     if (!token)
         return res.status(401).json({ message: "unauthorized access" });
-    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_membership_secret);
+    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
     req.cookies.user = decoded;
+    console.log(req.cookies.user);
     const user = yield prismaDb_1.default.user.findFirst({
         where: {
             id: decoded.userId,
@@ -33,8 +37,20 @@ exports.verifyMembership = (0, catchAsyncError_1.default)((req, res, next) => __
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
             success: false,
-            message: "Unauthorized",
+            message: "Unauthorized access",
             data: null,
+        });
+    console.log("user", user.id);
+    const membership = yield prismaDb_1.default.userMembership.findFirst({
+        where: {
+            userId: user.id,
+        }
+    });
+    if (!membership)
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 401,
+            success: false,
+            message: "Unauthorized access",
         });
     next();
 }));

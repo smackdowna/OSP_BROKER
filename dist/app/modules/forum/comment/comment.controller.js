@@ -22,7 +22,12 @@ const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const createComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { commenterId } = req.params;
     const { comment, author, topicId } = req.body;
-    const newComment = yield comment_services_1.commentServices.createComment({ comment, author, topicId, commenterId });
+    const newComment = yield comment_services_1.commentServices.createComment({
+        comment,
+        author,
+        topicId,
+        commenterId,
+    });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -100,54 +105,84 @@ const deleteComment = (0, catchAsyncError_1.default)((req, res, next) => __await
             message: "Comment id is required",
         });
     }
-    const checkFlagged = yield prismaDb_1.default.flaggedContent.findFirst({
-        where: {
-            commentId: id
-        }
-    });
-    if ((checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.isDeleted) === true) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 403,
-            success: false,
-            message: "Flagged comment is already deleted",
+    if (req.cookies.user.role === "USER") {
+        const comment = yield prismaDb_1.default.comment.findFirst({
+            where: {
+                id: id,
+            },
         });
+        if (!comment) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found",
+            });
+        }
+        if (req.cookies.user.userId !== (comment === null || comment === void 0 ? void 0 : comment.commenterId)) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to delete this comment",
+            });
+        }
     }
-    const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
-    const comment = yield prismaDb_1.default.comment.findFirst({
-        where: {
-            id: id,
+    if (req.cookies.user.role === "MODERATOR") {
+        const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
+        const checkFlagged = yield prismaDb_1.default.flaggedContent.findFirst({
+            where: {
+                commentId: id,
+            },
+        });
+        if (!checkFlagged) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "Comment is not flagged",
+            });
         }
-    });
-    const topic = yield prismaDb_1.default.topic.findFirst({
-        where: {
-            id: comment === null || comment === void 0 ? void 0 : comment.topicId,
+        if ((checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.isDeleted) === true) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "Flagged comment is already deleted or not flagged",
+            });
         }
-    });
-    const forum = yield prismaDb_1.default.forum.findFirst({
-        where: {
-            id: topic === null || topic === void 0 ? void 0 : topic.forumId,
+        const comment = yield prismaDb_1.default.comment.findFirst({
+            where: {
+                id: id,
+            },
+        });
+        const topic = yield prismaDb_1.default.topic.findFirst({
+            where: {
+                id: comment === null || comment === void 0 ? void 0 : comment.topicId,
+            },
+        });
+        const forum = yield prismaDb_1.default.forum.findFirst({
+            where: {
+                id: topic === null || topic === void 0 ? void 0 : topic.forumId,
+            },
+        });
+        let categoryId = [];
+        if (Array.isArray(categoryIds)) {
+            categoryId = categoryIds.filter((categoryId) => categoryId === (forum === null || forum === void 0 ? void 0 : forum.categoryId));
         }
-    });
-    let categoryId = [];
-    if (Array.isArray(categoryIds)) {
-        categoryId = categoryIds.filter((categoryId) => categoryId === (forum === null || forum === void 0 ? void 0 : forum.categoryId));
-    }
-    if (categoryId.length === 0) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 403,
-            success: false,
-            message: "You are not authorized to delete this forum of this category",
+        if (categoryId.length === 0) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to delete the comment of this category",
+            });
+        }
+        yield prismaDb_1.default.flaggedContent.update({
+            where: {
+                id: checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.id,
+            },
+            data: {
+                isDeleted: true,
+            },
         });
     }
     const deletedCommnet = yield comment_services_1.commentServices.deleteComment(id, res);
-    yield prismaDb_1.default.flaggedContent.update({
-        where: {
-            id: checkFlagged === null || checkFlagged === void 0 ? void 0 : checkFlagged.id
-        },
-        data: {
-            isDeleted: true
-        }
-    });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

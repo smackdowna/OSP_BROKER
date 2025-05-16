@@ -18,12 +18,13 @@ const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse")
 const membership_services_1 = require("./membership.services");
 // create membership plan
 const createMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, price, duration } = req.body;
+    const { name, description, price, billingCycle, features } = req.body;
     const membershipPlan = yield membership_services_1.membershipServices.createMembershipPlan({
         name,
         description,
         price,
-        duration,
+        billingCycle,
+        features,
     });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -77,18 +78,12 @@ const deleteMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => 
 // create user membership
 const createUserMembership = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { membershipPlanId, startDate, endDate, status, userId } = req.body;
-    const { userMembership, membershipToken } = yield membership_services_1.membershipServices.createUserMembership({
+    const { userMembership } = yield membership_services_1.membershipServices.createUserMembership({
         userId,
         membershipPlanId,
         startDate,
         endDate,
         status,
-    });
-    res.cookie("membership", membershipToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
     });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -121,7 +116,8 @@ const getUserMembershipById = (0, catchAsyncError_1.default)((req, res, next) =>
 // update user membership
 const updateUserMembership = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const updatedUserMembership = yield membership_services_1.membershipServices.updateUserMembership(id, res, req.body);
+    const { status } = req.body;
+    const updatedUserMembership = yield membership_services_1.membershipServices.updateUserMembership(id, res, status);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

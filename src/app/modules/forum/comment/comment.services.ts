@@ -13,15 +13,6 @@ const createComment = async (commentBody: TComment) => {
     if (!comment || !topicId || !author || !commenterId) {
         throw new AppError(400, "please provide all fields");
     }
-    
-    const existingComment = await prismadb.comment.findFirst({
-        where: {
-            comment: comment,
-        },
-    });
-    if (existingComment) {
-        throw new AppError(400, "Comment already exists with this content");
-    }
 
     const topic= await prismadb.topic.findFirst({
         where: {
@@ -175,20 +166,6 @@ const deleteComment = async (commentId: string , res: Response) => {
 
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to deleteTopic");
-    }
-    const existingComment = await prismadb.comment.findFirst({
-        where: {
-            id: commentId,
-        },
-    });
-    if (!existingComment) {
-        return(
-            sendResponse(res, {
-                statusCode: 404,
-                success: false,
-                message: "Comment not found with this id",
-            })
-        )
     }
     const deletedComment = await prismadb.comment.delete({
         where: {

@@ -10,6 +10,7 @@ router.post('/flagTopic/:topicId', verifyToken, flagContentController.flagTopic)
 router.post('/flagComment/:commentId', verifyToken, flagContentController.flagComment);
 router.post('/flagUser/:userId', verifyToken, flagContentController.flagUser);
 router.get('/', verifyToken, authorizeRole("MODERATOR"), flagContentController.getAllFlaggedContent);
+router.get('/users', verifyToken, authorizeRole("MODERATOR"), flagContentController.getAllFlaggedUsers);
 router.get('/:id', verifyToken, authorizeRole("MODERATOR"), flagContentController.getFlaggedContentById);
 
 export const flagContentRouter = router;

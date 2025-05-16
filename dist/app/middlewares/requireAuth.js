@@ -27,14 +27,14 @@ exports.verifyToken = (0, catchAsyncError_1.default)((req, res, next) => __await
     console.log(req.cookies.user);
     const user = yield prismaDb_1.default.user.findFirst({
         where: {
-            id: decoded.id,
+            id: decoded.userId,
         }
     });
     if (!user)
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
             success: false,
-            message: "Unauthorized",
+            message: "Unauthorized access",
             data: null,
         });
     next();

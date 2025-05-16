@@ -7,12 +7,13 @@ import { membershipServices } from "./membership.services";
 // create membership plan
 const createMembershipPlan = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { name, description, price, duration } = req.body;
+    const { name, description, price, billingCycle , features } = req.body;
     const membershipPlan = await membershipServices.createMembershipPlan({
       name,
       description,
       price,
-      duration,
+      billingCycle,
+      features,
     });
     sendResponse(res, {
       statusCode: 200,
@@ -88,19 +89,12 @@ const deleteMembershipPlan = catchAsyncError(
 const createUserMembership = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { membershipPlanId, startDate, endDate, status, userId } = req.body;
-    const {userMembership , membershipToken} = await membershipServices.createUserMembership({
+    const {userMembership } = await membershipServices.createUserMembership({
       userId,
       membershipPlanId,
       startDate,
       endDate,
       status,
-    });
-
-    res.cookie("membership", membershipToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 day
     });
 
     sendResponse(res, {
@@ -146,10 +140,11 @@ const getUserMembershipById = catchAsyncError(
 const updateUserMembership = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
+    const { status } = req.body;
     const updatedUserMembership = await membershipServices.updateUserMembership(
       id,
       res,
-      req.body
+      status
     );
     sendResponse(res, {
       statusCode: 200,

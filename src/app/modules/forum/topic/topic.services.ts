@@ -149,10 +149,26 @@ const deleteTopic = async (topicId: string , res: Response) => {
     return {deletedTopic};
 }
 
+// delete all topics
+const deleteAllTopics = async (res: Response) => {
+    const deletedTopics = await prismadb.topic.deleteMany();
+    if (!deletedTopics) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "No topics found",
+            })  
+        )
+    }
+    return {deletedTopics};
+}
+
 export const topicServices = {
     createTopic,
     getAllTopics,
     getTopicById,
     updateTopic,
     deleteTopic,
+    deleteAllTopics,  
 };

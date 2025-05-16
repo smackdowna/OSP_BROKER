@@ -201,6 +201,10 @@ model Comment{
 model Categories{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
+    description String
+    moderatorId String @db.ObjectId
+    icon String?
+    membership_access String[] @db.ObjectId
     forums Forum[] @relation("forumToCategory")
 
     createdAt DateTime @default(now())
@@ -225,7 +229,8 @@ model MembershipPlan{
     name String
     description String
     price Float
-    duration Int
+    billingCycle String
+    features String[]
     userMembership userMembership[] @relation("membershipToUserMembership")
 
     createdAt DateTime @default(now())
@@ -238,7 +243,7 @@ model userMembership{
     membershipPlanId String @db.ObjectId
     startDate DateTime
     endDate DateTime
-    status String
+    status String? @default("active")
     User User @relation("userToUserMembership",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     MembershipPlan MembershipPlan @relation("membershipToUserMembership",fields: [membershipPlanId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     paymentRecord paymentRecord[] @relation("userMembershipToPaymentRecord")

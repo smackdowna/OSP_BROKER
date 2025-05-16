@@ -153,10 +153,21 @@ const deleteTopic = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         message: "Topic deleted successfully",
     });
 }));
+// delete all topics
+const deleteAllTopics = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const deletedTopics = yield topic_services_1.topicServices.deleteAllTopics(res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All topics deleted successfully",
+        data: deletedTopics,
+    });
+}));
 exports.topicController = {
     createTopic,
     getAllTopics,
     getTopicById,
     updateTopic,
-    deleteTopic
+    deleteTopic,
+    deleteAllTopics,
 };

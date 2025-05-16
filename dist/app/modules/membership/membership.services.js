@@ -16,12 +16,10 @@ exports.membershipServices = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
-const auth_utils_1 = require("../auth/auth.utils");
-const config_1 = __importDefault(require("../../config"));
 // create membership plan
 const createMembershipPlan = (membershipPlanInterface) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, price, duration } = membershipPlanInterface;
-    if (!name || !description || !price || !duration) {
+    const { name, description, price, billingCycle, features } = membershipPlanInterface;
+    if (!name || !description || !price || !billingCycle || !features) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingMembershipPlan = yield prismaDb_1.default.membershipPlan.findFirst({
@@ -37,7 +35,8 @@ const createMembershipPlan = (membershipPlanInterface) => __awaiter(void 0, void
             name,
             description,
             price,
-            duration,
+            billingCycle,
+            features
         },
     });
     return { membershipPlan };
@@ -86,11 +85,11 @@ const getMembershipPlanById = (id, res) => __awaiter(void 0, void 0, void 0, fun
 });
 // update membership plan
 const updateMembershipPlan = (id, res, membershipPlanInterface) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, price, duration } = membershipPlanInterface;
+    const { name, description, price, billingCycle, features } = membershipPlanInterface;
     if (!id) {
         throw new appError_1.default(400, "please provide id");
     }
-    if (!name || !description || !price || !duration) {
+    if (!name || !description || !price || !billingCycle || !features) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingMembershipPlan = yield prismaDb_1.default.membershipPlan.findFirst({
@@ -113,7 +112,8 @@ const updateMembershipPlan = (id, res, membershipPlanInterface) => __awaiter(voi
             name,
             description,
             price,
-            duration,
+            billingCycle,
+            features,
         },
     });
     return { membershipPlan };
@@ -148,7 +148,7 @@ const deleteMembershipPlan = (id, res) => __awaiter(void 0, void 0, void 0, func
 // create user membership
 const createUserMembership = (userMembershipInterface) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, membershipPlanId, startDate, endDate, status } = userMembershipInterface;
-    if (!userId || !membershipPlanId || !startDate || !endDate || !status) {
+    if (!userId || !membershipPlanId || !startDate || !endDate) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingUserMembership = yield prismaDb_1.default.userMembership.findFirst({
@@ -169,11 +169,7 @@ const createUserMembership = (userMembershipInterface) => __awaiter(void 0, void
             status,
         },
     });
-    const jwtPayload = {
-        userId: userMembership.userId.toString()
-    };
-    const membershipToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_membership_secret, config_1.default.jwt_membership_expires_in);
-    return { userMembership, membershipToken };
+    return { userMembership };
 });
 // get all user memberships
 const getAllUserMemberships = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -203,12 +199,11 @@ const getUserMembershipById = (id, res) => __awaiter(void 0, void 0, void 0, fun
     return userMembership;
 });
 // update user membership
-const updateUserMembership = (id, res, userMembershipInterface) => __awaiter(void 0, void 0, void 0, function* () {
-    const { startDate, endDate, status } = userMembershipInterface;
+const updateUserMembership = (id, res, status) => __awaiter(void 0, void 0, void 0, function* () {
     if (!id) {
         throw new appError_1.default(400, "please provide id");
     }
-    if (!startDate || !endDate || !status) {
+    if (!status) {
         throw new appError_1.default(400, "please provide all fields");
     }
     const existingUserMembership = yield prismaDb_1.default.userMembership.findFirst({
@@ -228,8 +223,6 @@ const updateUserMembership = (id, res, userMembershipInterface) => __awaiter(voi
             id: id,
         },
         data: {
-            startDate,
-            endDate,
             status,
         },
     });

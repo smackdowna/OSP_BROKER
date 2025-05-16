@@ -14,5 +14,6 @@ router.post('/flagTopic/:topicId', requireAuth_1.verifyToken, flagContent_contro
 router.post('/flagComment/:commentId', requireAuth_1.verifyToken, flagContent_controller_1.flagContentController.flagComment);
 router.post('/flagUser/:userId', requireAuth_1.verifyToken, flagContent_controller_1.flagContentController.flagUser);
 router.get('/', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), flagContent_controller_1.flagContentController.getAllFlaggedContent);
+router.get('/users', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), flagContent_controller_1.flagContentController.getAllFlaggedUsers);
 router.get('/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), flagContent_controller_1.flagContentController.getFlaggedContentById);
 exports.flagContentRouter = router;

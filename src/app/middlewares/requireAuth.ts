@@ -22,14 +22,14 @@ export const verifyToken = catchAsyncError(async (req: Request, res: Response, n
 
     const user = await prismadb.user.findFirst({
             where: {
-                id: decoded.id,
+                id: decoded.userId,
             }
     });
 
     if(!user) return sendResponse(res, {
         statusCode: 401,
         success: false,
-        message: "Unauthorized",
+        message: "Unauthorized access",
         data: null,
     });
     
