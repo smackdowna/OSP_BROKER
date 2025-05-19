@@ -6,6 +6,7 @@ import { businessRouter } from "../modules/business/business.routes";
 import { adminRouter } from "../modules/admin/admin.router";
 import { moderatorRouter } from "../modules/moderator/moderator.router";
 import { flagContentRouter } from "../modules/flagContent/flagContent.router";
+import { userRoute } from "../modules/user/user.routes";
 
 const router = Router();
 
@@ -39,6 +40,10 @@ const moduleRoutes=[
     {
         path:"/flag",
         route: flagContentRouter
+    },
+    {
+        path: "/user",
+        route: userRoute
     }
 
 ]

@@ -52,10 +52,10 @@ model UserProfile {
   skills String[]
   socialLinks Json?
   userId String @db.ObjectId @unique
-  user User @relation("userToUserProfile",fields: [userId], references: [id])
+  user User @relation("userToUserProfile",fields: [userId], references: [id]  , onDelete: Cascade , onUpdate: Cascade)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt 
 }
 
 model Education{
@@ -66,7 +66,7 @@ model Education{
     startYear Int
     endYear Int
     grade String
-    userProfileId String @db.ObjectId @unique
+    userProfileId String @db.ObjectId 
     UserProfile UserProfile @relation("userToEducation",fields: [userProfileId], references: [id] , onDelete: Cascade , onUpdate: Cascade) 
 }
 

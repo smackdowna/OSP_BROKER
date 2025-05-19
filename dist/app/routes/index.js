@@ -8,6 +8,7 @@ const business_routes_1 = require("../modules/business/business.routes");
 const admin_router_1 = require("../modules/admin/admin.router");
 const moderator_router_1 = require("../modules/moderator/moderator.router");
 const flagContent_router_1 = require("../modules/flagContent/flagContent.router");
+const user_routes_1 = require("../modules/user/user.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -37,6 +38,10 @@ const moduleRoutes = [
     {
         path: "/flag",
         route: flagContent_router_1.flagContentRouter
+    },
+    {
+        path: "/user",
+        route: user_routes_1.userRoute
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
