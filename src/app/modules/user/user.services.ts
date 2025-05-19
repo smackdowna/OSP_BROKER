@@ -4,11 +4,7 @@ import { Response } from "express";
 
 // get all users
 export const getAllUsers = async (res: Response) => {
-  const users = await prismadb.user.findMany({
-    include: {
-      userProfile: true,
-    },
-  });
+  const users = await prismadb.user.findMany();
 
   if (!users) {
     return sendResponse(res, {
@@ -23,7 +19,7 @@ export const getAllUsers = async (res: Response) => {
 
 // get user by id
 export const getUserById = async (userId: string, res: Response) => {
-  const user = await prismadb.user.findUnique({
+  const user = await prismadb.user.findFirst({
     where: {
       id: userId,
     },
@@ -48,7 +44,7 @@ export const deleteUser = async (userId: string, res: Response) => {
   if (!res || typeof res.status !== "function") {
     throw new Error("Invalid Response object passed to deleteTopic");
   }
-  const user = await prismadb.user.findUnique({
+  const user = await prismadb.user.findFirst({
     where: {
       id: userId,
     },

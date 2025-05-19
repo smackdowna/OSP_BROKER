@@ -17,11 +17,7 @@ const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // get all users
 const getAllUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield prismaDb_1.default.user.findMany({
-        include: {
-            userProfile: true,
-        },
-    });
+    const users = yield prismaDb_1.default.user.findMany();
     if (!users) {
         return (0, sendResponse_1.default)(res, {
             statusCode: 404,
@@ -34,7 +30,7 @@ const getAllUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getAllUsers = getAllUsers;
 // get user by id
 const getUserById = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield prismaDb_1.default.user.findUnique({
+    const user = yield prismaDb_1.default.user.findFirst({
         where: {
             id: userId,
         },
@@ -57,7 +53,7 @@ const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* 
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to deleteTopic");
     }
-    const user = yield prismaDb_1.default.user.findUnique({
+    const user = yield prismaDb_1.default.user.findFirst({
         where: {
             id: userId,
         },
