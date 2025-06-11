@@ -29,7 +29,8 @@ const createBusiness = catchAsyncError(async (req: Request, res: Response, next:
         strategicPartners,
         saleDeckUrl,
         websiteLinks,
-        accountOwnerUsername
+        accountOwnerUsername,
+        businessAdminId
      } = req.body;
     const business = await businessServices.createBusiness({ 
         createdByUserId,
@@ -54,7 +55,8 @@ const createBusiness = catchAsyncError(async (req: Request, res: Response, next:
         strategicPartners,
         saleDeckUrl,
         websiteLinks,
-        accountOwnerUsername
+        accountOwnerUsername,
+        businessAdminId
      });
     sendResponse(res,{
         statusCode: 200,
@@ -109,6 +111,18 @@ const deleteBusiness = catchAsyncError(async (req: Request, res: Response, next:
         message: "Business deleted successfully",
     });
 });
+
+// approve representative
+const approveRepresentative= catchAsyncError(async(req:Request , res: Response , next: NextFunction)=>{
+    const {representativeId}= req.params;
+    const representative= await businessServices.approveRepresentatives(representativeId , res , req);
+    sendResponse(res,{
+        statusCode:200,
+        success: true ,
+        message:"representative approved successfully",
+        data: representative
+    })
+})
 
 // create representative
 const createRepresentative = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -194,6 +208,7 @@ export const businessController = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveRepresentative,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,

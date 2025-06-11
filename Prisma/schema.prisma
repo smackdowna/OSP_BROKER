@@ -19,7 +19,7 @@ enum ROLE{
 
 model User{
     id      String   @id @default(auto()) @map("_id") @db.ObjectId
-    fullName    String
+    fullName    String    
     email   String   @unique
     password String
     role    ROLE @default(USER)
@@ -95,6 +95,7 @@ model BusinessAdmin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String @db.ObjectId @unique
     user User @relation("userToBusinessAdmin",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    business business[] @relation("userToBusinessAdmin")
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -126,6 +127,8 @@ model business{
     websiteLinks String[]
     accountOwnerUsername String
     
+    businessAdminId String @db.ObjectId
+    BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
     representative Representative[] @relation("businessToRepresentative")
 }
 

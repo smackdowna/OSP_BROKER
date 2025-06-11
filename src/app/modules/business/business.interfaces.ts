@@ -23,6 +23,7 @@ export type TBusiness = {
   websiteLinks: string[];
   accountOwnerUsername: string;
   representatives?: TRepresentative[];
+  businessAdminId: string;
 };
 
 export type TRepresentative = {
