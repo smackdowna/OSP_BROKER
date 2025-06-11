@@ -1,7 +1,7 @@
 import { TBusiness, TRepresentative } from "./business.interfaces";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
-import { Response } from "express";
+import { Response, Request } from "express";
 import sendResponse from "../../middlewares/sendResponse";
 
 // create a new business
@@ -29,10 +29,11 @@ const createBusiness = async (business: TBusiness) => {
         strategicPartners,
         saleDeckUrl,
         websiteLinks,
-        accountOwnerUsername
+        accountOwnerUsername,
+        businessAdminId
     } = business;
 
-    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services ) {
+    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId ) {
         throw new AppError(400, "please provide all required fields");
     }
 
@@ -70,7 +71,8 @@ const createBusiness = async (business: TBusiness) => {
             strategicPartners: strategicPartners || [],
             saleDeckUrl: saleDeckUrl || "",
             websiteLinks: websiteLinks || [],
-            accountOwnerUsername
+            accountOwnerUsername,
+            businessAdminId
         }
     });
 
@@ -242,6 +244,79 @@ const deleteBusiness = async (id: string, res: Response) => {
     return { business: deletedBusiness };
 }
 
+
+// approve representatives
+const approveRepresentatives = async(representativeId: string , res:Response , req: Request)=>{
+    if(!representativeId){
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Representative ID is required"
+        });
+    }
+    const existingRepresentative = await prismadb.representative.findFirst({
+        where: {
+            id: representativeId
+        },
+        select:{
+            businessId: true
+        }
+    });
+
+    if(!existingRepresentative){
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message:" representative not found with this id."
+            })
+        )
+    }
+
+    const businessId= existingRepresentative?.businessId;
+    const existingBusiness= await prismadb.business.findFirst({
+        where:{
+            id:businessId
+        },
+        select:{
+            businessAdminId:true
+        }
+    })
+
+    const businessAdminId= existingBusiness?.businessAdminId
+
+    const existingBusinessAdmin= await prismadb.businessAdmin.findFirst({
+        where:{
+            id:businessAdminId
+        },
+        select:{
+            userId: true
+        }
+    })
+
+    if(req.cookies.user.userId !== existingBusinessAdmin?.userId){
+        return(
+            sendResponse(res,{
+                statusCode: 401,
+                success: false,
+                message: "unauthorized access"
+            })
+        )
+    }
+
+    const updatedRepresentative =await prismadb.representative.update({
+        where:{
+            id: representativeId
+        },
+        data:{
+            isVerified: true
+        }
+    })
+
+    return {representative: updatedRepresentative}
+}
+
+
 // create representative
 const createRepresentative = async (representative: TRepresentative) => {
     const { department, message, businessId, userId } = representative;
@@ -411,6 +486,7 @@ export const businessServices = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveRepresentatives,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,
