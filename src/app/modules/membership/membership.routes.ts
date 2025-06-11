@@ -8,9 +8,9 @@ import { authorizeRole } from "../../middlewares/authorizeRole";
 const router = express.Router();
 
 // Membership routes
-router.post("/userMembership", verifyToken, membershipController.createUserMembership);
-router.get("/userMemberships", verifyToken, membershipController.getAllUserMemberships);
-router.get("/userMembership/:id", verifyToken, membershipController.getUserMembershipById);
+router.post("/userMembership", verifyToken,authorizeRole("ADMIN"), membershipController.createUserMembership);
+router.get("/userMemberships", verifyToken,authorizeRole("ADMIN"), membershipController.getAllUserMemberships);
+router.get("/userMembership/:id", verifyToken,authorizeRole("ADMIN"), membershipController.getUserMembershipById);
 router.put("/userMembership/:id", verifyToken,authorizeRole("ADMIN"), membershipController.updateUserMembership);
 router.delete("/userMembership/:id", verifyToken,authorizeRole("ADMIN"), membershipController.deleteUserMembership);
 
