@@ -18,8 +18,8 @@ const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create a new business
 const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function* () {
-    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername } = business;
-    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services) {
+    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId } = business;
+    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId) {
         throw new appError_1.default(400, "please provide all required fields");
     }
     const existingBusiness = yield prismaDb_1.default.business.findFirst({
@@ -54,7 +54,8 @@ const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function*
             strategicPartners: strategicPartners || [],
             saleDeckUrl: saleDeckUrl || "",
             websiteLinks: websiteLinks || [],
-            accountOwnerUsername
+            accountOwnerUsername,
+            businessAdminId
         }
     });
     return { business: businessBody };
@@ -178,6 +179,65 @@ const deleteBusiness = (id, res) => __awaiter(void 0, void 0, void 0, function* 
         }
     });
     return { business: deletedBusiness };
+});
+// approve representatives
+const approveRepresentatives = (representativeId, res, req) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!representativeId) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Representative ID is required"
+        });
+    }
+    const existingRepresentative = yield prismaDb_1.default.representative.findFirst({
+        where: {
+            id: representativeId
+        },
+        select: {
+            businessId: true
+        }
+    });
+    if (!existingRepresentative) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: " representative not found with this id."
+        }));
+    }
+    const businessId = existingRepresentative === null || existingRepresentative === void 0 ? void 0 : existingRepresentative.businessId;
+    const existingBusiness = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: businessId
+        },
+        select: {
+            businessAdminId: true
+        }
+    });
+    const businessAdminId = existingBusiness === null || existingBusiness === void 0 ? void 0 : existingBusiness.businessAdminId;
+    const existingBusinessAdmin = yield prismaDb_1.default.businessAdmin.findFirst({
+        where: {
+            id: businessAdminId
+        },
+        select: {
+            userId: true
+        }
+    });
+    if (req.cookies.user.userId !== (existingBusinessAdmin === null || existingBusinessAdmin === void 0 ? void 0 : existingBusinessAdmin.userId)) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 401,
+            success: false,
+            message: "unauthorized access"
+        }));
+    }
+    const updatedRepresentative = yield prismaDb_1.default.representative.update({
+        where: {
+            id: representativeId
+        },
+        data: {
+            isVerified: true
+        }
+    });
+    return { representative: updatedRepresentative };
 });
 // create representative
 const createRepresentative = (representative) => __awaiter(void 0, void 0, void 0, function* () {
@@ -314,6 +374,7 @@ exports.businessServices = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveRepresentatives,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,

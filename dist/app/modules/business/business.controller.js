@@ -18,7 +18,7 @@ const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse")
 const business_services_1 = require("./business.services");
 // create business
 const createBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername } = req.body;
+    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId } = req.body;
     const business = yield business_services_1.businessServices.createBusiness({
         createdByUserId,
         authorizedUser,
@@ -42,7 +42,8 @@ const createBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awai
         strategicPartners,
         saleDeckUrl,
         websiteLinks,
-        accountOwnerUsername
+        accountOwnerUsername,
+        businessAdminId
     });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -91,6 +92,17 @@ const deleteBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awai
         statusCode: 200,
         success: true,
         message: "Business deleted successfully",
+    });
+}));
+// approve representative
+const approveRepresentative = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { representativeId } = req.params;
+    const representative = yield business_services_1.businessServices.approveRepresentatives(representativeId, res, req);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "representative approved successfully",
+        data: representative
     });
 }));
 // create representative
@@ -167,6 +179,7 @@ exports.businessController = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveRepresentative,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,
