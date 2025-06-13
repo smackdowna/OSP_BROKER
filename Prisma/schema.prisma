@@ -33,6 +33,8 @@ model User{
     userMembership userMembership[] @relation("userToUserMembership")
     forum Forum[] @relation("userToForum")
     flaggedContent FlaggedContent[] @relation("userToFlaggedContent")
+    businessPageFollower BusinessPageFollower[] @relation("userToBusinessPageFollower")
+    representativePageFollower RepresentativePageFollower[] @relation("userToRepresentativePageFollower")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -100,6 +102,23 @@ model BusinessAdmin{
     updatedAt DateTime @updatedAt
 }
 
+// this representative may have relation with business admin.
+model Representative{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    department String
+    message String
+    isVerified Boolean @default(false)
+    businessId String @db.ObjectId
+    Business business @relation("businessToRepresentative",fields: [businessId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId @unique  
+    user User @relation("userToRepresentative",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    representativePageFollower RepresentativePageFollower[] @relation("representativeToRepresentativePageFollower")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 // business registration model
 model business{
     id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -130,22 +149,10 @@ model business{
     businessAdminId String @db.ObjectId
     BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
     representative Representative[] @relation("businessToRepresentative")
+    businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
 }
 
 
-// this representative may have relation with business admin.
-model Representative{
-    id String @id @default(auto()) @map("_id") @db.ObjectId
-    department String
-    message String
-    isVerified Boolean @default(false)
-    businessId String @db.ObjectId
-    Business business @relation("businessToRepresentative",fields: [businessId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
-    userId String @db.ObjectId @unique  
-    user User @relation("userToRepresentative",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-}
 
 model Admin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -282,6 +289,30 @@ model FlaggedContent{
     comment Comment? @relation("commentToFlaggedContent",fields: [commentId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     userId String? @db.ObjectId
     user User? @relation("userToFlaggedContent",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+//Business Page followers model
+model BusinessPageFollower{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    businessId String @db.ObjectId
+    business business @relation("business to businessPageFollowers" , fields: [businessId] , references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId
+    user User @relation("userToBusinessPageFollower", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Representative page followers model
+model RepresentativePageFollower{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    representativeId String @db.ObjectId
+    representative Representative @relation("representativeToRepresentativePageFollower", fields: [representativeId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId
+    user User @relation("userToRepresentativePageFollower", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

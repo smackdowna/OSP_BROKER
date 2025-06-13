@@ -11,5 +11,5 @@ const moderator_controller_1 = require("./moderator.controller");
 const router = express_1.default.Router();
 // Moderator routes
 router.post('/banUser/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), moderator_controller_1.moderatorController.banUser);
-router.get('/', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), moderator_controller_1.moderatorController.getAllModerators);
+router.get('/', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), moderator_controller_1.moderatorController.getAllModerators);
 exports.moderatorRouter = router;
