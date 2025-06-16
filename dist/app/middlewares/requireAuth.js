@@ -19,9 +19,18 @@ const config_1 = __importDefault(require("../config"));
 const prismaDb_1 = __importDefault(require("../db/prismaDb"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 exports.verifyToken = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.accessToken || "";
-    if (!token)
-        return res.status(401).json({ message: "unauthorized access" });
+    // const token = req.cookies.accessToken || "";
+    // if (!token) return res.status(401).json({ message: "unauthorized access" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ error: 'No authorization header provided' });
+    }
+    // Extract the token (assuming Bearer scheme)
+    const token = authHeader.split(' ')[1]; // Splits "Bearer tokenvalue" into ["Bearer", "tokenvalue"]
+    console.log("token is", token);
+    if (!token) {
+        return res.status(401).json({ error: 'Invalid authorization token' });
+    }
     const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
     req.cookies.user = decoded;
     console.log(req.cookies.user);
