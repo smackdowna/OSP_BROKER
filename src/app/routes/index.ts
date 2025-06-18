@@ -7,6 +7,9 @@ import { adminRouter } from "../modules/admin/admin.router";
 import { moderatorRouter } from "../modules/moderator/moderator.router";
 import { flagContentRouter } from "../modules/flagContent/flagContent.router";
 import { userRoute } from "../modules/user/user.routes";
+import { announcementRouter } from "../modules/forum/announcemnet/announcement.routes";
+import { pollRouter } from "../modules/forum/poll/poll.routes";
+import { eventRouter } from "../modules/forum/events/event.routes";
 
 const router = Router();
 
@@ -44,7 +47,20 @@ const moduleRoutes=[
     {
         path: "/user",
         route: userRoute
+    },
+    {
+        path: "/announcement",
+        route: announcementRouter
+    },
+    {
+        path: "/poll",
+        route: pollRouter
+    },
+    {
+        path: "/event",
+        route: eventRouter
     }
+
 
 ]
 

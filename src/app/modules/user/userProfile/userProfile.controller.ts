@@ -27,7 +27,7 @@ const createUserProfile = catchAsyncError(
 const getUserProfileByUserId = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
-    const userProfile = await userProfileService.getUserProfileByUserId(userId, res);
+    const userProfile = await userProfileService.getUserProfileByUserId(userId, res , req);
     sendResponse(res, {
       statusCode: 200,
       success: true,

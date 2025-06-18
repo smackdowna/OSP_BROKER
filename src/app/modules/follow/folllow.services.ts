@@ -1,10 +1,9 @@
 import {TBusinessPageFollower , TRepresentativePageFollower} from "./follow.intreface"
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
-import { Response } from "express";
 
 // create business page follower(click follow)
-const createBusinessPageFollower = async (follower: TBusinessPageFollower , res: Response) => {
+const createBusinessPageFollower = async (follower: TBusinessPageFollower) => {
   const { businessId, userId } = follower;
 
   // Check if the follower already exists
@@ -46,7 +45,7 @@ const isUserFollowingBusinessPage = async (businessId:string, userId: string) =>
 }
 
 // create representative page follower(click follow)
-const createRepresentativePageFollower = async (follower: TRepresentativePageFollower, res: Response) => {
+const createRepresentativePageFollower = async (follower: TRepresentativePageFollower) => {
     const { representativeId, userId } = follower;
     
     // Check if the follower already exists

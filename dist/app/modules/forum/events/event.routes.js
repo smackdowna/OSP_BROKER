@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.eventRouter = void 0;
+const express_1 = require("express");
+const authorizeRole_1 = require("../../../middlewares/authorizeRole");
+const requireAuth_1 = require("../../../middlewares/requireAuth");
+const event_controller_1 = require("./event.controller");
+const authorizeMembership_1 = require("../../../middlewares/authorizeMembership");
+const router = (0, express_1.Router)();
+router.post("/:forumId", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), event_controller_1.eventController.createEvent);
+router.get("/:forumId", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, event_controller_1.eventController.getEventsByForumId);
+router.get("/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, event_controller_1.eventController.getEventById);
+router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), event_controller_1.eventController.updateEvent);
+router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), event_controller_1.eventController.deleteEvent);
+exports.eventRouter = router;

@@ -31,7 +31,7 @@ const createUserProfile = (0, catchAsyncError_1.default)((req, res, next) => __a
 // get user profile by userId
 const getUserProfileByUserId = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params;
-    const userProfile = yield userProfile_services_1.userProfileService.getUserProfileByUserId(userId, res);
+    const userProfile = yield userProfile_services_1.userProfileService.getUserProfileByUserId(userId, res, req);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

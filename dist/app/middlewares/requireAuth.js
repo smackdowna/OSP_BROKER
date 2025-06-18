@@ -32,8 +32,6 @@ exports.verifyToken = (0, catchAsyncError_1.default)((req, res, next) => __await
         return res.status(401).json({ error: 'Invalid authorization token' });
     }
     const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
-    req.cookies.user = decoded;
-    console.log(req.cookies.user);
     const user = yield prismaDb_1.default.user.findFirst({
         where: {
             id: decoded.userId,
@@ -46,5 +44,6 @@ exports.verifyToken = (0, catchAsyncError_1.default)((req, res, next) => __await
             message: "Unauthorized access",
             data: null,
         });
+    req.user = decoded;
     next();
 }));
