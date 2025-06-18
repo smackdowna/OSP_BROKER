@@ -16,8 +16,7 @@ export const verifyToken = catchAsyncError(async (req: Request, res: Response, n
     // const token = req.cookies.accessToken || "";
     // if (!token) return res.status(401).json({ message: "unauthorized access" });
 
-
-        const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     return res.status(401).json({ error: 'No authorization header provided' });
@@ -30,14 +29,12 @@ export const verifyToken = catchAsyncError(async (req: Request, res: Response, n
     return res.status(401).json({ error: 'Invalid authorization token' });
   }
     const decoded = jwt.verify(token, config.jwt_access_secret as string) as DecodedToken;
-    req.cookies.user=decoded;
-    console.log(req.cookies.user);
 
     const user = await prismadb.user.findFirst({
             where: {
                 id: decoded.userId,
             }
-    });
+    }); 
 
     if(!user) return sendResponse(res, {
         statusCode: 401,
@@ -45,6 +42,8 @@ export const verifyToken = catchAsyncError(async (req: Request, res: Response, n
         message: "Unauthorized access",
         data: null,
     });
+
+    req.user= decoded
     
     next();
 });

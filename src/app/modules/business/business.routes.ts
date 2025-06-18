@@ -14,6 +14,7 @@ router.put('/representative/:id', verifyToken, verifyMembership, businessControl
 router.delete('/representative/:id', verifyToken, verifyMembership, businessController.deleteRepresentative);
 router.post('/representative/:representativeId' , verifyToken , verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.approveRepresentative)
 
+
 // Business routes
 router.post('/', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.createBusiness);
 router.get('/', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.getAllBusinesses);

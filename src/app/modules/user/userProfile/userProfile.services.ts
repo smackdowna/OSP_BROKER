@@ -1,7 +1,7 @@
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
 import sendResponse from "../../../middlewares/sendResponse";
-import { Response } from "express";
+import { Response , Request } from "express";
 
 import { TUserProfile } from "./userProfile.interface";
 
@@ -36,20 +36,27 @@ export const createUserProfile = async (
 };
 
 // get user profile by userId
-export const getUserProfileByUserId = async (userId: string , res: Response) => {
+export const getUserProfileByUserId = async (userId: string , res: Response , req: Request) => {
+    if(req.cookies.user.userId !== userId){
+        return(
+            sendResponse(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to access this profile",
+            })
+        )
+    }
+
     const userProfile = await prismadb.userProfile.findFirst({
         where: {
             userId
         },
         include: {
-            education: {
+            education: true,
+            experience: true,
+            user:{
                 select:{
-                    userProfileId: true,
-                }
-            },
-            experience: {
-                select:{
-                    userProfileId: true,
+                    fullName: true
                 }
             }
         }
@@ -131,14 +138,11 @@ export const updateUserProfile = async (userId: string, res: Response, profileDa
 export const getAllUserProfiles = async (res: Response) => {
     const userProfiles = await prismadb.userProfile.findMany({
         include: {
-            education: {
+            education: true,
+            experience: true,
+            user:{
                 select:{
-                    userProfileId: true,
-                }
-            },
-            experience: {
-                select:{
-                    userProfileId: true,
+                    fullName: true
                 }
             }
         }

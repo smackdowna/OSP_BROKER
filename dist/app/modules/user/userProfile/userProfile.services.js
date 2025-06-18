@@ -42,20 +42,24 @@ const createUserProfile = (userId, profileData) => __awaiter(void 0, void 0, voi
 });
 exports.createUserProfile = createUserProfile;
 // get user profile by userId
-const getUserProfileByUserId = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserProfileByUserId = (userId, res, req) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.cookies.user.userId !== userId) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to access this profile",
+        }));
+    }
     const userProfile = yield prismaDb_1.default.userProfile.findFirst({
         where: {
             userId
         },
         include: {
-            education: {
+            education: true,
+            experience: true,
+            user: {
                 select: {
-                    userProfileId: true,
-                }
-            },
-            experience: {
-                select: {
-                    userProfileId: true,
+                    fullName: true
                 }
             }
         }
@@ -125,14 +129,11 @@ exports.updateUserProfile = updateUserProfile;
 const getAllUserProfiles = (res) => __awaiter(void 0, void 0, void 0, function* () {
     const userProfiles = yield prismaDb_1.default.userProfile.findMany({
         include: {
-            education: {
+            education: true,
+            experience: true,
+            user: {
                 select: {
-                    userProfileId: true,
-                }
-            },
-            experience: {
-                select: {
-                    userProfileId: true,
+                    fullName: true
                 }
             }
         }
