@@ -1,9 +1,8 @@
-import { TEvent } from  "./event.interface";
 import AppError from "../../../errors/appError";
 import prismadb from "../../../db/prismaDb";
 import sendResponse from "../../../middlewares/sendResponse";
 import { Response } from "express";
-
+import { TEvent } from "./event.interface";
 
 // create event
 export const createEvent = async (event: TEvent) => {
@@ -53,9 +52,10 @@ export const getEventsByForumId = async (forumId: string) => {
 
 // get single event by id
 export const getEventById = async (forumId: string, eventId: string , res:Response) => {
+
     // Check if the event exists
     const event = await prismadb.event.findFirst({
-        where: { id: eventId, forumId },
+        where: { id: eventId, forumId: forumId },
     });
 
     if (!event) {

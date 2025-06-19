@@ -1,6 +1,6 @@
 export type TEvent = {
   title: string;
   description: string;
-  date: Date;
+  date: string;
   forumId: string;
 };

@@ -8,7 +8,7 @@ const router = Router();
 
 router.post("/:forumId" , verifyToken, verifyMembership, authorizeRole("BUSINESS_ADMIN"), announcementController.createAnnouncement);
 router.get("/:forumId", verifyToken, verifyMembership, announcementController.getAnnouncementsByForumId);
-router.get("/:id", verifyToken, verifyMembership, announcementController.getAnnouncementById);
+router.get("/getSingleAnnouncement/:id", verifyToken, verifyMembership, announcementController.getAnnouncementById);
 router.delete("/:id", verifyToken, verifyMembership, authorizeRole("BUSINESS_ADMIN"), announcementController.deleteAnnouncement);
 router.put("/:id", verifyToken, verifyMembership, authorizeRole("BUSINESS_ADMIN"), announcementController.updateAnnouncement);
 

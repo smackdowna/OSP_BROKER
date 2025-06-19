@@ -19,7 +19,7 @@ const folllow_services_1 = require("./folllow.services");
 // create business page follower
 const createBusinessPageFollower = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const follower = yield folllow_services_1.followServices.createBusinessPageFollower({ businessId, userId });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -43,7 +43,7 @@ const isUserFollowingBusinessPage = (0, catchAsyncError_1.default)((req, res, ne
 // create representative page follower
 const createRepresentativePageFollower = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const follower = yield folllow_services_1.followServices.createRepresentativePageFollower({ representativeId, userId });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -55,7 +55,7 @@ const createRepresentativePageFollower = (0, catchAsyncError_1.default)((req, re
 // check if user is following representative page
 const isUserFollowingRepresentativePage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const follower = yield folllow_services_1.followServices.isUserFollowingRepresentativePage(representativeId, userId);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,

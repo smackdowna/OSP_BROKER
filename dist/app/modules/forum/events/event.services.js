@@ -59,7 +59,7 @@ exports.getEventsByForumId = getEventsByForumId;
 const getEventById = (forumId, eventId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event exists
     const event = yield prismaDb_1.default.event.findFirst({
-        where: { id: eventId, forumId },
+        where: { id: eventId, forumId: forumId },
     });
     if (!event) {
         return (0, sendResponse_1.default)(res, {
