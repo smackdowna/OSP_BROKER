@@ -6,6 +6,7 @@ import {businessServices} from "./business.services";
 
 // create business
 const createBusiness = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const {businessAdminId} = req.params;
     const { 
         createdByUserId,
         authorizedUser,
@@ -30,7 +31,6 @@ const createBusiness = catchAsyncError(async (req: Request, res: Response, next:
         saleDeckUrl,
         websiteLinks,
         accountOwnerUsername,
-        businessAdminId
      } = req.body;
     const business = await businessServices.createBusiness({ 
         createdByUserId,

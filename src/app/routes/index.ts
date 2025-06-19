@@ -7,6 +7,7 @@ import { adminRouter } from "../modules/admin/admin.router";
 import { moderatorRouter } from "../modules/moderator/moderator.router";
 import { flagContentRouter } from "../modules/flagContent/flagContent.router";
 import { userRoute } from "../modules/user/user.routes";
+import { followRouter } from "../modules/follow/follow.routes";
 import { announcementRouter } from "../modules/forum/announcemnet/announcement.routes";
 import { pollRouter } from "../modules/forum/poll/poll.routes";
 import { eventRouter } from "../modules/forum/events/event.routes";
@@ -49,6 +50,10 @@ const moduleRoutes=[
         route: userRoute
     },
     {
+        path: "/follow",
+        route: followRouter
+    },
+    {
         path: "/announcement",
         route: announcementRouter
     },
@@ -60,8 +65,6 @@ const moduleRoutes=[
         path: "/event",
         route: eventRouter
     }
-
-
 ]
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

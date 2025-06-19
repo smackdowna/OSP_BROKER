@@ -7,7 +7,7 @@ import { followServices } from "./folllow.services";
 // create business page follower
 const createBusinessPageFollower = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   const { businessId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user.userId;
 
   const follower = await followServices.createBusinessPageFollower({ businessId, userId });
   
@@ -37,7 +37,7 @@ const isUserFollowingBusinessPage = catchAsyncError(async (req: Request, res: Re
 // create representative page follower
 const createRepresentativePageFollower = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { representativeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     
     const follower = await followServices.createRepresentativePageFollower({ representativeId, userId });
     
@@ -52,7 +52,7 @@ const createRepresentativePageFollower = catchAsyncError(async (req: Request, re
 // check if user is following representative page
 const isUserFollowingRepresentativePage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { representativeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const follower = await followServices.isUserFollowingRepresentativePage(representativeId, userId);
     
