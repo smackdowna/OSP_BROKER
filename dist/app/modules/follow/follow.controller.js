@@ -20,7 +20,7 @@ const folllow_services_1 = require("./folllow.services");
 const createBusinessPageFollower = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId } = req.params;
     const userId = req.user.userId;
-    const follower = yield folllow_services_1.followServices.createBusinessPageFollower({ businessId, userId });
+    const follower = yield folllow_services_1.followServices.createBusinessPageFollower({ businessId, userId }, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -40,11 +40,22 @@ const isUserFollowingBusinessPage = (0, catchAsyncError_1.default)((req, res, ne
         data: follower,
     });
 }));
+// get all business page followers
+const getAllBusinessPageFollowers = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { businessId } = req.params;
+    const followers = yield folllow_services_1.followServices.getAllBusinessPageFollowers(businessId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All business page followers retrieved successfully",
+        data: followers,
+    });
+}));
 // create representative page follower
 const createRepresentativePageFollower = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
     const userId = req.user.userId;
-    const follower = yield folllow_services_1.followServices.createRepresentativePageFollower({ representativeId, userId });
+    const follower = yield folllow_services_1.followServices.createRepresentativePageFollower({ representativeId, userId }, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -64,9 +75,22 @@ const isUserFollowingRepresentativePage = (0, catchAsyncError_1.default)((req, r
         data: follower,
     });
 }));
+// get all representative page followers
+const getAllRepresentativePageFollowers = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { representativeId } = req.params;
+    const followers = yield folllow_services_1.followServices.getAllRepresentativePageFollowers(representativeId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All representative page followers retrieved successfully",
+        data: followers,
+    });
+}));
 exports.followController = {
     createBusinessPageFollower,
     isUserFollowingBusinessPage,
+    getAllBusinessPageFollowers,
     createRepresentativePageFollower,
     isUserFollowingRepresentativePage,
+    getAllRepresentativePageFollowers
 };
