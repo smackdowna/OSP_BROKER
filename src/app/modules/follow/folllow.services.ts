@@ -1,9 +1,11 @@
 import {TBusinessPageFollower , TRepresentativePageFollower} from "./follow.intreface"
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
+import sendResponse from "../../middlewares/sendResponse";
+import { Response } from "express";
 
 // create business page follower(click follow)
-const createBusinessPageFollower = async (follower: TBusinessPageFollower) => {
+const createBusinessPageFollower = async (follower: TBusinessPageFollower , res:Response) => {
   const { businessId, userId } = follower;
 
   // Check if the follower already exists
@@ -15,7 +17,11 @@ const createBusinessPageFollower = async (follower: TBusinessPageFollower) => {
   });
 
   if (existingFollower) {
-    throw new AppError(400, "You are already following this business page");  
+    return sendResponse(res ,{
+      statusCode: 400,
+      success: false,
+      message: "You are already following this business page",
+    })
   }
 
   // Create a new follower
@@ -44,8 +50,22 @@ const isUserFollowingBusinessPage = async (businessId:string, userId: string) =>
     return {flag: true};
 }
 
+// get all business page followers
+const getAllBusinessPageFollowers = async (businessId: string) => {
+  const followers = await prismadb.businessPageFollower.findMany({
+    where: {
+      businessId,
+    },
+    include: {
+      user: true, 
+    },
+  });
+
+  return followers;
+}
+
 // create representative page follower(click follow)
-const createRepresentativePageFollower = async (follower: TRepresentativePageFollower) => {
+const createRepresentativePageFollower = async (follower: TRepresentativePageFollower , res:Response) => {
     const { representativeId, userId } = follower;
     
     // Check if the follower already exists
@@ -57,7 +77,11 @@ const createRepresentativePageFollower = async (follower: TRepresentativePageFol
     });
     
     if (existingFollower) {
-        throw new AppError(400, "You are already following this representative page");
+        return sendResponse(res , {
+            statusCode: 400,
+            success: false,
+            message: "You are already following this representative page",
+        })
     }
     
     // Create a new follower
@@ -86,9 +110,25 @@ const isUserFollowingRepresentativePage = async (representativeId: string, userI
     return { flag: true };
 }
 
+// get all representative page followers
+const getAllRepresentativePageFollowers = async (representativeId: string) => {
+    const followers = await prismadb.representativePageFollower.findMany({
+        where: {
+            representativeId,
+        },
+        include: {
+            user: true, 
+        },
+    });
+
+    return followers;
+}
+
 export const followServices = {
     createBusinessPageFollower,
     isUserFollowingBusinessPage,
+    getAllBusinessPageFollowers,
     createRepresentativePageFollower,
-    isUserFollowingRepresentativePage
+    isUserFollowingRepresentativePage,
+    getAllRepresentativePageFollowers,
 };

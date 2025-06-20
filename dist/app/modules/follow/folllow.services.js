@@ -14,9 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.followServices = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
-const appError_1 = __importDefault(require("../../errors/appError"));
+const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create business page follower(click follow)
-const createBusinessPageFollower = (follower) => __awaiter(void 0, void 0, void 0, function* () {
+const createBusinessPageFollower = (follower, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId, userId } = follower;
     // Check if the follower already exists
     const existingFollower = yield prismaDb_1.default.businessPageFollower.findFirst({
@@ -26,7 +26,11 @@ const createBusinessPageFollower = (follower) => __awaiter(void 0, void 0, void 
         },
     });
     if (existingFollower) {
-        throw new appError_1.default(400, "You are already following this business page");
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "You are already following this business page",
+        });
     }
     // Create a new follower
     const newFollower = yield prismaDb_1.default.businessPageFollower.create({
@@ -50,8 +54,20 @@ const isUserFollowingBusinessPage = (businessId, userId) => __awaiter(void 0, vo
     }
     return { flag: true };
 });
+// get all business page followers
+const getAllBusinessPageFollowers = (businessId) => __awaiter(void 0, void 0, void 0, function* () {
+    const followers = yield prismaDb_1.default.businessPageFollower.findMany({
+        where: {
+            businessId,
+        },
+        include: {
+            user: true,
+        },
+    });
+    return followers;
+});
 // create representative page follower(click follow)
-const createRepresentativePageFollower = (follower) => __awaiter(void 0, void 0, void 0, function* () {
+const createRepresentativePageFollower = (follower, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId, userId } = follower;
     // Check if the follower already exists
     const existingFollower = yield prismaDb_1.default.representativePageFollower.findFirst({
@@ -61,7 +77,11 @@ const createRepresentativePageFollower = (follower) => __awaiter(void 0, void 0,
         },
     });
     if (existingFollower) {
-        throw new appError_1.default(400, "You are already following this representative page");
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "You are already following this representative page",
+        });
     }
     // Create a new follower
     const newFollower = yield prismaDb_1.default.representativePageFollower.create({
@@ -85,9 +105,23 @@ const isUserFollowingRepresentativePage = (representativeId, userId) => __awaite
     }
     return { flag: true };
 });
+// get all representative page followers
+const getAllRepresentativePageFollowers = (representativeId) => __awaiter(void 0, void 0, void 0, function* () {
+    const followers = yield prismaDb_1.default.representativePageFollower.findMany({
+        where: {
+            representativeId,
+        },
+        include: {
+            user: true,
+        },
+    });
+    return followers;
+});
 exports.followServices = {
     createBusinessPageFollower,
     isUserFollowingBusinessPage,
+    getAllBusinessPageFollowers,
     createRepresentativePageFollower,
-    isUserFollowingRepresentativePage
+    isUserFollowingRepresentativePage,
+    getAllRepresentativePageFollowers,
 };

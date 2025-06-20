@@ -9,7 +9,7 @@ const createBusinessPageFollower = catchAsyncError(async (req: Request, res: Res
   const { businessId } = req.params;
   const userId = req.user.userId;
 
-  const follower = await followServices.createBusinessPageFollower({ businessId, userId });
+  const follower = await followServices.createBusinessPageFollower({ businessId, userId } , res);
   
   sendResponse(res, {
     statusCode: 200,
@@ -34,12 +34,26 @@ const isUserFollowingBusinessPage = catchAsyncError(async (req: Request, res: Re
   });
 });
 
+// get all business page followers
+const getAllBusinessPageFollowers = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const { businessId } = req.params;
+
+  const followers = await followServices.getAllBusinessPageFollowers(businessId);
+  
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "All business page followers retrieved successfully",
+    data: followers,
+  });
+});
+
 // create representative page follower
 const createRepresentativePageFollower = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { representativeId } = req.params;
     const userId = req.user.userId;
     
-    const follower = await followServices.createRepresentativePageFollower({ representativeId, userId });
+    const follower = await followServices.createRepresentativePageFollower({ representativeId, userId } ,res);
     
     sendResponse(res, {
         statusCode: 200,
@@ -64,9 +78,25 @@ const isUserFollowingRepresentativePage = catchAsyncError(async (req: Request, r
     });
 });
 
+// get all representative page followers
+const getAllRepresentativePageFollowers = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { representativeId } = req.params;
+
+    const followers = await followServices.getAllRepresentativePageFollowers(representativeId);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All representative page followers retrieved successfully",
+        data: followers,
+    });
+});
+
 export const followController = {
     createBusinessPageFollower,
     isUserFollowingBusinessPage,
+    getAllBusinessPageFollowers,
     createRepresentativePageFollower,
     isUserFollowingRepresentativePage,
+    getAllRepresentativePageFollowers
 };
