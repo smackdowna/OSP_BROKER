@@ -14,12 +14,24 @@ interface DecodedToken extends JwtPayload {
 
 export const verifyMembership = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
 
+    console.log("req.cookies.user is", req.cookies.user);
 
     if(req.cookies.user.role==="ADMIN"){
         return next();
     }
-    const token = req.cookies.accessToken || "";
-    if (!token) return res.status(401).json({ message: "unauthorized access" });
+    // const token = req.cookies.accessToken || "";
+    // if (!token) return res.status(401).json({ message: "unauthorized access" });
+
+    const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ error: 'No authorization header provided' });
+  }
+
+  // Extract the token (assuming Bearer scheme)
+  const token = authHeader.split(' ')[1]; // Splits "Bearer tokenvalue" into ["Bearer", "tokenvalue"]
+  console.log("token is", token);
+
 
     const decoded = jwt.verify(token, config.jwt_access_secret as string) as DecodedToken;
     req.cookies.user=decoded;
