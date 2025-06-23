@@ -6,7 +6,7 @@ import { Response , Request } from "express";
 import { TUserProfile } from "./userProfile.interface";
 
 // create user profile
-export const createUserProfile = async (
+const createUserProfile = async (
   userId: string,
   profileData: TUserProfile
 ) => {
@@ -36,7 +36,7 @@ export const createUserProfile = async (
 };
 
 // get user profile by userId
-export const getUserProfileByUserId = async (userId: string , res: Response , req: Request) => {
+const getUserProfileByUserId = async (userId: string , res: Response , req: Request) => {
     if(req.cookies.user.userId !== userId){
         return(
             sendResponse(res, {
@@ -75,7 +75,7 @@ export const getUserProfileByUserId = async (userId: string , res: Response , re
 };
 
 // update user profile
-export const updateUserProfile = async (userId: string, res: Response, profileData: Partial<TUserProfile>) => {
+const updateUserProfile = async (userId: string, res: Response, profileData: Partial<TUserProfile>) => {
     const { headLine, location, about, profileImageUrl, education, experience,skills, socialLinks } = profileData;
 
     if (!headLine || !location   || !about || !profileImageUrl || !education || !experience || !socialLinks || !skills) {
@@ -135,7 +135,7 @@ export const updateUserProfile = async (userId: string, res: Response, profileDa
 }
 
 // get all user profiles
-export const getAllUserProfiles = async (res: Response) => {
+const getAllUserProfiles = async (res: Response) => {
     const userProfiles = await prismadb.userProfile.findMany({
         include: {
             education: true,
@@ -161,7 +161,7 @@ export const getAllUserProfiles = async (res: Response) => {
 };
 
 // delete user profile
-export const deleteUserProfile = async (userId: string, res: Response) => {
+const deleteUserProfile = async (userId: string, res: Response) => {
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to deleteTopic");
     }

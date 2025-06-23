@@ -5,7 +5,7 @@ import { Response } from "express";
 import { TEvent } from "./event.interface";
 
 // create event
-export const createEvent = async (event: TEvent) => {
+const createEvent = async (event: TEvent) => {
     const { title, description, date, forumId } = event;
 
     // Check if the forum exists
@@ -31,7 +31,7 @@ export const createEvent = async (event: TEvent) => {
 }
 
 // get all events by forum id
-export const getEventsByForumId = async (forumId: string) => {
+const getEventsByForumId = async (forumId: string) => {
     // Check if the forum exists
     const forumExists = await prismadb.forum.findFirst({
         where: { id: forumId },
@@ -51,7 +51,7 @@ export const getEventsByForumId = async (forumId: string) => {
 }
 
 // get single event by id
-export const getEventById = async (forumId: string, eventId: string , res:Response) => {
+const getEventById = async (forumId: string, eventId: string , res:Response) => {
 
     // Check if the event exists
     const event = await prismadb.event.findFirst({
@@ -70,7 +70,7 @@ export const getEventById = async (forumId: string, eventId: string , res:Respon
 }
 
 // update event
-export const updateEvent = async (eventId: string, updatedData: Partial<TEvent> , res:Response) => {
+const updateEvent = async (eventId: string, updatedData: Partial<TEvent> , res:Response) => {
     // Check if the event exists
     const eventExists = await prismadb.event.findFirst({
         where: { id: eventId },
@@ -94,7 +94,7 @@ export const updateEvent = async (eventId: string, updatedData: Partial<TEvent> 
 }
 
 // delete event
-export const deleteEvent = async (eventId: string, res:Response) => {
+const deleteEvent = async (eventId: string, res:Response) => {
     // Check if the event exists
     const eventExists = await prismadb.event.findFirst({
         where: { id: eventId },

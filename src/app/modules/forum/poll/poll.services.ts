@@ -6,7 +6,7 @@ import sendResponse from "../../../middlewares/sendResponse";
 
 
 // create poll
-export const createPoll = async (poll: TPoll) => {
+const createPoll = async (poll: TPoll) => {
     const { question, options, forumId } = poll;
     
     // Check if the forum exists
@@ -31,7 +31,7 @@ export const createPoll = async (poll: TPoll) => {
 }
 
 // get all polls by forum id
-export const getPollsByForumId = async (forumId: string) => {
+const getPollsByForumId = async (forumId: string) => {
     // Check if the forum exists
     const forumExists = await prismadb.forum.findFirst({
         where: { id: forumId },
@@ -50,7 +50,7 @@ export const getPollsByForumId = async (forumId: string) => {
 }
 
 // get single poll by id with forum Id
-export const getPollById = async (forumId: string, pollId: string, res: Response) => {
+const getPollById = async (forumId: string, pollId: string, res: Response) => {
     // Check if the poll exists
     const poll = await prismadb.poll.findFirst({
         where: { id: pollId, forumId: forumId },
@@ -68,7 +68,7 @@ export const getPollById = async (forumId: string, pollId: string, res: Response
 }
 
 // delete poll by id
-export const deletePoll = async (id: string, res: Response) => {
+const deletePoll = async (id: string, res: Response) => {
     // Check if the poll exists
     const pollExists = await prismadb.poll.findFirst({
         where: { id: id },
@@ -91,7 +91,7 @@ export const deletePoll = async (id: string, res: Response) => {
 }
 
 // update poll by id
-export const updatePoll = async (id: string, updatedData: Partial<TPoll>, res: Response) => {
+const updatePoll = async (id: string, updatedData: Partial<TPoll>, res: Response) => {
     // Check if the poll exists
     const pollExists = await prismadb.poll.findFirst({
         where: { id: id },
@@ -114,11 +114,114 @@ export const updatePoll = async (id: string, updatedData: Partial<TPoll>, res: R
     return {poll: updatedPoll}
 }
 
+// create poll analytics
+const createPollAnalytics= async(pollId: string, index: number , res:Response)=>{
+
+    const pollAnalyticsExist= await prismadb.pollAnalytics.findFirst({
+        where: {
+            pollId: pollId
+        }
+    })
+
+    let votes;
+    let votesLength = 0;
+    if(pollAnalyticsExist){
+         votes= await prismadb.pollAnalytics.findFirst({
+            where: {
+                pollId: pollId
+            },
+            select: {
+                votes: true
+            }
+        })
+        console.log("Votes:", votes);
+
+        if(votes?.votes){
+            votesLength = votes?.votes.length;
+        }
+        console.log("Votes Length:", votesLength);
+    }
+
+
+    let voteArr= votesLength!==0? votes?.votes : [] ;
+
+    if(votesLength ==0){
+        
+        const pollOptions= await prismadb.poll.findFirst({
+            where:{
+                id: pollId
+            },
+            select:{
+                options: true
+            }
+        })
+    
+        if(!pollOptions){
+            return sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Poll not found",
+            })
+        }
+    
+        const optionsLength = pollOptions.options.length;
+    
+         voteArr= new Array(optionsLength).fill(0);
+    
+        }
+        if(voteArr){
+        voteArr[index] = voteArr[index] + 1;
+        }
+    
+
+    if(!pollAnalyticsExist){
+        // create poll analytics if not exist
+        const newPollAnalytics = await prismadb.pollAnalytics.create({
+            data:{
+                pollId: pollId,
+                votes: voteArr
+            }
+        })
+        return {pollAnalytics:newPollAnalytics};
+    }
+    
+    const pollAnalytics= await prismadb.pollAnalytics.update({
+        where: {
+            pollId: pollId
+        },
+        data: {
+            votes: voteArr
+        }
+    })
+
+    return pollAnalytics;
+
+}
+
+// get poll analytics by pollId
+const getPollAnalytics= async (pollId: string, res: Response) => {
+    // Check if the poll exists
+    const pollAnalytics = await prismadb.pollAnalytics.findFirst({
+        where: { pollId: pollId },
+    });
+    
+    if (!pollAnalytics) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Poll not found",
+        });
+    }
+    
+    return pollAnalytics;
+}
 
 export const pollservices={
     createPoll,
     getPollsByForumId,
     getPollById,
     deletePoll,
-    updatePoll
+    updatePoll,
+    createPollAnalytics,
+    getPollAnalytics
 }

@@ -5,7 +5,7 @@ import { Response } from "express";
 import sendResponse from "../../../middlewares/sendResponse";
 
 // create announcement
-export const createAnnouncement = async (announcement: TAnnouncement) => {
+const createAnnouncement = async (announcement: TAnnouncement) => {
   const { title, description, forumId } = announcement;
 
   // Check if the forum exists
@@ -30,7 +30,7 @@ export const createAnnouncement = async (announcement: TAnnouncement) => {
 };
 
 // get all announcements by forumId
-export const getAnnouncementsByForumId = async (forumId: string) => {
+const getAnnouncementsByForumId = async (forumId: string) => {
   // Check if the forum exists
   const forumExists = await prismadb.forum.findFirst({
     where: { id: forumId },
@@ -50,7 +50,7 @@ export const getAnnouncementsByForumId = async (forumId: string) => {
 };
 
 // get sinlge announcement by id
-export const getAnnouncementById = async (forumId:string,announcementId: string , res:Response) => {
+const getAnnouncementById = async (forumId:string,announcementId: string , res:Response) => {
     // Check if the announcement exists
     const announcement = await prismadb.announcement.findFirst({
         where: { id: announcementId , forumId: forumId },
@@ -71,7 +71,7 @@ export const getAnnouncementById = async (forumId:string,announcementId: string 
 
 
 // delete announcement by id
-export const deleteAnnouncement = async (announcementId: string , res:Response) => {
+const deleteAnnouncement = async (announcementId: string , res:Response) => {
     // Check if the announcement exists
     const announcementExists = await prismadb.announcement.findFirst({
         where: { id: announcementId },
@@ -96,7 +96,7 @@ export const deleteAnnouncement = async (announcementId: string , res:Response) 
  }
 
 //  udpate announcement
-export const updateAnnouncement = async (announcementId: string, updatedData: Partial<TAnnouncement>, res: Response) => {
+const updateAnnouncement = async (announcementId: string, updatedData: Partial<TAnnouncement>, res: Response) => {
     // Check if the announcement exists
     const announcementExists = await prismadb.announcement.findFirst({
         where: { id: announcementId },
