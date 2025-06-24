@@ -370,3 +370,15 @@ model RepresentativePageFollower{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+
+// one to one message model
+model Message{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    senderId String @db.ObjectId
+    recipientId String @db.ObjectId
+    content String
+    read Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
