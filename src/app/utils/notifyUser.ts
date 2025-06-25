@@ -1,5 +1,4 @@
-import { io , onlineUsers } from "./socket";
-
+import {io , onlineUsers} from "./Socket";
 
 export const notifyUser = (recipientId: string, data: any) => {
     const socketId = onlineUsers.get(recipientId);

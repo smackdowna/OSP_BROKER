@@ -11,6 +11,7 @@ import { followRouter } from "../modules/follow/follow.routes";
 import { announcementRouter } from "../modules/forum/announcemnet/announcement.routes";
 import { pollRouter } from "../modules/forum/poll/poll.routes";
 import { eventRouter } from "../modules/forum/events/event.routes";
+import { chatRouter } from "../modules/chat/chat.routes";
 
 const router = Router();
 
@@ -64,6 +65,10 @@ const moduleRoutes=[
     {
         path: "/event",
         route: eventRouter
+    },
+    {
+        path: "/chat",
+        route: chatRouter
     }
 ]
 
