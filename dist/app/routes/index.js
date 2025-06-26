@@ -13,6 +13,7 @@ const follow_routes_1 = require("../modules/follow/follow.routes");
 const announcement_routes_1 = require("../modules/forum/announcemnet/announcement.routes");
 const poll_routes_1 = require("../modules/forum/poll/poll.routes");
 const event_routes_1 = require("../modules/forum/events/event.routes");
+const chat_routes_1 = require("../modules/chat/chat.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -62,6 +63,10 @@ const moduleRoutes = [
     {
         path: "/event",
         route: event_routes_1.eventRouter
+    },
+    {
+        path: "/chat",
+        route: chat_routes_1.chatRouter
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.announcementServices = exports.updateAnnouncement = exports.deleteAnnouncement = exports.getAnnouncementById = exports.getAnnouncementsByForumId = exports.createAnnouncement = void 0;
+exports.announcementServices = void 0;
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
@@ -36,7 +36,6 @@ const createAnnouncement = (announcement) => __awaiter(void 0, void 0, void 0, f
     });
     return newAnnouncement;
 });
-exports.createAnnouncement = createAnnouncement;
 // get all announcements by forumId
 const getAnnouncementsByForumId = (forumId) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the forum exists
@@ -53,7 +52,6 @@ const getAnnouncementsByForumId = (forumId) => __awaiter(void 0, void 0, void 0,
     });
     return announcements;
 });
-exports.getAnnouncementsByForumId = getAnnouncementsByForumId;
 // get sinlge announcement by id
 const getAnnouncementById = (forumId, announcementId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the announcement exists
@@ -69,7 +67,6 @@ const getAnnouncementById = (forumId, announcementId, res) => __awaiter(void 0, 
     }
     return announcement;
 });
-exports.getAnnouncementById = getAnnouncementById;
 // delete announcement by id
 const deleteAnnouncement = (announcementId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the announcement exists
@@ -89,7 +86,6 @@ const deleteAnnouncement = (announcementId, res) => __awaiter(void 0, void 0, vo
     });
     return { message: "Announcement deleted successfully" };
 });
-exports.deleteAnnouncement = deleteAnnouncement;
 //  udpate announcement
 const updateAnnouncement = (announcementId, updatedData, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the announcement exists
@@ -110,11 +106,10 @@ const updateAnnouncement = (announcementId, updatedData, res) => __awaiter(void 
     });
     return updatedAnnouncement;
 });
-exports.updateAnnouncement = updateAnnouncement;
 exports.announcementServices = {
-    createAnnouncement: exports.createAnnouncement,
-    getAnnouncementsByForumId: exports.getAnnouncementsByForumId,
-    getAnnouncementById: exports.getAnnouncementById,
-    deleteAnnouncement: exports.deleteAnnouncement,
-    updateAnnouncement: exports.updateAnnouncement
+    createAnnouncement,
+    getAnnouncementsByForumId,
+    getAnnouncementById,
+    deleteAnnouncement,
+    updateAnnouncement
 };

@@ -73,10 +73,37 @@ const updatePoll = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
         data: { poll: updatedPoll },
     });
 }));
+// create poll analytics
+const createPollAnalytics = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pollId } = req.params;
+    const { index } = req.query;
+    const indexNumber = Number(index);
+    console.log("Index Number:", indexNumber);
+    const pollAnalytics = yield poll_services_1.pollservices.createPollAnalytics(pollId, indexNumber, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 201,
+        success: true,
+        message: "Poll analytics created successfully",
+        data: pollAnalytics,
+    });
+}));
+// get poll analytics
+const getPollAnalytics = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pollId } = req.params;
+    const pollAnalytics = yield poll_services_1.pollservices.getPollAnalytics(pollId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Poll analytics retrieved successfully",
+        data: pollAnalytics,
+    });
+}));
 exports.pollController = {
     createPoll,
     getPollsByForumId,
     getPollById,
     deletePoll,
-    updatePoll
+    updatePoll,
+    createPollAnalytics,
+    getPollAnalytics
 };

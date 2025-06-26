@@ -7,8 +7,8 @@ const router= Router();
 
 
 // chat routes
-router.post('/:receiverId', verifyToken, chatController.createMessage);
-router.get('/:receiverId', verifyToken, verifyMembership, chatController.getMessages);
-router.get('/unreadMessages/:receiverId', verifyToken, verifyMembership, chatController.getUnreadMessages);
+router.post('/:recipientId', verifyToken, chatController.createMessage);
+router.get('/:recipientId', verifyToken, verifyMembership, chatController.getMessages);
+router.get('/unreadMessages/:recipientId', verifyToken, verifyMembership, chatController.getUnreadMessages);
 
 export const chatRouter = router;

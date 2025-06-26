@@ -7,7 +7,7 @@ import { notifyUser } from "../../utils/notifyUser";
 
 
 // create messages
-const createMessage= async(message: TMessage, res: Response) => {
+const createMessage= async(message: TMessage) => {
     const { senderId, recipientId, content } = message;
     const newMessage= await prismadb.message.create({
         data: {
@@ -39,6 +39,7 @@ const createMessage= async(message: TMessage, res: Response) => {
       message: `New message from ${user?.fullName}`,
       senderId,
       messageId: newMessage.id,
+      content: newMessage.content,
     });
 
     return {message: newMessage};

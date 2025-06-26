@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pollservices = exports.updatePoll = exports.deletePoll = exports.getPollById = exports.getPollsByForumId = exports.createPoll = void 0;
+exports.pollservices = void 0;
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
@@ -36,7 +36,6 @@ const createPoll = (poll) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return { poll: newPoll };
 });
-exports.createPoll = createPoll;
 // get all polls by forum id
 const getPollsByForumId = (forumId) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the forum exists
@@ -52,7 +51,6 @@ const getPollsByForumId = (forumId) => __awaiter(void 0, void 0, void 0, functio
     });
     return polls;
 });
-exports.getPollsByForumId = getPollsByForumId;
 // get single poll by id with forum Id
 const getPollById = (forumId, pollId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the poll exists
@@ -68,7 +66,6 @@ const getPollById = (forumId, pollId, res) => __awaiter(void 0, void 0, void 0, 
     }
     return poll;
 });
-exports.getPollById = getPollById;
 // delete poll by id
 const deletePoll = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the poll exists
@@ -88,7 +85,6 @@ const deletePoll = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return poll;
 });
-exports.deletePoll = deletePoll;
 // update poll by id
 const updatePoll = (id, updatedData, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the poll exists
@@ -109,11 +105,94 @@ const updatePoll = (id, updatedData, res) => __awaiter(void 0, void 0, void 0, f
     });
     return { poll: updatedPoll };
 });
-exports.updatePoll = updatePoll;
+// create poll analytics
+const createPollAnalytics = (pollId, index, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const pollAnalyticsExist = yield prismaDb_1.default.pollAnalytics.findFirst({
+        where: {
+            pollId: pollId
+        }
+    });
+    let votes;
+    let votesLength = 0;
+    if (pollAnalyticsExist) {
+        votes = yield prismaDb_1.default.pollAnalytics.findFirst({
+            where: {
+                pollId: pollId
+            },
+            select: {
+                votes: true
+            }
+        });
+        console.log("Votes:", votes);
+        if (votes === null || votes === void 0 ? void 0 : votes.votes) {
+            votesLength = votes === null || votes === void 0 ? void 0 : votes.votes.length;
+        }
+        console.log("Votes Length:", votesLength);
+    }
+    let voteArr = votesLength !== 0 ? votes === null || votes === void 0 ? void 0 : votes.votes : [];
+    if (votesLength == 0) {
+        const pollOptions = yield prismaDb_1.default.poll.findFirst({
+            where: {
+                id: pollId
+            },
+            select: {
+                options: true
+            }
+        });
+        if (!pollOptions) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 404,
+                success: false,
+                message: "Poll not found",
+            });
+        }
+        const optionsLength = pollOptions.options.length;
+        voteArr = new Array(optionsLength).fill(0);
+    }
+    if (voteArr) {
+        voteArr[index] = voteArr[index] + 1;
+    }
+    if (!pollAnalyticsExist) {
+        // create poll analytics if not exist
+        const newPollAnalytics = yield prismaDb_1.default.pollAnalytics.create({
+            data: {
+                pollId: pollId,
+                votes: voteArr
+            }
+        });
+        return { pollAnalytics: newPollAnalytics };
+    }
+    const pollAnalytics = yield prismaDb_1.default.pollAnalytics.update({
+        where: {
+            pollId: pollId
+        },
+        data: {
+            votes: voteArr
+        }
+    });
+    return pollAnalytics;
+});
+// get poll analytics by pollId
+const getPollAnalytics = (pollId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the poll exists
+    const pollAnalytics = yield prismaDb_1.default.pollAnalytics.findFirst({
+        where: { pollId: pollId },
+    });
+    if (!pollAnalytics) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Poll not found",
+        });
+    }
+    return pollAnalytics;
+});
 exports.pollservices = {
-    createPoll: exports.createPoll,
-    getPollsByForumId: exports.getPollsByForumId,
-    getPollById: exports.getPollById,
-    deletePoll: exports.deletePoll,
-    updatePoll: exports.updatePoll
+    createPoll,
+    getPollsByForumId,
+    getPollById,
+    deletePoll,
+    updatePoll,
+    createPollAnalytics,
+    getPollAnalytics
 };
