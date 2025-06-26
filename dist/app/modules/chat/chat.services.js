@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatServices = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
-const Socket_1 = require("../../utils/Socket");
+const mainSocket_1 = require("../../utils/mainSocket");
 const notifyUser_1 = require("../../utils/notifyUser");
 // create messages
 const createMessage = (message) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,9 +33,9 @@ const createMessage = (message) => __awaiter(void 0, void 0, void 0, function* (
             id: senderId
         }
     });
-    const recipientSocketId = Socket_1.onlineUsers.get(recipientId);
+    const recipientSocketId = mainSocket_1.onlineUsers.get(recipientId);
     if (recipientSocketId) {
-        Socket_1.io.to(recipientSocketId).emit("new-message", message);
+        mainSocket_1.io.to(recipientSocketId).emit("new-message", message);
         // Mark as read immediately if delivered
         yield prismaDb_1.default.message.update({
             where: { id: newMessage === null || newMessage === void 0 ? void 0 : newMessage.id },
