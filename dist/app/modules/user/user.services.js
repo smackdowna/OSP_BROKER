@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userService = exports.deleteUser = exports.getUserById = exports.getAllUsers = void 0;
+exports.userService = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // get all users
@@ -27,7 +27,6 @@ const getAllUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     return { users };
 });
-exports.getAllUsers = getAllUsers;
 // get user by id
 const getUserById = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prismaDb_1.default.user.findFirst({
@@ -47,7 +46,6 @@ const getUserById = (userId, res) => __awaiter(void 0, void 0, void 0, function*
     }
     return { user };
 });
-exports.getUserById = getUserById;
 // delete user
 const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!res || typeof res.status !== "function") {
@@ -72,9 +70,8 @@ const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* 
     });
     return { user };
 });
-exports.deleteUser = deleteUser;
 exports.userService = {
-    getAllUsers: exports.getAllUsers,
-    getUserById: exports.getUserById,
-    deleteUser: exports.deleteUser,
+    getAllUsers,
+    getUserById,
+    deleteUser,
 };

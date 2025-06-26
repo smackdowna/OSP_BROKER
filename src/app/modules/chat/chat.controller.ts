@@ -5,10 +5,10 @@ import { chatServices } from "./chat.services";
 
 // create message
 const createMessage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const content = req.body;
-    const senderId = req.user.id
-    const recipientId = req.params
-    const message = await chatServices.createMessage({ ...content, senderId, recipientId }, res);
+    const {content} = req.body;
+    const senderId = req.user.userId
+    const {recipientId} = req.params
+    const message = await chatServices.createMessage({ content, senderId, recipientId });
     sendResponse(res, {
         statusCode: 201,
         success: true,
@@ -20,9 +20,9 @@ const createMessage = catchAsyncError(async (req: Request, res: Response, next: 
 
 // get messages
 const getMessages = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const senderId = req.user.id;
-    const {  receiverId } = req.params;
-    const messages = await chatServices.getMessages(senderId, receiverId, res);
+    const senderId = req.user.userId;
+    const {  recipientId } = req.params;
+    const messages = await chatServices.getMessages(senderId, recipientId, res);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -33,8 +33,8 @@ const getMessages = catchAsyncError(async (req: Request, res: Response, next: Ne
 
 // get unread messages
 const getUnreadMessages = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { receiverId } = req.params;
-    const unreadMessages = await chatServices.getUnreadMessages(receiverId, res);
+    const { recipientId } = req.params;
+    const unreadMessages = await chatServices.getUnreadMessages(recipientId, res);
     sendResponse(res, {
         statusCode: 200,
         success: true,

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eventServices = exports.deleteEvent = exports.updateEvent = exports.getEventById = exports.getEventsByForumId = exports.createEvent = void 0;
+exports.eventServices = void 0;
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
@@ -37,7 +37,6 @@ const createEvent = (event) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return { event: newEvent };
 });
-exports.createEvent = createEvent;
 // get all events by forum id
 const getEventsByForumId = (forumId) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the forum exists
@@ -54,7 +53,6 @@ const getEventsByForumId = (forumId) => __awaiter(void 0, void 0, void 0, functi
     });
     return events;
 });
-exports.getEventsByForumId = getEventsByForumId;
 // get single event by id
 const getEventById = (forumId, eventId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event exists
@@ -70,7 +68,6 @@ const getEventById = (forumId, eventId, res) => __awaiter(void 0, void 0, void 0
     }
     return event;
 });
-exports.getEventById = getEventById;
 // update event
 const updateEvent = (eventId, updatedData, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event exists
@@ -91,7 +88,6 @@ const updateEvent = (eventId, updatedData, res) => __awaiter(void 0, void 0, voi
     });
     return event;
 });
-exports.updateEvent = updateEvent;
 // delete event
 const deleteEvent = (eventId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event exists
@@ -111,11 +107,10 @@ const deleteEvent = (eventId, res) => __awaiter(void 0, void 0, void 0, function
     });
     return event;
 });
-exports.deleteEvent = deleteEvent;
 exports.eventServices = {
-    createEvent: exports.createEvent,
-    getEventsByForumId: exports.getEventsByForumId,
-    getEventById: exports.getEventById,
-    updateEvent: exports.updateEvent,
-    deleteEvent: exports.deleteEvent
+    createEvent,
+    getEventsByForumId,
+    getEventById,
+    updateEvent,
+    deleteEvent
 };
