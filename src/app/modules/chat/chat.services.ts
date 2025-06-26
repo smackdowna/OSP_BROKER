@@ -2,7 +2,7 @@ import prismadb from "../../db/prismaDb";
 import sendResponse from "../../middlewares/sendResponse";
 import { Response } from "express";
 import { TMessage } from "./chat.interface";
-import {io , onlineUsers } from "../../utils/Socket";
+import {io , onlineUsers } from "../../utils/mainSocket";
 import { notifyUser } from "../../utils/notifyUser";
 
 
