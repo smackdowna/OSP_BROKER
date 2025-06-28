@@ -27,6 +27,27 @@ const banUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(voi
         data: user,
     });
 }));
+// unban users
+const unbanUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    const user = yield moderator_services_1.moderatorServices.unbanUser(res, userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "User unbanned successfully",
+        data: user,
+    });
+}));
+// get all banned users
+const getAllBannedUsers = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const bannedUsers = yield moderator_services_1.moderatorServices.getAllBannedUsers(res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Banned users retrieved successfully",
+        data: bannedUsers,
+    });
+}));
 // get all moderators
 const getAllModerators = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const moderators = yield moderator_services_1.moderatorServices.getAllModerators(res);
@@ -39,5 +60,7 @@ const getAllModerators = (0, catchAsyncError_1.default)((req, res, next) => __aw
 }));
 exports.moderatorController = {
     banUser,
+    unbanUser,
+    getAllBannedUsers,
     getAllModerators
 };

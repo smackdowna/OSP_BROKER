@@ -39,6 +39,46 @@ const banUser = (res, userId) => __awaiter(void 0, void 0, void 0, function* () 
     });
     return updatedUser;
 });
+// unban user
+const unbanUser = (res, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prismaDb_1.default.user.findFirst({
+        where: {
+            id: userId,
+        },
+    });
+    if (!user) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "User not found"
+        }));
+    }
+    const updatedUser = yield prismaDb_1.default.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            isBanned: false,
+        },
+    });
+    return updatedUser;
+});
+// get all banned users
+const getAllBannedUsers = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const bannedUsers = yield prismaDb_1.default.user.findMany({
+        where: {
+            isBanned: true,
+        },
+    });
+    if (!bannedUsers) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No banned users found"
+        }));
+    }
+    return bannedUsers;
+});
 // get all moderators
 const getAllModerators = (res) => __awaiter(void 0, void 0, void 0, function* () {
     const moderators = yield prismaDb_1.default.moderator.findMany();
@@ -53,5 +93,7 @@ const getAllModerators = (res) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.moderatorServices = {
     banUser,
+    unbanUser,
+    getAllBannedUsers,
     getAllModerators
 };
