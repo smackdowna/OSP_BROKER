@@ -10,14 +10,14 @@ const requireAuth_1 = require("../../middlewares/requireAuth");
 const authorizeRole_1 = require("../../middlewares/authorizeRole");
 const router = express_1.default.Router();
 // Membership routes
-router.post("/userMembership", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.createUserMembership);
+router.post("/userMembership", membership_controller_1.membershipController.createUserMembership);
 router.get("/userMemberships", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.getAllUserMemberships);
 router.get("/userMembership/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.getUserMembershipById);
 router.put("/userMembership/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.updateUserMembership);
 router.delete("/userMembership/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.deleteUserMembership);
 router.post("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.createMembershipPlan);
-router.get("/", requireAuth_1.verifyToken, membership_controller_1.membershipController.getAllMembershipPlans);
-router.get("/:id", requireAuth_1.verifyToken, membership_controller_1.membershipController.getMembershipPlanById);
+router.get("/", membership_controller_1.membershipController.getAllMembershipPlans);
+router.get("/:id", membership_controller_1.membershipController.getMembershipPlanById);
 router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.updateMembershipPlan);
 router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.deleteMembershipPlan);
 exports.membershipRouter = router;

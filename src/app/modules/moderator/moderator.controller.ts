@@ -17,6 +17,31 @@ const banUser = catchAsyncError(async (req: Request, res: Response, next: NextFu
   });
 });
 
+
+// unban users
+const unbanUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+  const user = await moderatorServices.unbanUser(res ,userId);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User unbanned successfully",
+    data: user,
+  });
+});
+
+// get all banned users
+const getAllBannedUsers = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const bannedUsers = await moderatorServices.getAllBannedUsers(res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Banned users retrieved successfully",
+    data: bannedUsers,
+  });
+});
+
+
 // get all moderators
 const getAllModerators = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   const moderators = await moderatorServices.getAllModerators(res);
@@ -30,5 +55,7 @@ const getAllModerators = catchAsyncError(async (req: Request, res: Response, nex
 
 export const moderatorController = {
   banUser,
+  unbanUser,
+  getAllBannedUsers,
   getAllModerators
 };
