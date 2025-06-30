@@ -1,5 +1,4 @@
 export type TBusiness = {
-  createdByUserId: string; // Business Admin User ID
   authorizedUser?: boolean;
   businessName: string;
   slogan: string;
