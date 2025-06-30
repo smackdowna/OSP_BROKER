@@ -18,10 +18,9 @@ const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse")
 const business_services_1 = require("./business.services");
 // create business
 const createBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { businessAdminId } = req.params;
-    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, } = req.body;
+    const businessAdminId = req.user.userId;
+    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, } = req.body;
     const business = yield business_services_1.businessServices.createBusiness({
-        createdByUserId,
         authorizedUser,
         businessName,
         slogan,

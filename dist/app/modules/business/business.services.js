@@ -18,8 +18,8 @@ const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create a new business
 const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function* () {
-    const { createdByUserId, authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId } = business;
-    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId) {
+    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId } = business;
+    if (!businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId) {
         throw new appError_1.default(400, "please provide all required fields");
     }
     const existingBusiness = yield prismaDb_1.default.business.findFirst({
@@ -32,7 +32,6 @@ const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function*
     }
     const businessBody = yield prismaDb_1.default.business.create({
         data: {
-            createdByUserId,
             authorizedUser: authorizedUser || false,
             businessName,
             slogan,

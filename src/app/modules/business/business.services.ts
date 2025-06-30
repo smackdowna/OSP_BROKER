@@ -7,7 +7,6 @@ import sendResponse from "../../middlewares/sendResponse";
 // create a new business
 const createBusiness = async (business: TBusiness) => {
     const {
-        createdByUserId,
         authorizedUser,
         businessName,
         slogan,
@@ -33,7 +32,7 @@ const createBusiness = async (business: TBusiness) => {
         businessAdminId
     } = business;
 
-    if (!createdByUserId || !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId ) {
+    if ( !businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId ) {
         throw new AppError(400, "please provide all required fields");
     }
 
@@ -49,7 +48,6 @@ const createBusiness = async (business: TBusiness) => {
 
     const businessBody = await prismadb.business.create({
         data: {
-            createdByUserId,
             authorizedUser: authorizedUser || false,
             businessName,
             slogan,

@@ -70,7 +70,30 @@ const getCategoryById= async (categoryId: string , res: Response) => {
             })
         )
     }
-    return {category};
+    console.log("Category: ", category);
+
+    const moderatorId= category?.moderatorId;
+    console.log("Moderator ID: ", moderatorId);
+    const moderatorName= await prismadb.user.findFirst({
+        where: {
+            id: moderatorId,
+        },
+        select: {
+            fullName: true
+        },
+    });
+
+
+    const moderatorProfileUrl= await prismadb.userProfile.findFirst({
+        where: {
+            userId: moderatorId,
+        },
+        select: {
+            profileImageUrl: true
+        }
+    });
+
+    return {category , moderatorName  , moderatorProfileUrl};
 }
 
 // update category

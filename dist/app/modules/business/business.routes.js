@@ -18,7 +18,7 @@ router.put('/representative/:id', requireAuth_1.verifyToken, authorizeMembership
 router.delete('/representative/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, business_controller_1.businessController.deleteRepresentative);
 router.post('/representative/:representativeId', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.approveRepresentative);
 // Business routes
-router.post('/:businessAdminId', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.createBusiness);
+router.post('/', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.createBusiness);
 router.get('/', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.getAllBusinesses);
 router.get('/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.getBusinessById);
 router.put('/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("BUSINESS_ADMIN"), business_controller_1.businessController.updateBusiness);

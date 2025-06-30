@@ -23,7 +23,7 @@ model User{
     email   String   @unique
     password String
     role    ROLE @default(USER)
-    phone   String
+    phone   String  @unique
     isBanned Boolean? @default(false)
     userProfile UserProfile? @relation("userToUserProfile")
     representative Representative? @relation("userToRepresentative")
@@ -122,7 +122,6 @@ model Representative{
 // business registration model
 model business{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    createdByUserId String @db.ObjectId //business admin id
     authorizedUser Boolean @default(false)
     businessName String
     slogan String
@@ -148,6 +147,8 @@ model business{
     
     businessAdminId String @db.ObjectId
     BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
+
+    groupChat GroupChat? @relation("businessToGroupChat")
     representative Representative[] @relation("businessToRepresentative")
     businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
 }
@@ -382,3 +383,40 @@ model Message{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+// group chat
+
+model GroupChat{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    businessId String @db.ObjectId @unique
+
+    Business business @relation("businessToGroupChat", fields: [businessId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    groupMessages GroupMessage[] @relation("groupToGroupMessages")
+    groupMembers GroupMembers[] @relation("groupToGroupMembers")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model GroupMessage{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    senderId String @db.ObjectId
+    content String
+
+    groupchatId String @db.ObjectId
+    GroupChat GroupChat @relation("groupToGroupMessages", fields: [groupchatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model GroupMembers{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+
+    groupchatId String @db.ObjectId
+    GroupChat GroupChat @relation("groupToGroupMembers", fields: [groupchatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
