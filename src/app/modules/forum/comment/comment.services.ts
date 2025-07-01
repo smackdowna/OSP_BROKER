@@ -92,6 +92,31 @@ const getAllComments = async () => {
     return {comments};
 }
 
+// get comment by topic id
+const getCommentByTopicId = async (topicId: string , res:Response) => {
+    const comment = await prismadb.comment.findMany({
+        where: {
+            topicId: topicId,
+        },
+        include: {
+            Topic: {
+                select:{
+                    id: true,
+                    title:true
+                }
+            },
+        },
+    });
+    if (!comment) {
+        sendResponse(res , {
+            statusCode: 404,
+            success: false,
+            message: "No comments found for this topic",
+        })
+    }
+    return {comment};
+}
+
 // delete all comments
 const deleteAllComments = async () => {
     const comments = await prismadb.comment.deleteMany({});
@@ -178,6 +203,7 @@ const deleteComment = async (commentId: string , res: Response) => {
 export const commentServices = {
     createComment,
     getAllComments,
+    getCommentByTopicId,
     deleteAllComments,
     getCommentById,
     updateComment,
