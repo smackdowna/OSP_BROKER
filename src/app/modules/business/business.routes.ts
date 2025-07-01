@@ -16,7 +16,7 @@ router.post('/representative/:representativeId' , verifyToken , verifyMembership
 
 
 // Business routes
-router.post('/', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.createBusiness);
+router.post('/', verifyToken, verifyMembership, businessController.createBusiness);
 router.get('/', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.getAllBusinesses);
 router.get('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.getBusinessById);
 router.put('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.updateBusiness);

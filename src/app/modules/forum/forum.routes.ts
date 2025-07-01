@@ -11,15 +11,16 @@ const router = express.Router();
 
 // Topic routes
 router.post('/topic',verifyToken,verifyMembership, topicController.createTopic);
-router.get('/topics',verifyToken,verifyMembership, topicController.getAllTopics);
+router.get('/topics', topicController.getAllTopics);
 router.get('/topic/:id',verifyToken,verifyMembership, topicController.getTopicById);
 router.put('/topic/:id',verifyToken,authorizeRole("MODERATOR"), topicController.updateTopic);
 router.delete('/topic/:id',verifyToken,authorizeRole("MODERATOR"), topicController.deleteTopic);
 router.delete('/topics',verifyToken,authorizeRole("MODERATOR"), topicController.deleteAllTopics);
 
 // Comment routes
-router.post('/comment/:commenterId',verifyToken,verifyMembership, commentController.createComment);
-router.get('/comments',verifyToken,verifyMembership, commentController.getAllComments);
+router.post('/comment',verifyToken,verifyMembership, commentController.createComment);
+router.get('/comments',verifyToken,verifyMembership, authorizeRole("ADMIN"), commentController.getAllComments);
+router.get('/comments/:topicId' , commentController.getCommentByTopicId);
 router.get('/comment/:id',verifyToken,verifyMembership, commentController.getCommentById);
 router.get('/notifications/:senderId',verifyToken,verifyMembership, commentController.getAllNotifications);
 router.put('/comment/:id',verifyToken,verifyMembership, commentController.updateComment);
@@ -28,14 +29,14 @@ router.delete('/comments',verifyToken,authorizeRole("ADMIN"), commentController.
 
 // Category routes
 router.post('/category',verifyToken,authorizeRole("ADMIN"), categoriesController.createCategory);
-router.get('/categories',verifyToken, categoriesController.getAllCategories);
+router.get('/categories', categoriesController.getAllCategories);
 router.get('/category/:id',verifyToken, categoriesController.getCategoryById);
 router.put('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.updateCategory);
 router.delete('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.deleteCategory);
 
 // Forum routes
 router.post('/',verifyToken,verifyMembership, forumControllers.createForum);
-router.get('/',verifyToken,verifyMembership, forumControllers.getAllForums);
+router.get('/', forumControllers.getAllForums);
 router.get('/:id',verifyToken,verifyMembership, forumControllers.getForumById); 
 router.put('/:id',verifyToken,authorizeRole("MODERATOR"), forumControllers.updateForum);
 router.delete('/:id',verifyToken,authorizeRole("MODERATOR"), forumControllers.deleteForum);

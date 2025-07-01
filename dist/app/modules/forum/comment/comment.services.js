@@ -93,6 +93,30 @@ const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     return { comments };
 });
+// get comment by topic id
+const getCommentByTopicId = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const comment = yield prismaDb_1.default.comment.findMany({
+        where: {
+            topicId: topicId,
+        },
+        include: {
+            Topic: {
+                select: {
+                    id: true,
+                    title: true
+                }
+            },
+        },
+    });
+    if (!comment) {
+        (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No comments found for this topic",
+        });
+    }
+    return { comment };
+});
 // delete all comments
 const deleteAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
     const comments = yield prismaDb_1.default.comment.deleteMany({});
@@ -168,6 +192,7 @@ const deleteComment = (commentId, res) => __awaiter(void 0, void 0, void 0, func
 exports.commentServices = {
     createComment,
     getAllComments,
+    getCommentByTopicId,
     deleteAllComments,
     getCommentById,
     updateComment,

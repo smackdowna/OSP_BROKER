@@ -154,6 +154,18 @@ model business{
 }
 
 
+// approve business_admin role requests after creating a buiness page.
+// model BusinessAdminRequest{
+//     id String @id @default(auto()) @map("_id") @db.ObjectId
+//     userId String @db.ObjectId @unique
+//     userName String
+//     approved Boolean @default(false)
+
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+
 
 model Admin{
     id String @id @default(auto()) @map("_id") @db.ObjectId

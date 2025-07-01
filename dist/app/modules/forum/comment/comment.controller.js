@@ -20,7 +20,7 @@ const getCategoryId_1 = require("../../../utils/getCategoryId");
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 // create comment
 const createComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { commenterId } = req.params;
+    const commenterId = req.user.userId;
     const { comment, author, topicId } = req.body;
     const newComment = yield comment_services_1.commentServices.createComment({
         comment,
@@ -54,6 +54,17 @@ const getAllComments = (0, catchAsyncError_1.default)((req, res, next) => __awai
         success: true,
         message: "All comments fetched successfully",
         data: comments,
+    });
+}));
+// get comment by topic id
+const getCommentByTopicId = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { topicId } = req.params;
+    const comment = yield comment_services_1.commentServices.getCommentByTopicId(topicId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Comments fetched successfully",
+        data: comment,
     });
 }));
 // get comment by id
@@ -194,6 +205,7 @@ exports.commentController = {
     createComment,
     deleteAllComments,
     getAllComments,
+    getCommentByTopicId,
     getCommentById,
     updateComment,
     deleteComment,

@@ -9,7 +9,7 @@ import prismadb from "../../../db/prismaDb";
 // create comment
 const createComment = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { commenterId } = req.params;
+    const  commenterId  = req.user.userId;
     const { comment, author, topicId } = req.body;
     const newComment = await commentServices.createComment({
       comment,
@@ -52,6 +52,18 @@ const getAllComments = catchAsyncError(
     });
   }
 );
+
+// get comment by topic id
+const getCommentByTopicId = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+  const { topicId } = req.params;
+  const comment = await commentServices.getCommentByTopicId(topicId, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Comments fetched successfully",
+    data: comment,
+  });
+});
 
 // get comment by id
 const getCommentById = catchAsyncError(
@@ -224,6 +236,7 @@ export const commentController = {
   createComment,
   deleteAllComments,
   getAllComments,
+  getCommentByTopicId,
   getCommentById,
   updateComment,
   deleteComment,
