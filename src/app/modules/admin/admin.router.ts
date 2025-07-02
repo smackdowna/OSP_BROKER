@@ -8,5 +8,6 @@ const router = express.Router();
 // Admin routes
 router.post('/assignModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.assignModerator);
 router.delete('/removeModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.removeModerator);
+router.put('/updateRole', verifyToken, authorizeRole("ADMIN"), adminController.updateRole);
 
 export const adminRouter = router;

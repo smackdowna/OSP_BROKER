@@ -19,7 +19,7 @@ const business_services_1 = require("./business.services");
 // create business
 const createBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const businessAdminId = req.user.userId;
-    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, } = req.body;
+    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessCategoryId } = req.body;
     const business = yield business_services_1.businessServices.createBusiness({
         authorizedUser,
         businessName,
@@ -43,8 +43,9 @@ const createBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awai
         saleDeckUrl,
         websiteLinks,
         accountOwnerUsername,
-        businessAdminId
-    });
+        businessAdminId,
+        businessCategoryId
+    }, req);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -94,6 +95,17 @@ const deleteBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awai
         message: "Business deleted successfully",
     });
 }));
+// approve business page
+const approveBusinessPage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { businessId } = req.params;
+    const business = yield business_services_1.businessServices.approveBusinessPage(businessId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business page approved successfully",
+        data: business,
+    });
+}));
 // approve representative
 const approveRepresentative = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
@@ -114,7 +126,7 @@ const createRepresentative = (0, catchAsyncError_1.default)((req, res, next) => 
         message,
         businessId,
         userId
-    });
+    }, req);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -141,6 +153,17 @@ const getRepresentativeById = (0, catchAsyncError_1.default)((req, res, next) =>
         success: true,
         message: "Representative retrieved successfully",
         data: representative,
+    });
+}));
+// get representative by business id
+const getRepresentativeByBusinessId = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { businessId } = req.params;
+    const representatives = yield business_services_1.businessServices.getRepresentativeByBusinessId(businessId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Representative retrieved successfully",
+        data: representatives,
     });
 }));
 // update representative
@@ -179,10 +202,12 @@ exports.businessController = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveBusinessPage,
     approveRepresentative,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,
+    getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
     deleteAllRepresentatives

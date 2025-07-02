@@ -1,8 +1,10 @@
 import config from "../../config";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
+import sendResponse from "../../middlewares/sendResponse";
 import { createToken } from "../auth/auth.utils";
 import { Response } from "express";
+import { Role } from "./admin.interface";
 
 // assign moderator role to user
 
@@ -52,23 +54,23 @@ const updatedUser = await prismadb.user.update({
     },
   });
 
-  const newToken = createToken(
-    {
-      userId: updatedUser.id,
-      email: updatedUser.email,
-      role: updatedUser.role, // Updated role
-    },
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string
-  );
+  // const newToken = createToken(
+  //   {
+  //     userId: updatedUser.id,
+  //     email: updatedUser.email,
+  //     role: updatedUser.role, // Updated role
+  //   },
+  //   config.jwt_access_secret as string,
+  //   config.jwt_access_expires_in as string
+  // );
 
-  // Set the new token in the cookie
-  res.cookie("accessToken", newToken, {
-    httpOnly: true,
-    secure: config.node_env === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  // // Set the new token in the cookie
+  // res.cookie("accessToken", newToken, {
+  //   httpOnly: true,
+  //   secure: config.node_env === "production",
+  //   sameSite: "strict",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  // });
 
   return { user: updatedUser, moderator };
 };
@@ -106,7 +108,37 @@ const removeModerator = async (userId: string) => {
   return { moderator };
 };
 
+// update role
+const updateRole= async(userId: string , role:Role  ,res:Response)=>{
+  const user= await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    }
+  });
+
+  if(!user){
+    return( sendResponse(res,{
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+    }))
+  }
+
+  const updatedUser=  await prismadb.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      role: role,
+    },
+  });
+
+  return {user: updatedUser};
+  
+}
+
 export const adminServices = {
   assignModerator,
   removeModerator,
+  updateRole
 };

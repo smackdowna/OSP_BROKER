@@ -123,7 +123,7 @@ model Representative{
 model business{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     authorizedUser Boolean @default(false)
-    businessName String
+    businessName String @unique
     slogan String
     mission String
     industry String
@@ -148,24 +148,23 @@ model business{
     businessAdminId String @db.ObjectId
     BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
 
+    businessCategoryId String @db.ObjectId
+    BusinessCategory BusinessCategory @relation("businessToBusinessCategory",fields: [businessCategoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
     groupChat GroupChat? @relation("businessToGroupChat")
     representative Representative[] @relation("businessToRepresentative")
     businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
 }
 
+model BusinessCategory{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    description String
+    business business[] @relation("businessToBusinessCategory")
 
-// approve business_admin role requests after creating a buiness page.
-// model BusinessAdminRequest{
-//     id String @id @default(auto()) @map("_id") @db.ObjectId
-//     userId String @db.ObjectId @unique
-//     userName String
-//     approved Boolean @default(false)
-
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-// }
-
-
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
 
 model Admin{
     id String @id @default(auto()) @map("_id") @db.ObjectId

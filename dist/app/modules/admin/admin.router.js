@@ -12,4 +12,5 @@ const router = express_1.default.Router();
 // Admin routes
 router.post('/assignModerator/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.assignModerator);
 router.delete('/removeModerator/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.removeModerator);
+router.put('/updateRole', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.updateRole);
 exports.adminRouter = router;

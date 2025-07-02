@@ -30,6 +30,7 @@ const createBusiness = catchAsyncError(async (req: Request, res: Response, next:
         saleDeckUrl,
         websiteLinks,
         accountOwnerUsername,
+        businessCategoryId
      } = req.body;
     const business = await businessServices.createBusiness({ 
         authorizedUser,
@@ -54,8 +55,9 @@ const createBusiness = catchAsyncError(async (req: Request, res: Response, next:
         saleDeckUrl,
         websiteLinks,
         accountOwnerUsername,
-        businessAdminId
-     });
+        businessAdminId,
+        businessCategoryId
+     } , req);
     sendResponse(res,{
         statusCode: 200,
         success: true,
@@ -110,6 +112,18 @@ const deleteBusiness = catchAsyncError(async (req: Request, res: Response, next:
     });
 });
 
+// approve business page
+const approveBusinessPage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { businessId } = req.params;
+    const business = await businessServices.approveBusinessPage(businessId , res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business page approved successfully",
+        data: business,
+    });
+});
+
 // approve representative
 const approveRepresentative= catchAsyncError(async(req:Request , res: Response , next: NextFunction)=>{
     const {representativeId}= req.params;
@@ -135,7 +149,7 @@ const createRepresentative = catchAsyncError(async (req: Request, res: Response,
         message,
         businessId,
         userId
-     });
+     } , req);
     sendResponse(res,{
         statusCode: 200,
         success: true,
@@ -164,6 +178,18 @@ const getRepresentativeById = catchAsyncError(async (req: Request, res: Response
         success: true,
         message: "Representative retrieved successfully",
         data: representative,
+    });
+});
+
+// get representative by business id
+const getRepresentativeByBusinessId = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { businessId } = req.params;
+    const representatives = await businessServices.getRepresentativeByBusinessId(businessId , res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Representative retrieved successfully",
+        data: representatives,
     });
 });
 
@@ -206,10 +232,12 @@ export const businessController = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveBusinessPage,
     approveRepresentative,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,
+    getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
     deleteAllRepresentatives
