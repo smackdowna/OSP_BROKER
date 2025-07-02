@@ -17,9 +17,9 @@ const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create a new business
-const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function* () {
-    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId } = business;
-    if (!businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId) {
+const createBusiness = (business, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authorizedUser, businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks, accountOwnerUsername, businessAdminId, businessCategoryId } = business;
+    if (!businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId || !businessCategoryId) {
         throw new appError_1.default(400, "please provide all required fields");
     }
     const existingBusiness = yield prismaDb_1.default.business.findFirst({
@@ -54,9 +54,24 @@ const createBusiness = (business) => __awaiter(void 0, void 0, void 0, function*
             saleDeckUrl: saleDeckUrl || "",
             websiteLinks: websiteLinks || [],
             accountOwnerUsername,
-            businessAdminId
+            businessAdminId,
+            businessCategoryId
         }
     });
+    if (!businessBody) {
+        throw new appError_1.default(500, "Failed to create business");
+    }
+    if (req.user.role !== "ADMIN") {
+        yield prismaDb_1.default.user.update({
+            where: {
+                id: businessAdminId
+            },
+            data: {
+                role: "BUSINESS_ADMIN"
+            }
+        });
+        req.cookies.user.role = "BUSINESS_ADMIN";
+    }
     return { business: businessBody };
 });
 // get all businesses
@@ -179,6 +194,56 @@ const deleteBusiness = (id, res) => __awaiter(void 0, void 0, void 0, function* 
     });
     return { business: deletedBusiness };
 });
+// approve business page
+const approveBusinessPage = (businessId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!businessId) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Business ID is required"
+        });
+    }
+    const existingBusiness = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: businessId
+        },
+        select: {
+            businessAdminId: true
+        }
+    });
+    if (!existingBusiness) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business not found with this id."
+        }));
+    }
+    const businessAdminId = existingBusiness === null || existingBusiness === void 0 ? void 0 : existingBusiness.businessAdminId;
+    const role = yield prismaDb_1.default.user.findFirst({
+        where: {
+            id: businessAdminId
+        },
+        select: {
+            role: true
+        }
+    });
+    if ((role === null || role === void 0 ? void 0 : role.role) !== "BUSINESS_ADMIN") {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 401,
+            success: false,
+            message: "your page cannot be approved."
+        }));
+    }
+    const updatedBusiness = yield prismaDb_1.default.business.update({
+        where: {
+            id: businessId
+        },
+        data: {
+            authorizedUser: true
+        }
+    });
+    return { business: updatedBusiness };
+});
 // approve representatives
 const approveRepresentatives = (representativeId, res, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (!representativeId) {
@@ -239,7 +304,7 @@ const approveRepresentatives = (representativeId, res, req) => __awaiter(void 0,
     return { representative: updatedRepresentative };
 });
 // create representative
-const createRepresentative = (representative) => __awaiter(void 0, void 0, void 0, function* () {
+const createRepresentative = (representative, req) => __awaiter(void 0, void 0, void 0, function* () {
     const { department, message, businessId, userId } = representative;
     if (!department || !message || !businessId || !userId) {
         throw new appError_1.default(400, "please provide all required fields");
@@ -265,6 +330,20 @@ const createRepresentative = (representative) => __awaiter(void 0, void 0, void 
             userId
         }
     });
+    if (!representativeBody) {
+        throw new appError_1.default(500, "Failed to create representative");
+    }
+    if (req.user.role !== "ADMIN") {
+        yield prismaDb_1.default.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                role: "REPRESENTATIVE"
+            }
+        });
+        req.cookies.user.role = "REPRESENTATIVE";
+    }
     return { representative: representativeBody };
 });
 // get all representatives
@@ -305,6 +384,29 @@ const getRepresentativeById = (id, res) => __awaiter(void 0, void 0, void 0, fun
         }));
     }
     return { representative };
+});
+// get Representative by business id
+const getRepresentativeByBusinessId = (businessId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const representatives = yield prismaDb_1.default.representative.findMany({
+        where: {
+            businessId: businessId
+        },
+        include: {
+            Business: {
+                select: {
+                    businessName: true
+                }
+            }
+        }
+    });
+    if (!representatives) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representatives not found for this business"
+        }));
+    }
+    return { representatives };
 });
 // update representative
 const updateRepresentative = (id, res, representative) => __awaiter(void 0, void 0, void 0, function* () {
@@ -373,10 +475,12 @@ exports.businessServices = {
     getBusinessById,
     updateBusiness,
     deleteBusiness,
+    approveBusinessPage,
     approveRepresentatives,
     createRepresentative,
     getAllRepresentatives,
     getRepresentativeById,
+    getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
     deleteAllRepresentatives

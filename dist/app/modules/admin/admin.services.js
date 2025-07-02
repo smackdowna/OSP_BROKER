@@ -13,10 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminServices = void 0;
-const config_1 = __importDefault(require("../../config"));
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../errors/appError"));
-const auth_utils_1 = require("../auth/auth.utils");
+const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // assign moderator role to user
 const assignModerator = (res, userId, categoryId) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("this is category id", categoryId);
@@ -60,18 +59,22 @@ const assignModerator = (res, userId, categoryId) => __awaiter(void 0, void 0, v
             role: "MODERATOR",
         },
     });
-    const newToken = (0, auth_utils_1.createToken)({
-        userId: updatedUser.id,
-        email: updatedUser.email,
-        role: updatedUser.role, // Updated role
-    }, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
-    // Set the new token in the cookie
-    res.cookie("accessToken", newToken, {
-        httpOnly: true,
-        secure: config_1.default.node_env === "production",
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    // const newToken = createToken(
+    //   {
+    //     userId: updatedUser.id,
+    //     email: updatedUser.email,
+    //     role: updatedUser.role, // Updated role
+    //   },
+    //   config.jwt_access_secret as string,
+    //   config.jwt_access_expires_in as string
+    // );
+    // // Set the new token in the cookie
+    // res.cookie("accessToken", newToken, {
+    //   httpOnly: true,
+    //   secure: config.node_env === "production",
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    // });
     return { user: updatedUser, moderator };
 });
 // remove moderator role from user
@@ -102,7 +105,32 @@ const removeModerator = (userId) => __awaiter(void 0, void 0, void 0, function* 
     });
     return { moderator };
 });
+// update role
+const updateRole = (userId, role, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield prismaDb_1.default.user.findFirst({
+        where: {
+            id: userId,
+        }
+    });
+    if (!user) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "User not found",
+        }));
+    }
+    const updatedUser = yield prismaDb_1.default.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            role: role,
+        },
+    });
+    return { user: updatedUser };
+});
 exports.adminServices = {
     assignModerator,
     removeModerator,
+    updateRole
 };

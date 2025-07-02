@@ -8,19 +8,21 @@ const router = express.Router();
 
 // Representative routes
 router.post('/representative/:businessId', verifyToken, verifyMembership, businessController.createRepresentative);
-router.get('/representatives', verifyToken, verifyMembership, businessController.getAllRepresentatives);
+router.get('/representatives', verifyToken, verifyMembership,authorizeRole("ADMIN"), businessController.getAllRepresentatives);
 router.get('/representative/:id', verifyToken, verifyMembership, businessController.getRepresentativeById);
-router.put('/representative/:id', verifyToken, verifyMembership, businessController.updateRepresentative);
-router.delete('/representative/:id', verifyToken, verifyMembership, businessController.deleteRepresentative);
-router.post('/representative/:representativeId' , verifyToken , verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.approveRepresentative)
+router.get('/representatives/:businessId', verifyToken, verifyMembership, businessController.getRepresentativeByBusinessId);
+router.put('/representative/:id', verifyToken, verifyMembership,authorizeRole("REPRESENTATIVE"), businessController.updateRepresentative);
+router.delete('/representative/:id', verifyToken, verifyMembership,authorizeRole("REPRESENTATIVE"), businessController.deleteRepresentative);
+router.post('/representative/:representativeId' , verifyToken , verifyMembership,authorizeRole("ADMIN"), businessController.approveRepresentative)
 
 
 // Business routes
 router.post('/', verifyToken, verifyMembership, businessController.createBusiness);
-router.get('/', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.getAllBusinesses);
+router.get('/', verifyToken, verifyMembership,authorizeRole("ADMIN"), businessController.getAllBusinesses);
 router.get('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.getBusinessById);
 router.put('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.updateBusiness);
 router.delete('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.deleteBusiness);
+router.post('/:businessId', verifyToken, verifyMembership, authorizeRole("ADMIN"), businessController.approveBusinessPage);
 
 
 export const businessRouter = router;

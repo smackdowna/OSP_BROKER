@@ -33,7 +33,21 @@ const removeModerator = catchAsyncError(async (req: Request, res: Response, next
     });
 });
 
+// update user role
+const updateRole= catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user.userId;
+    const { role } = req.body;
+    const user = await adminServices.updateRole(userId, role, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User role updated successfully",
+        data: user,
+    });
+});
+
 export const adminController = {
     assignModerator,
     removeModerator,
+    updateRole
 };
