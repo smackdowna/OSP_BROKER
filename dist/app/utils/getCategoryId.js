@@ -14,21 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCategoryId = void 0;
 const sendResponse_1 = __importDefault(require("../middlewares/sendResponse"));
-const config_1 = __importDefault(require("../config"));
 const prismaDb_1 = __importDefault(require("../db/prismaDb"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const getCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.cookies.accessToken || "";
-    if (!token)
-        return res.status(401).json({ message: "unauthorized access" });
-    const decoded = jsonwebtoken_1.default.verify(token, config_1.default.jwt_access_secret);
-    req.cookies.user = decoded;
-    console.log(req.cookies.user);
-    const user = yield prismaDb_1.default.user.findFirst({
-        where: {
-            id: decoded.id,
-        }
-    });
+    const user = req.user;
     if (!user)
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
@@ -40,19 +28,19 @@ const getCategoryId = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
             success: false,
-            message: "you are not a moderator"
+            message: "unauthorized access",
         });
     // console.log("this is decoded", decoded.userId);
     const moderator = yield prismaDb_1.default.moderator.findFirst({
         where: {
-            userId: decoded.userId,
-        }
+            userId: user.userId,
+        },
     });
     if (!moderator)
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
             success: false,
-            message: "you are not a moderator",
+            message: "unauthorized access",
             data: null,
         });
     console.log("thi is mdoerator", moderator);

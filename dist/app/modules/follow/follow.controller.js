@@ -28,10 +28,22 @@ const createBusinessPageFollower = (0, catchAsyncError_1.default)((req, res, nex
         data: follower,
     });
 }));
+// unfollow business page
+const unfollowBusinessPage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { businessId } = req.params;
+    const userId = req.user.userId;
+    const unfollow = yield folllow_services_1.followServices.unfollowBusinessPage(businessId, userId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "You have unfollowed this business page",
+        data: unfollow,
+    });
+}));
 // check if user is following business page
 const isUserFollowingBusinessPage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const follower = yield folllow_services_1.followServices.isUserFollowingBusinessPage(businessId, userId);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -63,6 +75,18 @@ const createRepresentativePageFollower = (0, catchAsyncError_1.default)((req, re
         data: follower,
     });
 }));
+// // unfollow representative page
+const unfollowRepresentativePage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { representativeId } = req.params;
+    const userId = req.user.userId;
+    const unfollow = yield folllow_services_1.followServices.unfollowRepresentativePage(representativeId, userId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "You have unfollowed this representative page",
+        data: unfollow,
+    });
+}));
 // check if user is following representative page
 const isUserFollowingRepresentativePage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
@@ -88,9 +112,11 @@ const getAllRepresentativePageFollowers = (0, catchAsyncError_1.default)((req, r
 }));
 exports.followController = {
     createBusinessPageFollower,
+    unfollowBusinessPage,
     isUserFollowingBusinessPage,
     getAllBusinessPageFollowers,
     createRepresentativePageFollower,
+    unfollowRepresentativePage,
     isUserFollowingRepresentativePage,
     getAllRepresentativePageFollowers
 };

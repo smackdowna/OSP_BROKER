@@ -52,32 +52,34 @@ const getForumById = (0, catchAsyncError_1.default)((req, res, next) => __awaite
 }));
 // update forum
 const updateForum = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
     const { id } = req.params;
-    if (!id) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 400,
-            success: false,
-            message: "Forum id is required",
-        });
-    }
-    const forumWithCategoryId = yield prismaDb_1.default.forum.findFirst({
-        where: {
-            id: id,
+    if (req.user.role !== "ADMIN") {
+        const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
+        if (!id) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 400,
+                success: false,
+                message: "Forum id is required",
+            });
         }
-    });
-    let categoryId = [];
-    if (Array.isArray(categoryIds)) {
-        categoryId = categoryIds.filter((categoryId) => categoryId === (forumWithCategoryId === null || forumWithCategoryId === void 0 ? void 0 : forumWithCategoryId.categoryId));
-    }
-    if (categoryId.length === 0) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 403,
-            success: false,
-            message: "You are not authorized to update this forum of this category",
+        const forumWithCategoryId = yield prismaDb_1.default.forum.findFirst({
+            where: {
+                id: id,
+            }
         });
+        let categoryId = [];
+        if (Array.isArray(categoryIds)) {
+            categoryId = categoryIds.filter((categoryId) => categoryId === (forumWithCategoryId === null || forumWithCategoryId === void 0 ? void 0 : forumWithCategoryId.categoryId));
+        }
+        if (categoryId.length === 0) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to update this forum of this category",
+            });
+        }
     }
-    const forum = yield forum_services_1.forumServices.updateForum(id, req, res, req.body);
+    const forum = yield forum_services_1.forumServices.updateForum(id, res, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -87,30 +89,32 @@ const updateForum = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
 }));
 // delete forum
 const deleteForum = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
     const { id } = req.params;
-    if (!id) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 400,
-            success: false,
-            message: "Forum id is required",
-        });
-    }
-    const categoryIdfromForum = yield prismaDb_1.default.forum.findFirst({
-        where: {
-            id: id,
+    if (req.user.role !== "ADMIN") {
+        const categoryIds = yield (0, getCategoryId_1.getCategoryId)(req, res);
+        if (!id) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 400,
+                success: false,
+                message: "Forum id is required",
+            });
         }
-    });
-    let categoryId = [];
-    if (Array.isArray(categoryIds)) {
-        categoryId = categoryIds.filter((categoryId) => categoryId === (categoryIdfromForum === null || categoryIdfromForum === void 0 ? void 0 : categoryIdfromForum.categoryId));
-    }
-    if (categoryId.length === 0) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 403,
-            success: false,
-            message: "You are not authorized to delete this forum of this category",
+        const categoryIdfromForum = yield prismaDb_1.default.forum.findFirst({
+            where: {
+                id: id,
+            }
         });
+        let categoryId = [];
+        if (Array.isArray(categoryIds)) {
+            categoryId = categoryIds.filter((categoryId) => categoryId === (categoryIdfromForum === null || categoryIdfromForum === void 0 ? void 0 : categoryIdfromForum.categoryId));
+        }
+        if (categoryId.length === 0) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to delete this forum of this category",
+            });
+        }
     }
     yield forum_services_1.forumServices.deleteForum(id, res);
     (0, sendResponse_1.default)(res, {

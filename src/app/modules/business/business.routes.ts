@@ -2,6 +2,7 @@ import express from 'express';
 import { verifyToken } from '../../middlewares/requireAuth';
 import { verifyMembership } from '../../middlewares/authorizeMembership';
 import { businessController } from './business.controller';
+import { businessCategoryController } from './businessCategory/businessCategory.controller';
 import { authorizeRole } from '../../middlewares/authorizeRole';
 
 const router = express.Router();
@@ -15,6 +16,12 @@ router.put('/representative/:id', verifyToken, verifyMembership,authorizeRole("R
 router.delete('/representative/:id', verifyToken, verifyMembership,authorizeRole("REPRESENTATIVE"), businessController.deleteRepresentative);
 router.post('/representative/:representativeId' , verifyToken , verifyMembership,authorizeRole("ADMIN"), businessController.approveRepresentative)
 
+// Business Category routes
+router.post('/category', verifyToken,authorizeRole("ADMIN"), businessCategoryController.createBusinessCategory);
+router.get('/category', verifyToken, authorizeRole("ADMIN"), businessCategoryController.getAllBusinessCategories);
+router.get('/category/:id', verifyToken,  authorizeRole("ADMIN"), businessCategoryController.getBusinessCategoryById);
+router.put('/category/:id', verifyToken,  authorizeRole("ADMIN"), businessCategoryController.updateBusinessCategory);
+router.delete('/category/:id', verifyToken, authorizeRole("ADMIN"), businessCategoryController.deleteBusinessCategory);
 
 // Business routes
 router.post('/', verifyToken, verifyMembership, businessController.createBusiness);
@@ -23,6 +30,7 @@ router.get('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN")
 router.put('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.updateBusiness);
 router.delete('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.deleteBusiness);
 router.post('/:businessId', verifyToken, verifyMembership, authorizeRole("ADMIN"), businessController.approveBusinessPage);
+
 
 
 export const businessRouter = router;
