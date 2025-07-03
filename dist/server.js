@@ -23,7 +23,7 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
-app.use((0, cors_1.default)({ origin: ["http://localhost:8080", "http://localhost:3000", "https://osp-broker.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
+app.use((0, cors_1.default)({ origin: ["http://localhost:8080", "http://localhost:3000", "https://osp-broker.web.app", "https://osp-broker-admin.web.app", "https://osp-broker.firebaseapp.com"], credentials: true }));
 app.use(express_1.default.json());
 if (config_1.default.node_env === "development") {
     app.use((0, morgan_1.default)("tiny"));
