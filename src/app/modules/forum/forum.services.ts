@@ -98,7 +98,7 @@ const getForumById= async (forumId: string , res: Response ) => {
 }
 
 // update forum 
-const updateForum = async (forumId: string, req:Request, res: Response, forum: Partial<TForum> ) => {
+const updateForum = async (forumId: string, res: Response, forum: Partial<TForum> ) => {
     const { title, description  } = forum;
     if (!title || !description  ) {
         throw new AppError(400, "please provide all fields");

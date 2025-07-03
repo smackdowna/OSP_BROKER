@@ -107,7 +107,7 @@ const getForumById = (forumId, res) => __awaiter(void 0, void 0, void 0, functio
     return { forum };
 });
 // update forum 
-const updateForum = (forumId, req, res, forum) => __awaiter(void 0, void 0, void 0, function* () {
+const updateForum = (forumId, res, forum) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, description } = forum;
     if (!title || !description) {
         throw new appError_1.default(400, "please provide all fields");

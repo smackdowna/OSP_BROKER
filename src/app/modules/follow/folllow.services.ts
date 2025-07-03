@@ -34,6 +34,33 @@ const createBusinessPageFollower = async (follower: TBusinessPageFollower , res:
   return newFollower;
 }
 
+//unfollow business page
+const unfollowBusinessPage= async(businessId: string, userId: string, res: Response) => {
+  const businessPageFollower = await prismadb.businessPageFollower.findFirst({
+    where: {
+      businessId,
+      userId,
+    },
+  });
+   
+  if (!businessPageFollower) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "You are not following this business page",
+    });
+  }
+
+  const unfollow=await prismadb.businessPageFollower.delete({
+    where: {
+      id: businessPageFollower.id,
+    },
+  });
+  
+  return unfollow;
+};
+
+
 // check if user is following business page
 const isUserFollowingBusinessPage = async (businessId:string, userId: string) => {
   const follower = await prismadb.businessPageFollower.findFirst({
@@ -94,6 +121,32 @@ const createRepresentativePageFollower = async (follower: TRepresentativePageFol
     return newFollower;
 }
 
+// unfollow representative page
+const unfollowRepresentativePage = async (representativeId: string, userId: string, res: Response) => {
+    const representativePageFollower = await prismadb.representativePageFollower.findFirst({
+        where: {
+            representativeId,
+            userId,
+        },
+    });
+
+    if (!representativePageFollower) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "You are not following this representative page",
+        });
+    }
+
+    const unfollow = await prismadb.representativePageFollower.delete({
+        where: {
+            id: representativePageFollower.id,
+        },
+    });
+
+    return unfollow;
+}
+
 // check if user is following representative page
 const isUserFollowingRepresentativePage = async (representativeId: string, userId: string) => {
     const follower = await prismadb.representativePageFollower.findFirst({
@@ -125,9 +178,11 @@ const getAllRepresentativePageFollowers = async (representativeId: string) => {
 
 export const followServices = {
     createBusinessPageFollower,
+    unfollowBusinessPage,
     isUserFollowingBusinessPage,
     getAllBusinessPageFollowers,
     createRepresentativePageFollower,
+    unfollowRepresentativePage,
     isUserFollowingRepresentativePage,
     getAllRepresentativePageFollowers,
 };

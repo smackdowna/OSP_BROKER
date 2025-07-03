@@ -19,10 +19,26 @@ const createBusinessPageFollower = catchAsyncError(async (req: Request, res: Res
   });
 });
 
+// unfollow business page
+const unfollowBusinessPage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const { businessId } = req.params;
+  const userId = req.user.userId;
+
+  const unfollow = await followServices.unfollowBusinessPage(businessId, userId, res);
+  
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "You have unfollowed this business page",
+    data: unfollow,
+  });
+});
+
+
 // check if user is following business page
 const isUserFollowingBusinessPage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   const { businessId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user.userId;
 
   const follower = await followServices.isUserFollowingBusinessPage(businessId, userId);
   
@@ -63,6 +79,21 @@ const createRepresentativePageFollower = catchAsyncError(async (req: Request, re
     });
     });
 
+  // // unfollow representative page
+const unfollowRepresentativePage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { representativeId } = req.params;
+    const userId = req.user.userId;
+
+    const unfollow = await followServices.unfollowRepresentativePage(representativeId, userId, res);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "You have unfollowed this representative page",
+        data: unfollow,
+    }); 
+});
+
 // check if user is following representative page
 const isUserFollowingRepresentativePage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { representativeId } = req.params;
@@ -94,9 +125,11 @@ const getAllRepresentativePageFollowers = catchAsyncError(async (req: Request, r
 
 export const followController = {
     createBusinessPageFollower,
+    unfollowBusinessPage,
     isUserFollowingBusinessPage,
     getAllBusinessPageFollowers,
     createRepresentativePageFollower,
+    unfollowRepresentativePage,
     isUserFollowingRepresentativePage,
     getAllRepresentativePageFollowers
 };

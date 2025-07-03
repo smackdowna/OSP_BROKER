@@ -41,6 +41,28 @@ const createBusinessPageFollower = (follower, res) => __awaiter(void 0, void 0, 
     });
     return newFollower;
 });
+//unfollow business page
+const unfollowBusinessPage = (businessId, userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const businessPageFollower = yield prismaDb_1.default.businessPageFollower.findFirst({
+        where: {
+            businessId,
+            userId,
+        },
+    });
+    if (!businessPageFollower) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "You are not following this business page",
+        });
+    }
+    const unfollow = yield prismaDb_1.default.businessPageFollower.delete({
+        where: {
+            id: businessPageFollower.id,
+        },
+    });
+    return unfollow;
+});
 // check if user is following business page
 const isUserFollowingBusinessPage = (businessId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const follower = yield prismaDb_1.default.businessPageFollower.findFirst({
@@ -92,6 +114,28 @@ const createRepresentativePageFollower = (follower, res) => __awaiter(void 0, vo
     });
     return newFollower;
 });
+// unfollow representative page
+const unfollowRepresentativePage = (representativeId, userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const representativePageFollower = yield prismaDb_1.default.representativePageFollower.findFirst({
+        where: {
+            representativeId,
+            userId,
+        },
+    });
+    if (!representativePageFollower) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "You are not following this representative page",
+        });
+    }
+    const unfollow = yield prismaDb_1.default.representativePageFollower.delete({
+        where: {
+            id: representativePageFollower.id,
+        },
+    });
+    return unfollow;
+});
 // check if user is following representative page
 const isUserFollowingRepresentativePage = (representativeId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const follower = yield prismaDb_1.default.representativePageFollower.findFirst({
@@ -119,9 +163,11 @@ const getAllRepresentativePageFollowers = (representativeId) => __awaiter(void 0
 });
 exports.followServices = {
     createBusinessPageFollower,
+    unfollowBusinessPage,
     isUserFollowingBusinessPage,
     getAllBusinessPageFollowers,
     createRepresentativePageFollower,
+    unfollowRepresentativePage,
     isUserFollowingRepresentativePage,
     getAllRepresentativePageFollowers,
 };
