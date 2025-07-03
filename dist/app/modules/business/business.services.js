@@ -286,12 +286,14 @@ const approveRepresentatives = (representativeId, res, req) => __awaiter(void 0,
             userId: true
         }
     });
-    if (req.cookies.user.userId !== (existingBusinessAdmin === null || existingBusinessAdmin === void 0 ? void 0 : existingBusinessAdmin.userId)) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 401,
-            success: false,
-            message: "unauthorized access"
-        }));
+    if (req.user.role !== "ADMIN") {
+        if (req.cookies.user.userId !== (existingBusinessAdmin === null || existingBusinessAdmin === void 0 ? void 0 : existingBusinessAdmin.userId)) {
+            return ((0, sendResponse_1.default)(res, {
+                statusCode: 401,
+                success: false,
+                message: "unauthorized access"
+            }));
+        }
     }
     const updatedRepresentative = yield prismaDb_1.default.representative.update({
         where: {

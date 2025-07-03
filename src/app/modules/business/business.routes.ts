@@ -14,7 +14,7 @@ router.get('/representative/:id', verifyToken, verifyMembership, businessControl
 router.get('/representatives/:businessId', verifyToken, verifyMembership, businessController.getRepresentativeByBusinessId);
 router.put('/representative/:id', verifyToken, verifyMembership,authorizeRole("REPRESENTATIVE"), businessController.updateRepresentative);
 router.delete('/representative/:id', verifyToken, verifyMembership,authorizeRole("REPRESENTATIVE"), businessController.deleteRepresentative);
-router.post('/representative/:representativeId' , verifyToken , verifyMembership,authorizeRole("ADMIN"), businessController.approveRepresentative)
+router.post('/approveRepresentative/:representativeId' , verifyToken , verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.approveRepresentative)
 
 // Business Category routes
 router.post('/category', verifyToken,authorizeRole("ADMIN"), businessCategoryController.createBusinessCategory);

@@ -372,14 +372,16 @@ const approveRepresentatives = async(representativeId: string , res:Response , r
         }
     })
 
-    if(req.cookies.user.userId !== existingBusinessAdmin?.userId){
-        return(
-            sendResponse(res,{
-                statusCode: 401,
-                success: false,
-                message: "unauthorized access"
-            })
-        )
+    if(req.user.role!=="ADMIN"){
+        if(req.cookies.user.userId !== existingBusinessAdmin?.userId){
+            return(
+                sendResponse(res,{
+                    statusCode: 401,
+                    success: false,
+                    message: "unauthorized access"
+                })
+            )
+        }
     }
 
     const updatedRepresentative =await prismadb.representative.update({
