@@ -120,7 +120,8 @@ const approveRepresentative = (0, catchAsyncError_1.default)((req, res, next) =>
 // create representative
 const createRepresentative = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId } = req.params;
-    const { department, message, userId } = req.body;
+    const userId = req.user.userId;
+    const { department, message, } = req.body;
     const representative = yield business_services_1.businessServices.createRepresentative({
         department,
         message,
@@ -196,6 +197,16 @@ const deleteAllRepresentatives = (0, catchAsyncError_1.default)((req, res, next)
         message: "All representatives deleted successfully",
     });
 }));
+// update representative role
+const updateRepresentativeRole = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    yield business_services_1.businessServices.updateRepresentativeRole(userId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Representative role updated successfully",
+    });
+}));
 exports.businessController = {
     createBusiness,
     getAllBusinesses,
@@ -210,5 +221,6 @@ exports.businessController = {
     getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
-    deleteAllRepresentatives
+    deleteAllRepresentatives,
+    updateRepresentativeRole
 };

@@ -109,7 +109,7 @@ const removeModerator = async (userId: string) => {
 };
 
 // update role
-const updateRole= async(userId: string , role:Role  ,res:Response)=>{
+const updateBusinessAdminRole= async(userId: string  ,res:Response)=>{
   const user= await prismadb.user.findFirst({
     where: {
       id: userId,
@@ -129,9 +129,24 @@ const updateRole= async(userId: string , role:Role  ,res:Response)=>{
       id: userId,
     },
     data: {
-      role: role,
+      role: "USER"
     },
   });
+
+  const existingBusinessAdmin = await prismadb.businessAdmin.findFirst({
+    where: {
+      userId: userId,
+    },
+  });
+
+  if(existingBusinessAdmin){
+    await prismadb.businessAdmin.delete({
+      where:{
+        userId: userId,
+      }
+    })
+  }
+
 
   return {user: updatedUser};
   
@@ -140,5 +155,5 @@ const updateRole= async(userId: string , role:Role  ,res:Response)=>{
 export const adminServices = {
   assignModerator,
   removeModerator,
-  updateRole
+  updateBusinessAdminRole
 };

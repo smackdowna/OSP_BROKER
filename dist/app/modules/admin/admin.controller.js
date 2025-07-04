@@ -43,10 +43,9 @@ const removeModerator = (0, catchAsyncError_1.default)((req, res, next) => __awa
     });
 }));
 // update user role
-const updateRole = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.user.userId;
-    const { role } = req.body;
-    const user = yield admin_services_1.adminServices.updateRole(userId, role, res);
+const updateBusinessAdminRole = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
+    const user = yield admin_services_1.adminServices.updateBusinessAdminRole(userId, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -57,5 +56,5 @@ const updateRole = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
 exports.adminController = {
     assignModerator,
     removeModerator,
-    updateRole
+    updateBusinessAdminRole
 };

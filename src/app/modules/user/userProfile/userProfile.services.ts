@@ -8,8 +8,20 @@ import { TUserProfile } from "./userProfile.interface";
 // create user profile
 const createUserProfile = async (
   userId: string,
-  profileData: TUserProfile
+  profileData: TUserProfile ,
+  req: Request ,
+  res: Response
 ) => {
+        if(req.cookies.user.userId !== userId){
+        return(
+            sendResponse(res, {
+                statusCode: 403,
+                success: false,
+                message: "You are not authorized to access this profile",
+            })
+        )
+    }
+
     const { headLine, location, isVerified, isProfileComplete,skills, about, profileImageUrl, education, experience, socialLinks } = profileData;
 
     const userProfile = await prismadb.userProfile.create({
@@ -49,7 +61,7 @@ const getUserProfileByUserId = async (userId: string , res: Response , req: Requ
 
     const userProfile = await prismadb.userProfile.findFirst({
         where: {
-            userId
+            userId:userId
         },
         include: {
             education: true,
@@ -71,7 +83,46 @@ const getUserProfileByUserId = async (userId: string , res: Response , req: Requ
             })
         )
     }
-    return {userProfile};
+
+    const userMembership= await prismadb.userMembership.findMany({
+        where:{
+            userId: userId
+        },
+        select:{
+            startDate: true,
+            endDate: true,
+            status: true,
+            membershipPlanId: true,
+        }
+    })
+    if(!userMembership) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "User membership not found",
+            })
+        )
+    }
+    const membershipPlanIds = userMembership.map((membership) => membership.membershipPlanId);
+
+    const membershipPlans = await prismadb.membershipPlan.findMany({
+        where: {
+            id: {
+                in: membershipPlanIds
+            }
+        },
+        select: {
+            name: true,
+            price: true,
+            description: true,
+            billingCycle: true,
+            features: true,
+        }
+    });
+
+
+    return {userProfile , userMembership , membershipPlans };
 };
 
 // update user profile

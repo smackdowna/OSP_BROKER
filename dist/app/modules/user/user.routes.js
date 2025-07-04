@@ -13,7 +13,7 @@ const router = express_1.default.Router();
 // User profile routes
 router.post("/userProfile/:userId", requireAuth_1.verifyToken, userProfile_controller_1.userProfileController.createUserProfile);
 router.get("/userProfile/:userId", requireAuth_1.verifyToken, userProfile_controller_1.userProfileController.getUserProfileByUserId);
-router.get("/userProfiles", requireAuth_1.verifyToken, userProfile_controller_1.userProfileController.getAllUserProfiles);
+router.get("/userProfiles", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), userProfile_controller_1.userProfileController.getAllUserProfiles);
 router.put("/userProfile/:userId", requireAuth_1.verifyToken, userProfile_controller_1.userProfileController.updateUserProfile);
 router.delete("/userProfile/:userId", requireAuth_1.verifyToken, userProfile_controller_1.userProfileController.deleteUserProfile);
 // User routes

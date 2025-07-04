@@ -30,6 +30,25 @@ const createBusiness = (business, req) => __awaiter(void 0, void 0, void 0, func
     if (existingBusiness) {
         throw new appError_1.default(400, "Business already exists with this name");
     }
+    const cleanName = (name) => {
+        return name
+            .toLowerCase()
+            .trim() // Remove leading/trailing spaces
+            .replace(/\s+/g, '') // Remove all spaces
+            .replace(/[_\-\.\!\@\#\$\%\^\&\*\(\)\/\\]/g, ''); // Remove underscores, hyphens, dots
+    };
+    const BusinessNames = yield prismaDb_1.default.business.findMany({
+        select: {
+            businessName: true
+        }
+    });
+    const cleanedBusinessNames = BusinessNames.map((business) => {
+        return cleanName(business.businessName);
+    });
+    const cleanedBusinessName = cleanName(businessName);
+    if (cleanedBusinessNames.includes(cleanedBusinessName)) {
+        throw new appError_1.default(400, "Business name already exists with this name ");
+    }
     const businessBody = yield prismaDb_1.default.business.create({
         data: {
             authorizedUser: authorizedUser || false,
@@ -68,6 +87,11 @@ const createBusiness = (business, req) => __awaiter(void 0, void 0, void 0, func
             },
             data: {
                 role: "BUSINESS_ADMIN"
+            }
+        });
+        yield prismaDb_1.default.businessAdmin.create({
+            data: {
+                userId: businessAdminId
             }
         });
         req.cookies.user.role = "BUSINESS_ADMIN";
@@ -471,6 +495,34 @@ const deleteAllRepresentatives = () => __awaiter(void 0, void 0, void 0, functio
     }
     return { representatives };
 });
+// update representative role
+const updateRepresentativeRole = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingRepresentative = yield prismaDb_1.default.representative.findFirst({
+        where: {
+            userId: userId
+        }
+    });
+    if (!existingRepresentative) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representative not found with this id"
+        }));
+    }
+    yield prismaDb_1.default.user.update({
+        where: {
+            id: existingRepresentative.userId
+        },
+        data: {
+            role: "USER"
+        }
+    });
+    yield prismaDb_1.default.representative.delete({
+        where: {
+            userId: userId
+        }
+    });
+});
 exports.businessServices = {
     createBusiness,
     getAllBusinesses,
@@ -485,5 +537,6 @@ exports.businessServices = {
     getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
-    deleteAllRepresentatives
+    deleteAllRepresentatives,
+    updateRepresentativeRole
 };

@@ -139,10 +139,10 @@ const approveRepresentative= catchAsyncError(async(req:Request , res: Response ,
 // create representative
 const createRepresentative = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const {businessId} = req.params;
+    const userId=req.user.userId;
     const { 
         department,
         message,
-        userId
      } = req.body;
     const representative = await businessServices.createRepresentative({ 
         department,
@@ -226,6 +226,18 @@ const deleteAllRepresentatives = catchAsyncError(async (req: Request, res: Respo
     });
 });
 
+// update representative role
+const updateRepresentativeRole = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const{userId} = req.params;
+
+    await businessServices.updateRepresentativeRole(userId , res );
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Representative role updated successfully",
+    });
+});
+
 export const businessController = {
     createBusiness,
     getAllBusinesses,
@@ -240,5 +252,6 @@ export const businessController = {
     getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
-    deleteAllRepresentatives
+    deleteAllRepresentatives,
+    updateRepresentativeRole
 }

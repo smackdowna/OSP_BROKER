@@ -106,7 +106,7 @@ const removeModerator = (userId) => __awaiter(void 0, void 0, void 0, function* 
     return { moderator };
 });
 // update role
-const updateRole = (userId, role, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateBusinessAdminRole = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield prismaDb_1.default.user.findFirst({
         where: {
             id: userId,
@@ -124,13 +124,25 @@ const updateRole = (userId, role, res) => __awaiter(void 0, void 0, void 0, func
             id: userId,
         },
         data: {
-            role: role,
+            role: "USER"
         },
     });
+    const existingBusinessAdmin = yield prismaDb_1.default.businessAdmin.findFirst({
+        where: {
+            userId: userId,
+        },
+    });
+    if (existingBusinessAdmin) {
+        yield prismaDb_1.default.businessAdmin.delete({
+            where: {
+                userId: userId,
+            }
+        });
+    }
     return { user: updatedUser };
 });
 exports.adminServices = {
     assignModerator,
     removeModerator,
-    updateRole
+    updateBusinessAdminRole
 };

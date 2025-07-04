@@ -13,6 +13,7 @@ const createUserProfile = catchAsyncError(
     const userProfile = await userProfileService.createUserProfile(
       userId,
       profileData
+      , req, res
     );
     sendResponse(res, {
       statusCode: 200,

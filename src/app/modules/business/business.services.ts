@@ -47,6 +47,30 @@ const createBusiness = async (business: TBusiness , req:Request) => {
         throw new AppError(400, "Business already exists with this name");
     }
 
+    const cleanName = (name: string): string => {
+    return name
+        .toLowerCase()
+        .trim() // Remove leading/trailing spaces
+        .replace(/\s+/g, '') // Remove all spaces
+        .replace(/[_\-\.\!\@\#\$\%\^\&\*\(\)\/\\]/g, '') // Remove underscores, hyphens, dots
+    };
+
+    const BusinessNames= await prismadb.business.findMany({
+        select:{
+            businessName: true
+        }
+    })
+
+    const cleanedBusinessNames= BusinessNames.map((business) => {
+        return cleanName(business.businessName);
+    });
+
+    const cleanedBusinessName = cleanName(businessName);
+
+    if (cleanedBusinessNames.includes(cleanedBusinessName)) {
+        throw new AppError(400, "Business name already exists with this name ");
+    }
+
     const businessBody = await prismadb.business.create({
         data: {
             authorizedUser: authorizedUser || false,
@@ -88,6 +112,11 @@ const createBusiness = async (business: TBusiness , req:Request) => {
             },
             data:{
                 role: "BUSINESS_ADMIN"
+            }
+        })
+        await prismadb.businessAdmin.create({
+            data:{
+                userId: businessAdminId
             }
         })
         req.cookies.user.role = "BUSINESS_ADMIN"; 
@@ -604,6 +633,40 @@ const deleteAllRepresentatives = async () => {
     return { representatives };
 }
 
+// update representative role
+const updateRepresentativeRole = async (userId: string,  res: Response) => {
+    const existingRepresentative = await prismadb.representative.findFirst({
+        where: {
+            userId: userId
+        }
+    });
+    if (!existingRepresentative) {
+        return (
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Representative not found with this id"
+            })
+        )
+    }
+
+    await prismadb.user.update({
+        where:{
+            id: existingRepresentative.userId
+        },
+        data:{
+            role:"USER"
+        }
+    })
+
+    await prismadb.representative.delete({
+        where:{
+            userId: userId
+        }
+    })
+}
+
+
 export const businessServices = {
     createBusiness,
     getAllBusinesses,
@@ -618,5 +681,6 @@ export const businessServices = {
     getRepresentativeByBusinessId,
     updateRepresentative,
     deleteRepresentative,
-    deleteAllRepresentatives
+    deleteAllRepresentatives,
+    updateRepresentativeRole
 }

@@ -17,7 +17,14 @@ const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create user profile
-const createUserProfile = (userId, profileData) => __awaiter(void 0, void 0, void 0, function* () {
+const createUserProfile = (userId, profileData, req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.cookies.user.userId !== userId) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 403,
+            success: false,
+            message: "You are not authorized to access this profile",
+        }));
+    }
     const { headLine, location, isVerified, isProfileComplete, skills, about, profileImageUrl, education, experience, socialLinks } = profileData;
     const userProfile = yield prismaDb_1.default.userProfile.create({
         data: {
@@ -51,7 +58,7 @@ const getUserProfileByUserId = (userId, res, req) => __awaiter(void 0, void 0, v
     }
     const userProfile = yield prismaDb_1.default.userProfile.findFirst({
         where: {
-            userId
+            userId: userId
         },
         include: {
             education: true,
@@ -70,7 +77,40 @@ const getUserProfileByUserId = (userId, res, req) => __awaiter(void 0, void 0, v
             message: "User profile not found",
         }));
     }
-    return { userProfile };
+    const userMembership = yield prismaDb_1.default.userMembership.findMany({
+        where: {
+            userId: userId
+        },
+        select: {
+            startDate: true,
+            endDate: true,
+            status: true,
+            membershipPlanId: true,
+        }
+    });
+    if (!userMembership) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "User membership not found",
+        }));
+    }
+    const membershipPlanIds = userMembership.map((membership) => membership.membershipPlanId);
+    const membershipPlans = yield prismaDb_1.default.membershipPlan.findMany({
+        where: {
+            id: {
+                in: membershipPlanIds
+            }
+        },
+        select: {
+            name: true,
+            price: true,
+            description: true,
+            billingCycle: true,
+            features: true,
+        }
+    });
+    return { userProfile, userMembership, membershipPlans };
 });
 // update user profile
 const updateUserProfile = (userId, res, profileData) => __awaiter(void 0, void 0, void 0, function* () {
