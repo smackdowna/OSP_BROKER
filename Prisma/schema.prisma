@@ -17,6 +17,21 @@ enum ROLE{
     BUSINESS_ADMIN //verify representative
 }
 
+enum ContentType{
+    TOPIC
+    COMMENT
+    POST
+}
+
+enum ReactionType{
+    LIKE
+    LOVE
+    FUNNY
+    WOW
+    SAD
+    ANGRY
+}
+
 model User{
     id      String   @id @default(auto()) @map("_id") @db.ObjectId
     fullName    String    
@@ -205,6 +220,7 @@ model Topic{
     Forum Forum @relation("forumToTopic",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     comments Comment[] @relation("topicToComment")
     flaggedContent FlaggedContent[] @relation("topicToFlaggedContent")
+    reactions Reactions[] @relation("topicToReactions")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -218,6 +234,7 @@ model Comment{
     commenterId String? @db.ObjectId
     Topic Topic @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
+    reactions Reactions[] @relation("commentToReactions")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -430,4 +447,21 @@ model GroupMembers{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+
+// reactions
+model Reactions{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    contentType ContentType 
+    reactionType ReactionType 
+    topicId String? @db.ObjectId
+    commentId String? @db.ObjectId
+    Topic Topic? @relation("topicToReactions", fields: [topicId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    Comment Comment? @relation("commentToReactions", fields: [commentId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
 

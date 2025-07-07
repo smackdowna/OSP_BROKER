@@ -1,17 +1,18 @@
 import { Router } from "express";
-import { authRouter } from "../modules/auth/auth.route";
+import { authRouter } from "../modules/auth/auth.routes";
 import { forumRouter } from "../modules/forum/forum.routes";
 import { membershipRouter } from "../modules/membership/membership.routes";
 import { businessRouter } from "../modules/business/business.routes";
-import { adminRouter } from "../modules/admin/admin.router";
-import { moderatorRouter } from "../modules/moderator/moderator.router";
-import { flagContentRouter } from "../modules/flagContent/flagContent.router";
+import { adminRouter } from "../modules/admin/admin.routes";
+import { moderatorRouter } from "../modules/moderator/moderator.routes";
+import { flagContentRouter } from "../modules/flagContent/flagContent.routes";
 import { userRoute } from "../modules/user/user.routes";
 import { followRouter } from "../modules/follow/follow.routes";
 import { announcementRouter } from "../modules/forum/announcemnet/announcement.routes";
 import { pollRouter } from "../modules/forum/poll/poll.routes";
 import { eventRouter } from "../modules/forum/events/event.routes";
 import { chatRouter } from "../modules/chat/chat.routes";
+import { reactionsRouter } from "../modules/Reactions/reactions.routes";
 
 const router = Router();
 
@@ -69,6 +70,10 @@ const moduleRoutes=[
     {
         path: "/chat",
         route: chatRouter
+    },
+    {
+        path: "/reactions",
+        route: reactionsRouter
     }
 ]
 
