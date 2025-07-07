@@ -1,24 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const auth_route_1 = require("../modules/auth/auth.route");
+const auth_routes_1 = require("../modules/auth/auth.routes");
 const forum_routes_1 = require("../modules/forum/forum.routes");
 const membership_routes_1 = require("../modules/membership/membership.routes");
 const business_routes_1 = require("../modules/business/business.routes");
-const admin_router_1 = require("../modules/admin/admin.router");
-const moderator_router_1 = require("../modules/moderator/moderator.router");
-const flagContent_router_1 = require("../modules/flagContent/flagContent.router");
+const admin_routes_1 = require("../modules/admin/admin.routes");
+const moderator_routes_1 = require("../modules/moderator/moderator.routes");
+const flagContent_routes_1 = require("../modules/flagContent/flagContent.routes");
 const user_routes_1 = require("../modules/user/user.routes");
 const follow_routes_1 = require("../modules/follow/follow.routes");
 const announcement_routes_1 = require("../modules/forum/announcemnet/announcement.routes");
 const poll_routes_1 = require("../modules/forum/poll/poll.routes");
 const event_routes_1 = require("../modules/forum/events/event.routes");
 const chat_routes_1 = require("../modules/chat/chat.routes");
+const reactions_routes_1 = require("../modules/Reactions/reactions.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
         path: "/auth",
-        route: auth_route_1.authRouter
+        route: auth_routes_1.authRouter
     },
     {
         path: "/forum",
@@ -34,15 +35,15 @@ const moduleRoutes = [
     },
     {
         path: "/admin",
-        route: admin_router_1.adminRouter
+        route: admin_routes_1.adminRouter
     },
     {
         path: "/moderator",
-        route: moderator_router_1.moderatorRouter
+        route: moderator_routes_1.moderatorRouter
     },
     {
         path: "/flag",
-        route: flagContent_router_1.flagContentRouter
+        route: flagContent_routes_1.flagContentRouter
     },
     {
         path: "/user",
@@ -67,6 +68,10 @@ const moduleRoutes = [
     {
         path: "/chat",
         route: chat_routes_1.chatRouter
+    },
+    {
+        path: "/reactions",
+        route: reactions_routes_1.reactionsRouter
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

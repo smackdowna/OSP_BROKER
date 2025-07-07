@@ -251,11 +251,11 @@ const approveBusinessPage = (businessId, res) => __awaiter(void 0, void 0, void 
             role: true
         }
     });
-    if ((role === null || role === void 0 ? void 0 : role.role) !== "BUSINESS_ADMIN") {
+    if ((role === null || role === void 0 ? void 0 : role.role) !== "ADMIN") {
         return ((0, sendResponse_1.default)(res, {
             statusCode: 401,
             success: false,
-            message: "your page cannot be approved."
+            message: "unauthorized access"
         }));
     }
     const updatedBusiness = yield prismaDb_1.default.business.update({
@@ -310,7 +310,7 @@ const approveRepresentatives = (representativeId, res, req) => __awaiter(void 0,
             userId: true
         }
     });
-    if (req.user.role !== "ADMIN") {
+    if (req.user.role !== "BUSINESS_ADMIN") {
         if (req.cookies.user.userId !== (existingBusinessAdmin === null || existingBusinessAdmin === void 0 ? void 0 : existingBusinessAdmin.userId)) {
             return ((0, sendResponse_1.default)(res, {
                 statusCode: 401,
