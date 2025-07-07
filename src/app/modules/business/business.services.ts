@@ -328,12 +328,12 @@ const approveBusinessPage = async (businessId: string, res: Response) => {
         }
     });
 
-    if(role?.role !== "BUSINESS_ADMIN"){
+    if(role?.role !== "ADMIN"){
         return (
             sendResponse(res, {
                 statusCode: 401,
                 success: false,
-                message: "your page cannot be approved."
+                message: "unauthorized access"
             })
         )
     }
@@ -401,7 +401,7 @@ const approveRepresentatives = async(representativeId: string , res:Response , r
         }
     })
 
-    if(req.user.role!=="ADMIN"){
+    if(req.user.role!=="BUSINESS_ADMIN"){
         if(req.cookies.user.userId !== existingBusinessAdmin?.userId){
             return(
                 sendResponse(res,{
