@@ -201,9 +201,6 @@ model Forum{
     user User @relation("userToForum",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     Categories Categories @relation("forumToCategory",fields: [categoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     topics Topic[] @relation("forumToTopic")
-    announcements Announcement[] @relation("forumToAnnouncement")
-    polls Poll[] @relation("forumToPoll")
-    events Event[] @relation("forumToEvent")
 
 
     createdAt DateTime @default(now())
@@ -258,8 +255,6 @@ model Announcement{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
     description String
-    forumId String @db.ObjectId
-    Forum Forum @relation("forumToAnnouncement",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -268,11 +263,9 @@ model Announcement{
 // poll model(inside forum)
 model Poll{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    question String
+    question String 
     options String[]
     pollAnalytics PollAnalytics? @relation("pollToPollAnalytics")
-    forumId String @db.ObjectId
-    Forum Forum @relation("forumToPoll",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -296,8 +289,6 @@ model Event{
     title String
     description String
     date DateTime
-    forumId String @db.ObjectId
-    Forum Forum @relation("forumToEvent",fields: [forumId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

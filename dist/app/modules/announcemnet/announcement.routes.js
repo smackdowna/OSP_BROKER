@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.announcementRouter = void 0;
+const announcement_controller_1 = require("./announcement.controller");
+const express_1 = require("express");
+const requireAuth_1 = require("../../middlewares/requireAuth");
+const authorizeRole_1 = require("../../middlewares/authorizeRole");
+const authorizeMembership_1 = require("../../middlewares/authorizeMembership");
+const router = (0, express_1.Router)();
+router.post("/", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.createAnnouncement);
+router.get("/", announcement_controller_1.announcementController.getAnnouncements);
+router.get("/:id", announcement_controller_1.announcementController.getAnnouncementById);
+router.delete("/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.deleteAnnouncement);
+router.put("/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.updateAnnouncement);
+exports.announcementRouter = router;

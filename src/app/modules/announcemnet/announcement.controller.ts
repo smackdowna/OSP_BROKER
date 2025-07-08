@@ -1,14 +1,13 @@
-import catchAsyncError from "../../../utils/catchAsyncError";
+import catchAsyncError from "../../utils/catchAsyncError";
 import { Request, Response  ,NextFunction } from "express";
-import sendResponse from "../../../middlewares/sendResponse";
+import sendResponse from "../../middlewares/sendResponse";
 import { announcementServices } from "./announcement.services";
 
 
 // create announcement
 const createAnnouncement = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
-    const {forumId}= req.params;
     const {title , description} = req.body;
-    const newAnnouncement = await announcementServices.createAnnouncement({title , description, forumId});
+    const newAnnouncement = await announcementServices.createAnnouncement({title , description});
     
     sendResponse(res, {
         statusCode: 201,
@@ -18,10 +17,9 @@ const createAnnouncement = catchAsyncError( async (req: Request, res: Response, 
     });
 })
 
-// get all announcements by forumId
-const getAnnouncementsByForumId = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
-    const {forumId} = req.params;
-    const announcements = await announcementServices.getAnnouncementsByForumId(forumId);
+// get all announcements
+const getAnnouncements = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const announcements = await announcementServices.getAnnouncements(res);
     
     sendResponse(res, {
         statusCode: 200,
@@ -32,11 +30,11 @@ const getAnnouncementsByForumId = catchAsyncError( async (req: Request, res: Res
 })
 
 
+
 // get single announcement by id and forumId in body
 const getAnnouncementById = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
-    const {forumdId}= req.body;
-    const announcement = await announcementServices.getAnnouncementById(forumdId,id , res);
+    const announcement = await announcementServices.getAnnouncementById(id , res);
     
     sendResponse(res, {
         statusCode: 200,
@@ -75,7 +73,7 @@ const updateAnnouncement = catchAsyncError( async (req: Request, res: Response, 
 
 export const announcementController = {
     createAnnouncement,
-    getAnnouncementsByForumId,
+    getAnnouncements,
     getAnnouncementById,
     deleteAnnouncement,
     updateAnnouncement,

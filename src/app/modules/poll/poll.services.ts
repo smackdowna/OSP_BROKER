@@ -1,21 +1,22 @@
 import { TPoll } from "./poll.interface";
-import AppError from "../../../errors/appError";
+import AppError from "../../errors/appError";
 import { Response } from "express";
-import prismadb from "../../../db/prismaDb";
-import sendResponse from "../../../middlewares/sendResponse";
+import prismadb from "../../db/prismaDb";
+import sendResponse from "../../middlewares/sendResponse";
 
 
 // create poll
 const createPoll = async (poll: TPoll) => {
-    const { question, options, forumId } = poll;
+    const { question, options } = poll;
     
-    // Check if the forum exists
-    const forumExists = await prismadb.forum.findFirst({
-        where: { id: forumId },
+    const existingPoll= await prismadb.poll.findFirst({
+        where: {
+            question: question,
+        },
     });
-    
-    if (!forumExists) {
-        throw new AppError(404, "Forum not found");
+
+    if (existingPoll) {
+        throw new AppError(400, "Poll with this question already exists");
     }
     
     // Create the poll
@@ -23,37 +24,37 @@ const createPoll = async (poll: TPoll) => {
         data: {
         question,
         options,
-        forumId,
         },
     });
     
     return {poll:newPoll};
 }
 
-// get all polls by forum id
-const getPollsByForumId = async (forumId: string) => {
-    // Check if the forum exists
-    const forumExists = await prismadb.forum.findFirst({
-        where: { id: forumId },
-    });
-    
-    if (!forumExists) {
-        throw new AppError(404, "Forum not found");
-    }
-    
-    // Get all polls for the forum
+// get all polls
+const getPolls= async ( res: Response) => {
+    // Get all polls
     const polls = await prismadb.poll.findMany({
-        where: { forumId },
+        orderBy: {
+            createdAt: "desc",
+        },
     });
+    
+    if (!polls || polls.length === 0) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "No polls found",
+        });
+    }
     
     return polls;
 }
 
-// get single poll by id with forum Id
-const getPollById = async (forumId: string, pollId: string, res: Response) => {
+// get single poll by id
+const getPollById = async ( pollId: string, res: Response) => {
     // Check if the poll exists
     const poll = await prismadb.poll.findFirst({
-        where: { id: pollId, forumId: forumId },
+        where: { id: pollId },
     });
     
     if (!poll) {
@@ -218,7 +219,7 @@ const getPollAnalytics= async (pollId: string, res: Response) => {
 
 export const pollservices={
     createPoll,
-    getPollsByForumId,
+    getPolls,
     getPollById,
     deletePoll,
     updatePoll,
