@@ -1,20 +1,22 @@
-import AppError from "../../../errors/appError";
-import prismadb from "../../../db/prismaDb";
-import sendResponse from "../../../middlewares/sendResponse";
+import AppError from "../../errors/appError";
+import prismadb from "../../db/prismaDb";
+import sendResponse from "../../middlewares/sendResponse";
 import { Response } from "express";
 import { TEvent } from "./event.interface";
 
 // create event
 const createEvent = async (event: TEvent) => {
-    const { title, description, date, forumId } = event;
+    const { title, description, date } = event;
 
-    // Check if the forum exists
-    const forumExists = await prismadb.forum.findFirst({
-        where: { id: forumId },
+    const existingEvent = await prismadb.event.findFirst({
+        where: {
+            title: title,
+            date: date, 
+        },
     });
 
-    if (!forumExists) {
-        throw new AppError(404, "Forum not found");
+    if( existingEvent ) {
+        throw new AppError(400, "Event with this title and date already exists");
     }
 
     // Create a new event
@@ -22,40 +24,39 @@ const createEvent = async (event: TEvent) => {
         data: {
             title,
             description,
-            date,
-            forumId,
+            date
         },
     });
 
     return {event: newEvent};
 }
 
-// get all events by forum id
-const getEventsByForumId = async (forumId: string) => {
-    // Check if the forum exists
-    const forumExists = await prismadb.forum.findFirst({
-        where: { id: forumId },
-    });
-
-    if (!forumExists) {
-        throw new AppError(404, "Forum not found");
-    }
-
-    // Get all events for the forum
+// get all events
+const getEvents = async (res: Response) => {
+    // Get all events
     const events = await prismadb.event.findMany({
-        where: { forumId },
-        orderBy: { date: 'asc' }, // Order by date ascending
+        orderBy: {
+            createdAt: "desc",
+        },
     });
+
+    if (!events || events.length === 0) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "No events found",
+        });
+    }
 
     return events;
 }
 
 // get single event by id
-const getEventById = async (forumId: string, eventId: string , res:Response) => {
+const getEventById = async ( eventId: string , res:Response) => {
 
     // Check if the event exists
     const event = await prismadb.event.findFirst({
-        where: { id: eventId, forumId: forumId },
+        where: { id: eventId},
     });
 
     if (!event) {
@@ -119,7 +120,7 @@ const deleteEvent = async (eventId: string, res:Response) => {
 
 export const eventServices = {
     createEvent,
-    getEventsByForumId,
+    getEvents,
     getEventById,
     updateEvent,
     deleteEvent

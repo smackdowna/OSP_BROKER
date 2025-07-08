@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.pollRouter = void 0;
+const express_1 = require("express");
+const authorizeRole_1 = require("../../middlewares/authorizeRole");
+const requireAuth_1 = require("../../middlewares/requireAuth");
+const poll_controller_1 = require("./poll.controller");
+const authorizeMembership_1 = require("../../middlewares/authorizeMembership");
+const router = (0, express_1.Router)();
+router.post("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.createPoll);
+router.get("/", poll_controller_1.pollController.getPolls);
+router.get("/:id", poll_controller_1.pollController.getPollById);
+router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.deletePoll);
+router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.updatePoll);
+router.post("/vote/:pollId", poll_controller_1.pollController.createPollAnalytics);
+router.get("/analytics/:pollId", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.getPollAnalytics);
+exports.pollRouter = router;

@@ -1,13 +1,12 @@
-import catchAsyncError from "../../../utils/catchAsyncError";
+import catchAsyncError from "../../utils/catchAsyncError";
 import { Request, Response  ,NextFunction } from "express";
-import sendResponse from "../../../middlewares/sendResponse";
+import sendResponse from "../../middlewares/sendResponse";
 import { pollservices } from "./poll.services";
 
 // create poll
 const createPoll = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
-    const {forumId} = req.params;
     const {question, options} = req.body;
-    const poll = await pollservices.createPoll({question, options, forumId});
+    const poll = await pollservices.createPoll({question, options});
     
     sendResponse(res, {
         statusCode: 201,
@@ -17,10 +16,10 @@ const createPoll = catchAsyncError( async (req: Request, res: Response, next: Ne
     });
 });
 
-// get all polls by forum id
-const getPollsByForumId = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
-    const {forumId} = req.params;
-    const polls = await pollservices.getPollsByForumId(forumId);
+
+// get all polls
+const getPolls = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const polls = await pollservices.getPolls(res);
     
     sendResponse(res, {
         statusCode: 200,
@@ -31,11 +30,10 @@ const getPollsByForumId = catchAsyncError( async (req: Request, res: Response, n
 });
 
 
-// get single poll by id with forum Id
+// get single poll by id
 const getPollById = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
-    const {forumId} = req.body;
-    const poll = await pollservices.getPollById(forumId, id, res);
+    const poll = await pollservices.getPollById( id, res);
     
     sendResponse(res, {
         statusCode: 200,
@@ -101,7 +99,7 @@ const getPollAnalytics = catchAsyncError( async (req: Request, res: Response, ne
 
 export const pollController = {
     createPoll,
-    getPollsByForumId,
+    getPolls,
     getPollById,
     deletePoll,
     updatePoll,
