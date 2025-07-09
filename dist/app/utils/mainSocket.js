@@ -20,13 +20,12 @@ const server = http_1.default.createServer(server_1.default);
 // Track online users (userId -> socketId)
 const onlineUsers = new Map();
 exports.onlineUsers = onlineUsers;
-const groupMembers = new Map();
 const io = new socket_io_1.Server(server, {
     cors: {
         origin: [
             "http://localhost:8080",
             "https://osp-broker.web.app",
-            "https://osp-broker.firebaseapp.com"
+            "https://osp-broker.firebaseapp.com",
         ],
         methods: ["GET", "POST"],
     },
@@ -39,45 +38,38 @@ io.on("connection", (socket) => {
         onlineUsers.set(userId, socket.id);
         console.log(`User ${userId} registered with socket ${socket.id}`);
     });
-    socket.on("join-group", (groupId) => {
-        var _a;
+    socket.on("join-group", (groupId) => __awaiter(void 0, void 0, void 0, function* () {
         const userId = socket.data.userId;
         if (!userId) {
             socket.emit("error", { message: "Unauthorized" });
             return;
         }
-        if (!groupMembers.has(groupId)) {
-            groupMembers.set(groupId, new Set());
+        try {
+            socket.join(groupId);
+            console.log(`User ${userId} joined group ${groupId}`);
+            socket.emit("group-joined", groupId);
         }
-        (_a = groupMembers.get(groupId)) === null || _a === void 0 ? void 0 : _a.add(userId);
-        socket.join(groupId); // Join the Socket.IO room
-        console.log(`User ${userId} joined group ${groupId}`);
-        socket.emit("group-joined", groupId);
-    });
+        catch (err) {
+            console.error("Error checking group membership:", err);
+            socket.emit("error", { message: "Failed to join group" });
+        }
+    }));
     // Leave a group (business page)
     socket.on("leave-group", (groupId) => {
-        var _a;
         const userId = socket.data.userId;
         if (!userId) {
             socket.emit("error", { message: "Unauthorized" });
             return;
         }
-        (_a = groupMembers.get(groupId)) === null || _a === void 0 ? void 0 : _a.delete(userId);
-        socket.leave(groupId); // Leave the Socket.IO room
+        socket.leave(groupId);
         console.log(`User ${userId} left group ${groupId}`);
         socket.emit("group-left", groupId);
     });
     // Handle group messages
     socket.on("group-message", (_a) => __awaiter(void 0, [_a], void 0, function* ({ groupId, content }) {
-        var _b;
         const userId = socket.data.userId;
         if (!userId) {
             socket.emit("error", { message: "Unauthorized" });
-            return;
-        }
-        // Check if user is a member of the group
-        if (!((_b = groupMembers.get(groupId)) === null || _b === void 0 ? void 0 : _b.has(userId))) {
-            socket.emit("error", { message: "Not a member of this group" });
             return;
         }
         try {
@@ -86,7 +78,7 @@ io.on("connection", (socket) => {
                 groupId,
                 senderId: userId,
                 content,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             });
             socket.emit("message-sent", content);
         }
