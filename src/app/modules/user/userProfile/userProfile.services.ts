@@ -49,15 +49,6 @@ const createUserProfile = async (
 
 // get user profile by userId
 const getUserProfileByUserId = async (userId: string , res: Response , req: Request) => {
-    if(req.cookies.user.userId !== userId){
-        return(
-            sendResponse(res, {
-                statusCode: 403,
-                success: false,
-                message: "You are not authorized to access this profile",
-            })
-        )
-    }
 
     const userProfile = await prismadb.userProfile.findFirst({
         where: {

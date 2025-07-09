@@ -49,13 +49,6 @@ const createUserProfile = (userId, profileData, req, res) => __awaiter(void 0, v
 });
 // get user profile by userId
 const getUserProfileByUserId = (userId, res, req) => __awaiter(void 0, void 0, void 0, function* () {
-    if (req.cookies.user.userId !== userId) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 403,
-            success: false,
-            message: "You are not authorized to access this profile",
-        }));
-    }
     const userProfile = yield prismaDb_1.default.userProfile.findFirst({
         where: {
             userId: userId
