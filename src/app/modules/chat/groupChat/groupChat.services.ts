@@ -1,18 +1,28 @@
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
-import { Response  } from "express";
+import { Response , Request  } from "express";
 import { TGroupMessage , TGroupChat  } from "./groupChat.interface";
 import { io  } from "../../../utils/mainSocket";
 import sendResponse from "../../../middlewares/sendResponse";
 
 
 // create group chat
-const createGroupChat = async (groupChat: TGroupChat, res: Response) => {
-  const { name, businessId } = groupChat;
+const createGroupChat = async (groupChat: TGroupChat) => {
+  const {  businessId } = groupChat;
+
+  const business = await prismadb.business.findFirst({
+    where: {
+      id: businessId,
+    },
+  });
+
+  if (!business) {
+    throw new AppError(404, "Business not found");
+  }
 
   const existingGroupChat = await prismadb.groupChat.findFirst({
     where: {
-      name,
+      name: business.businessName,
       businessId,
     },
   });
@@ -23,7 +33,7 @@ const createGroupChat = async (groupChat: TGroupChat, res: Response) => {
 
   const newGroupChat = await prismadb.groupChat.create({
     data: {
-      name,
+      name: business.businessName,
       businessId,
     },
   });
@@ -31,8 +41,29 @@ const createGroupChat = async (groupChat: TGroupChat, res: Response) => {
   return {groupChat: newGroupChat};
 };
 
+// get group chat by businessId
+const getGroupChatByBusinessId = async (businessId: string ,res:Response) => {
+  if (!businessId) {
+    throw new AppError(400, "Please provide business ID");
+  }
+
+  const groupChat = await prismadb.groupChat.findFirst({
+    where: { businessId: businessId },
+  });
+
+  if (!groupChat) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Group chat not found",
+    });
+  }
+
+  return { groupChat };
+};
+
 // delete group chat
-const deleteGroupChat = async (groupChatId: string, res: Response) => {
+const deleteGroupChat = async (groupChatId: string) => {
     if (!groupChatId) {
         throw new AppError(400, "Please provide group chat ID");
     }
@@ -53,7 +84,10 @@ const deleteGroupChat = async (groupChatId: string, res: Response) => {
 }
 
 // join group chat
-const joinGroupChat = async (groupChatId: string,businessId: string, userId: string, res: Response) => {
+const joinGroupChat = async (groupChatId: string,businessId: string, userId: string, res: Response , req: Request) => {
+
+    if(req.cookies.user.role!== "ADMIN" || req.cookies.user.role !== "BUSINESS_ADMIN") {
+
     const businessPageFollower= await prismadb.businessPageFollower.findFirst({
         where: {
             businessId: businessId,
@@ -67,6 +101,7 @@ const joinGroupChat = async (groupChatId: string,businessId: string, userId: str
             success: false,
             message: "You must follow the business page to join the group chat"
         });
+    }
     }
 
 
@@ -84,7 +119,7 @@ const joinGroupChat = async (groupChatId: string,businessId: string, userId: str
 
   // Check if user is already a member
   const existingMember = await prismadb.groupMembers.findFirst({
-    where: { userId, groupchatId: groupChatId },
+    where: { userId, groupChatId: groupChatId },
   });
 
   if (existingMember) {
@@ -94,7 +129,7 @@ const joinGroupChat = async (groupChatId: string,businessId: string, userId: str
   const newMember = await prismadb.groupMembers.create({
     data: {
       userId,
-      groupchatId: groupChatId,
+      groupChatId: groupChatId,
     },
   });
 
@@ -127,7 +162,7 @@ const leaveGroupChat= async (groupChatId: string, userId: string, res: Response)
 
     // Check if user is a member
     const existingMember = await prismadb.groupMembers.findFirst({
-        where: { userId, groupchatId: groupChatId },
+        where: { userId, groupChatId: groupChatId },
     });
 
     if (!existingMember) {
@@ -148,29 +183,41 @@ const leaveGroupChat= async (groupChatId: string, userId: string, res: Response)
 }
 
 // send group messages
-const sendGroupMessage = async (message: TGroupMessage, res: Response) => {
-    const { groupchatId, senderId, content } = message;
-    if (!groupchatId || !senderId || !content) {
+const sendGroupMessage = async (message: TGroupMessage) => {
+    const { groupChatId, senderId, content } = message;
+    if (!groupChatId || !senderId || !content) {
         throw new AppError(400, "Please provide group chat ID, sender ID and message content");
     }
     const groupChat = await prismadb.groupChat.findFirst({
-        where: { id: groupchatId },
+        where: { id: groupChatId },
     });
 
     if (!groupChat) {
         throw new AppError(404, "Group chat not found");
     }
 
+    const checkMember= await prismadb.groupMembers.findFirst({
+        where:{
+            userId: senderId,
+            groupChatId: groupChatId    
+        }
+    });
+
+    if (!checkMember) {
+        throw new AppError(403, "You are not a member of this group chat");
+    }
+
+
     const newMessage = await prismadb.groupMessage.create({
         data: {
-            groupchatId,
+            groupChatId,
             senderId,
             content,
         },
     });
 
 
-    io.to(groupchatId).emit("newGroupMessage", {
+    io.to(groupChatId).emit("newGroupMessage", {
         message: newMessage
     });
 
@@ -178,7 +225,7 @@ const sendGroupMessage = async (message: TGroupMessage, res: Response) => {
 }
 
 // get group messages
-const getGroupMessages = async (groupChatId: string, res: Response) => {
+const getGroupMessages = async (groupChatId: string , req: Request , res:Response) => {
     if (!groupChatId) {
         throw new AppError(400, "Please provide group chat ID");
     }
@@ -188,12 +235,50 @@ const getGroupMessages = async (groupChatId: string, res: Response) => {
     });
 
     if (!groupChat) {
-        throw new AppError(404, "Group chat not found");
+        sendResponse(res , {
+            statusCode: 404,
+            success: false,
+            message: "Group chat not found"
+        })
     }
 
-    const messages = await prismadb.groupMessage.findMany({
-        where: { groupchatId: groupChatId },
+
+    const checkMember = await prismadb.groupMembers.findFirst({
+        where: {
+            groupChatId: groupChatId,
+            userId: req.user.userId
+        }
+    });
+
+    if (!checkMember) {
+        throw new AppError(403, "You are not a member of this group chat");
+    }
+
+    let messages = await prismadb.groupMessage.findMany({
+        where: { groupChatId: groupChatId },
+        include:{
+            user: {
+                select: {
+                    fullName: true,
+                }
+            },
+            userProfile: {
+                select: {
+                    profileImageUrl: true,
+                }
+            }
+        },
         orderBy: { createdAt: "asc" },
+    });
+
+    messages= messages.map((message) => {
+        return {
+            ...message,
+            sender: {
+                fullName: message.user?.fullName || "Unknown",
+                profileImageUrl: message.userProfile?.profileImageUrl || null
+            }
+        };
     });
 
     return { messages };
@@ -201,6 +286,7 @@ const getGroupMessages = async (groupChatId: string, res: Response) => {
 
 export const groupChatServices = {
     createGroupChat,
+    getGroupChatByBusinessId,
     deleteGroupChat,
     joinGroupChat,
     leaveGroupChat,

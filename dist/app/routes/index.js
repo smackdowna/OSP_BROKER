@@ -15,6 +15,7 @@ const poll_routes_1 = require("../modules/poll/poll.routes");
 const event_routes_1 = require("../modules/events/event.routes");
 const chat_routes_1 = require("../modules/chat/chat.routes");
 const reactions_routes_1 = require("../modules/Reactions/reactions.routes");
+const groupChat_routes_1 = require("../modules/chat/groupChat/groupChat.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -68,6 +69,10 @@ const moduleRoutes = [
     {
         path: "/chat",
         route: chat_routes_1.chatRouter
+    },
+    {
+        path: "/groupChat",
+        route: groupChat_routes_1.groupChatRouter
     },
     {
         path: "/reactions",
