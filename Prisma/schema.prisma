@@ -50,6 +50,7 @@ model User{
     flaggedContent FlaggedContent[] @relation("userToFlaggedContent")
     businessPageFollower BusinessPageFollower[] @relation("userToBusinessPageFollower")
     representativePageFollower RepresentativePageFollower[] @relation("userToRepresentativePageFollower")
+    groupMessage GroupMessage[] @relation("userToGroupMessage")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -70,6 +71,7 @@ model UserProfile {
   socialLinks Json?
   userId String @db.ObjectId @unique
   user User @relation("userToUserProfile",fields: [userId], references: [id]  , onDelete: Cascade , onUpdate: Cascade)
+  groupMessage GroupMessage[] @relation("userProfileToGroupMessage")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
@@ -423,8 +425,11 @@ model GroupMessage{
     senderId String @db.ObjectId
     content String
 
-    groupchatId String @db.ObjectId
-    GroupChat GroupChat @relation("groupToGroupMessages", fields: [groupchatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    user User @relation("userToGroupMessage", fields: [senderId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userProfile UserProfile @relation("userProfileToGroupMessage", fields: [senderId], references: [userId], onDelete: Cascade , onUpdate: Cascade)
+
+    groupChatId String @db.ObjectId
+    GroupChat GroupChat @relation("groupToGroupMessages", fields: [groupChatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -433,8 +438,8 @@ model GroupMembers{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String @db.ObjectId
 
-    groupchatId String @db.ObjectId
-    GroupChat GroupChat @relation("groupToGroupMembers", fields: [groupchatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    groupChatId String @db.ObjectId
+    GroupChat GroupChat @relation("groupToGroupMembers", fields: [groupChatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }

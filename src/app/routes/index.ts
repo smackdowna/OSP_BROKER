@@ -13,6 +13,7 @@ import { pollRouter } from "../modules/poll/poll.routes";
 import { eventRouter } from "../modules/events/event.routes";
 import { chatRouter } from "../modules/chat/chat.routes";
 import { reactionsRouter } from "../modules/Reactions/reactions.routes";
+import { groupChatRouter } from "../modules/chat/groupChat/groupChat.routes";
 
 const router = Router();
 
@@ -70,6 +71,10 @@ const moduleRoutes=[
     {
         path: "/chat",
         route: chatRouter
+    },
+    {
+        path : "/groupChat",
+        route: groupChatRouter
     },
     {
         path: "/reactions",

@@ -1,5 +1,4 @@
 export type TGroupChat = {
-  name: string;
   businessId: string;
   groupMessages?: TGroupMessage[];
   groupMembers?: TGroupMember[];
@@ -8,10 +7,10 @@ export type TGroupChat = {
 export type TGroupMessage = {
   senderId: string;
   content: string;
-  groupchatId: string;
+  groupChatId: string;
 };
 
 export type TGroupMember = {
   userId: string;
-  groupchatId: string;
+  groupChatId: string;
 };
