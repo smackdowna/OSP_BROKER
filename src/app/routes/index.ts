@@ -14,6 +14,7 @@ import { eventRouter } from "../modules/events/event.routes";
 import { chatRouter } from "../modules/chat/chat.routes";
 import { reactionsRouter } from "../modules/Reactions/reactions.routes";
 import { groupChatRouter } from "../modules/chat/groupChat/groupChat.routes";
+import { liveConventionRoutes } from "../modules/liveConvention/liveConvention.routes";
 
 const router = Router();
 
@@ -79,6 +80,10 @@ const moduleRoutes=[
     {
         path: "/reactions",
         route: reactionsRouter
+    },
+    {
+        path: "/liveConvention",
+        route: liveConventionRoutes
     }
 ]
 
