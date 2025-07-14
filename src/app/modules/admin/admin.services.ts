@@ -1,10 +1,7 @@
-import config from "../../config";
 import prismadb from "../../db/prismaDb";
 import AppError from "../../errors/appError";
 import sendResponse from "../../middlewares/sendResponse";
-import { createToken } from "../auth/auth.utils";
 import { Response } from "express";
-import { Role } from "./admin.interface";
 
 // assign moderator role to user
 

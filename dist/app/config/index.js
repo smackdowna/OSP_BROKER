@@ -26,4 +26,6 @@ exports.default = {
     google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
     google_redirect_uri: process.env.GOOGLE_REDIRECT_URI,
     apple_client_id: process.env.APPLE_CLIENT_ID,
+    zoom_meeting_sdk_key: process.env.ZOOM_MEETING_SDK_KEY,
+    zoom_meeting_sdk_secret: process.env.ZOOM_MEETING_SDK_SECRET
 };
