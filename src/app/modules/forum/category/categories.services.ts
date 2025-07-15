@@ -6,8 +6,8 @@ import sendResponse from "../../../middlewares/sendResponse";
 
 // create category
 const createCategory = async (category: TCategory) => {
-    const { name , description , moderatorId , icon, membership_access} = category;
-    if (!name || !description || !moderatorId || !membership_access) {
+    const { name , description  , icon, membership_access} = category;
+    if (!name || !description  || !membership_access) {
         throw new AppError(400, "name field is required");
     }
     const existingCategory = await prismadb.categories.findFirst({
@@ -22,7 +22,6 @@ const createCategory = async (category: TCategory) => {
         data: {
             name , 
             description ,
-            moderatorId ,
             icon,
             membership_access
         },
@@ -70,30 +69,8 @@ const getCategoryById= async (categoryId: string , res: Response) => {
             })
         )
     }
-    console.log("Category: ", category);
 
-    const moderatorId= category?.moderatorId;
-    console.log("Moderator ID: ", moderatorId);
-    const moderatorName= await prismadb.user.findFirst({
-        where: {
-            id: moderatorId,
-        },
-        select: {
-            fullName: true
-        },
-    });
-
-
-    const moderatorProfileUrl= await prismadb.userProfile.findFirst({
-        where: {
-            userId: moderatorId,
-        },
-        select: {
-            profileImageUrl: true
-        }
-    });
-
-    return {category , moderatorName  , moderatorProfileUrl};
+    return {category };
 }
 
 // update category

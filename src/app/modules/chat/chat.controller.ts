@@ -31,6 +31,19 @@ const getMessages = catchAsyncError(async (req: Request, res: Response, next: Ne
     });
 });
 
+// get unique recipients with message
+const getUniqueReciepientsWithMessage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const senderId = req.user.userId;
+    const recipients = await chatServices.getUniqueReciepientsWithMessage(senderId);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Recipients retrieved successfully",
+        data: recipients
+    });
+});
+
+
 // get unread messages
 const getUnreadMessages = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { recipientId } = req.params;
@@ -43,8 +56,23 @@ const getUnreadMessages = catchAsyncError(async (req: Request, res: Response, ne
     });
 });
 
+
+// update message read status
+const updateMessageReadStatus = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { recipientId } = req.params;
+    const updatedMessage = await chatServices.updateMessageReadStatus(recipientId, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Message read status updated successfully",
+        data: updatedMessage
+    });
+});
+
 export const chatController = {
     createMessage,
     getMessages,
-    getUnreadMessages
+    getUniqueReciepientsWithMessage,
+    getUnreadMessages , 
+    updateMessageReadStatus
 };

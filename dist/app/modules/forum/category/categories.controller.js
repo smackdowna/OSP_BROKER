@@ -18,8 +18,8 @@ const sendResponse_1 = __importDefault(require("../../../middlewares/sendRespons
 const categories_services_1 = require("./categories.services");
 // create category
 const createCategory = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, moderatorId, icon, membership_access } = req.body;
-    const category = yield categories_services_1.categoriesServices.createCategory({ name, description, moderatorId, icon, membership_access });
+    const { name, description, icon, membership_access } = req.body;
+    const category = yield categories_services_1.categoriesServices.createCategory({ name, description, icon, membership_access });
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

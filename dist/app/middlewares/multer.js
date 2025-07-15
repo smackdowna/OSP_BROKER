@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-// add this middleware in the routes where you want to handle file uploads
 const multer_1 = __importStar(require("multer"));
 const storage = (0, multer_1.memoryStorage)();
 const singleUpload = (0, multer_1.default)({ storage }).single("file");
-exports.default = singleUpload;
+const multipleUpload = (0, multer_1.default)({ storage }).array("files", 10);
+exports.default = { singleUpload, multipleUpload };

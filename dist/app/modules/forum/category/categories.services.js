@@ -18,8 +18,8 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create category
 const createCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, moderatorId, icon, membership_access } = category;
-    if (!name || !description || !moderatorId || !membership_access) {
+    const { name, description, icon, membership_access } = category;
+    if (!name || !description || !membership_access) {
         throw new appError_1.default(400, "name field is required");
     }
     const existingCategory = yield prismaDb_1.default.categories.findFirst({
@@ -34,7 +34,6 @@ const createCategory = (category) => __awaiter(void 0, void 0, void 0, function*
         data: {
             name,
             description,
-            moderatorId,
             icon,
             membership_access
         },
@@ -78,26 +77,7 @@ const getCategoryById = (categoryId, res) => __awaiter(void 0, void 0, void 0, f
             message: "Category not found with this id",
         }));
     }
-    console.log("Category: ", category);
-    const moderatorId = category === null || category === void 0 ? void 0 : category.moderatorId;
-    console.log("Moderator ID: ", moderatorId);
-    const moderatorName = yield prismaDb_1.default.user.findFirst({
-        where: {
-            id: moderatorId,
-        },
-        select: {
-            fullName: true
-        },
-    });
-    const moderatorProfileUrl = yield prismaDb_1.default.userProfile.findFirst({
-        where: {
-            userId: moderatorId,
-        },
-        select: {
-            profileImageUrl: true
-        }
-    });
-    return { category, moderatorName, moderatorProfileUrl };
+    return { category };
 });
 // update category
 const updateCategory = (categoryId, res, category) => __awaiter(void 0, void 0, void 0, function* () {

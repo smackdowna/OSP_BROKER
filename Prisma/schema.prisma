@@ -51,6 +51,7 @@ model User{
     businessPageFollower BusinessPageFollower[] @relation("userToBusinessPageFollower")
     representativePageFollower RepresentativePageFollower[] @relation("userToRepresentativePageFollower")
     groupMessage GroupMessage[] @relation("userToGroupMessage")
+    booking Booking[] @relation("userToBooking")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -131,6 +132,7 @@ model Representative{
     user User @relation("userToRepresentative",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     representativePageFollower RepresentativePageFollower[] @relation("representativeToRepresentativePageFollower")
+    booking Booking[] @relation("representativeToBooking")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -243,7 +245,6 @@ model Categories{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     description String
-    moderatorId String @db.ObjectId
     icon String?
     membership_access String[] @db.ObjectId
     forums Forum[] @relation("forumToCategory")
@@ -461,3 +462,40 @@ model Reactions{
 }
 
 
+// bookings model
+model Booking{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    availableDate DateTime
+    booked Boolean @default(false)
+    userId String? @db.ObjectId
+    user User? @relation("userToBooking", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    representativeId String @db.ObjectId
+    representative Representative @relation("representativeToBooking", fields: [representativeId], references : [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// post model (can be created by business admin or representative)
+model Post{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    title String
+    description String
+    media Media[] @relation("postToMedia")
+    
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+
+model Media{
+    fileId String @id @default(uuid()) @map("_id")
+    name String
+    url String
+    thumbnailUrl String?
+    fileType String?
+
+    postId String @db.ObjectId
+    Post Post @relation("postToMedia", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+}

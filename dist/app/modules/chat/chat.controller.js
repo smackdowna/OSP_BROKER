@@ -41,6 +41,17 @@ const getMessages = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         data: messages
     });
 }));
+// get unique recipients with message
+const getUniqueReciepientsWithMessage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const senderId = req.user.userId;
+    const recipients = yield chat_services_1.chatServices.getUniqueReciepientsWithMessage(senderId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Recipients retrieved successfully",
+        data: recipients
+    });
+}));
 // get unread messages
 const getUnreadMessages = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { recipientId } = req.params;
@@ -52,8 +63,21 @@ const getUnreadMessages = (0, catchAsyncError_1.default)((req, res, next) => __a
         data: unreadMessages
     });
 }));
+// update message read status
+const updateMessageReadStatus = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { recipientId } = req.params;
+    const updatedMessage = yield chat_services_1.chatServices.updateMessageReadStatus(recipientId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Message read status updated successfully",
+        data: updatedMessage
+    });
+}));
 exports.chatController = {
     createMessage,
     getMessages,
-    getUnreadMessages
+    getUniqueReciepientsWithMessage,
+    getUnreadMessages,
+    updateMessageReadStatus
 };

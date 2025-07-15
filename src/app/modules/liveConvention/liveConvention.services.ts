@@ -11,8 +11,8 @@ const createSignature = async (liveConvention: Partial<TLiveConvention>) => {
   const oHeader = { alg: 'HS256', typ: 'JWT' }
 
   const oPayload = {
-    appKey: process.env.ZOOM_MEETING_SDK_KEY,
-    sdkKey: process.env.ZOOM_MEETING_SDK_KEY,
+    appKey: config.zoom_meeting_sdk_key,
+    sdkKey: config.zoom_meeting_sdk_key,
     mn: meetingNumber,
     role,
     iat,
