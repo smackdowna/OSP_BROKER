@@ -4,10 +4,11 @@ import { Router } from 'express';
 
 const router= Router();
 
-
 // chat routes
 router.post('/:recipientId', verifyToken, chatController.createMessage);
-router.get('/:recipientId', verifyToken, chatController.getMessages);
+router.get('/recipients', verifyToken, chatController.getUniqueReciepientsWithMessage);
+router.get('/:recipientId', verifyToken, chatController.getMessages); 
 router.get('/unreadMessages/:recipientId', verifyToken, chatController.getUnreadMessages);
+router.post('/updateReadStatus/:recipientId', verifyToken, chatController.updateMessageReadStatus);
 
 export const chatRouter = router;

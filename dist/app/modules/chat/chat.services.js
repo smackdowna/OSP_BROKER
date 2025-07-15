@@ -71,6 +71,24 @@ const getMessages = (senderId, receiverId, res) => __awaiter(void 0, void 0, voi
     }
     return messages;
 });
+// get all the unique reciepients for a user with most latest messages
+const getUniqueReciepientsWithMessage = (senderId) => __awaiter(void 0, void 0, void 0, function* () {
+    const recipients = yield prismaDb_1.default.message.findMany({
+        where: {
+            senderId: senderId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        distinct: ['recipientId'],
+        select: {
+            recipientId: true,
+            content: true,
+            createdAt: true
+        }
+    });
+    return recipients;
+});
 // get unread messages
 const getUnreadMessages = (receiverId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const unreadMessages = yield prismaDb_1.default.message.findMany({
@@ -89,10 +107,32 @@ const getUnreadMessages = (receiverId, res) => __awaiter(void 0, void 0, void 0,
             message: "No unread messages found"
         });
     }
-    return unreadMessages;
+    return { messages: unreadMessages };
+});
+// update message read status
+const updateMessageReadStatus = (receiverId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const updatedMessage = yield prismaDb_1.default.message.updateMany({
+        where: {
+            recipientId: receiverId,
+            read: false
+        },
+        data: {
+            read: true
+        }
+    });
+    if (!updatedMessage || updatedMessage.count === 0) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No unread messages found"
+        }));
+    }
+    return { messages: updatedMessage };
 });
 exports.chatServices = {
     createMessage,
     getMessages,
-    getUnreadMessages
+    getUniqueReciepientsWithMessage,
+    getUnreadMessages,
+    updateMessageReadStatus
 };

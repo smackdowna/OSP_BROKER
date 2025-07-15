@@ -23,5 +23,8 @@ export default {
   google_redirect_uri: process.env.GOOGLE_REDIRECT_URI,
   apple_client_id: process.env.APPLE_CLIENT_ID,
   zoom_meeting_sdk_key:process.env.ZOOM_MEETING_SDK_KEY,
-  zoom_meeting_sdk_secret:process.env.ZOOM_MEETING_SDK_SECRET
+  zoom_meeting_sdk_secret:process.env.ZOOM_MEETING_SDK_SECRET,
+  imageKit_public_key: process.env.IMAGEKIT_PUBLIC_KEY,
+  imageKit_private_key: process.env.IMAGEKIT_PRIVATE_KEY,
+  imageKit_url_endpoint: process.env.IMAGEKIT_URL_ENDPOINT
 };

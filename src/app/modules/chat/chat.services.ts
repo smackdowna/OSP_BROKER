@@ -69,6 +69,25 @@ const getMessages= async(senderId: string, receiverId: string , res: Response) =
     return messages;
 }
 
+// get all the unique reciepients for a user with most latest messages
+const getUniqueReciepientsWithMessage = async (senderId: string) => {
+    const recipients = await prismadb.message.findMany({
+        where: {
+            senderId: senderId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        distinct: ['recipientId'],
+        select: {
+            recipientId: true,
+            content: true,
+            createdAt: true
+        }
+    });
+
+    return recipients;
+}
 
 // get unread messages
 const getUnreadMessages= async( receiverId: string, res: Response)=>{
@@ -90,12 +109,37 @@ const getUnreadMessages= async( receiverId: string, res: Response)=>{
         })
     }
 
-    return unreadMessages;
+    return {messages:unreadMessages};
 }
+
+// update message read status
+const updateMessageReadStatus = async (receiverId: string , res:Response) => {
+    const updatedMessage= await prismadb.message.updateMany({
+        where: {
+            recipientId: receiverId,
+            read: false
+        },
+        data: {
+            read: true
+        }
+    });
+    if(!updatedMessage || updatedMessage.count === 0) {
+        return( sendResponse(res , {
+            statusCode: 404,
+            success: false,
+            message: "No unread messages found"
+        }))
+    }
+    return {messages:updatedMessage};
+};
+
+
 
 
 export const chatServices = {
     createMessage,
     getMessages,
-    getUnreadMessages
+    getUniqueReciepientsWithMessage,
+    getUnreadMessages , 
+    updateMessageReadStatus
 };

@@ -22,8 +22,8 @@ const createSignature = (liveConvention) => __awaiter(void 0, void 0, void 0, fu
     const exp = typeof expirationSeconds === 'number' ? iat + expirationSeconds : iat + 60 * 60 * 2;
     const oHeader = { alg: 'HS256', typ: 'JWT' };
     const oPayload = {
-        appKey: process.env.ZOOM_MEETING_SDK_KEY,
-        sdkKey: process.env.ZOOM_MEETING_SDK_KEY,
+        appKey: config_1.default.zoom_meeting_sdk_key,
+        sdkKey: config_1.default.zoom_meeting_sdk_key,
         mn: meetingNumber,
         role,
         iat,

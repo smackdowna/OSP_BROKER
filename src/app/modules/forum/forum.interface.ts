@@ -1,7 +1,6 @@
 export type TCategory = {
     name: string;
     description: string;
-    moderatorId: string;
     icon?: string;
     membership_access : string[];
   };
