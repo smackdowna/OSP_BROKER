@@ -70,7 +70,32 @@ const getCategoryById= async (categoryId: string , res: Response) => {
         )
     }
 
-    return {category };
+    const moderator= await prismadb.moderator.findFirst({
+        where:{
+            categoryIds:{
+                has: categoryId  // Checks if the array contains this specific categoryId
+            }
+        },
+        include:{
+            user:{
+                select:{
+                    id: true,
+                    fullName: true,
+                }
+            }
+        }
+    })
+
+    const moderatorImage= await prismadb.userProfile.findFirst({
+        where:{
+            userId: moderator?.user.id
+        },
+        select:{
+            profileImageUrl: true
+        }
+    })
+
+    return {category , moderatorName: moderator?.user.fullName, moderatorImage: moderatorImage?.profileImageUrl};
 }
 
 // update category

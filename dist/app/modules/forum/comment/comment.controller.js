@@ -21,13 +21,14 @@ const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 // create comment
 const createComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const commenterId = req.user.userId;
-    const { comment, author, topicId } = req.body;
+    const { comment, author, topicId, postId } = req.body;
     const newComment = yield comment_services_1.commentServices.createComment({
         comment,
         author,
         topicId,
+        postId,
         commenterId,
-    });
+    }, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -163,11 +164,21 @@ const deleteComment = (0, catchAsyncError_1.default)((req, res, next) => __await
                 id: id,
             },
         });
-        const topic = yield prismaDb_1.default.topic.findFirst({
-            where: {
-                id: comment === null || comment === void 0 ? void 0 : comment.topicId,
-            },
-        });
+        if (!comment) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found",
+            });
+        }
+        let topic = null;
+        if (comment.topicId) {
+            topic = yield prismaDb_1.default.topic.findFirst({
+                where: {
+                    id: comment.topicId,
+                },
+            });
+        }
         const forum = yield prismaDb_1.default.forum.findFirst({
             where: {
                 id: topic === null || topic === void 0 ? void 0 : topic.forumId,

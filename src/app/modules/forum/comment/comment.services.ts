@@ -7,58 +7,112 @@ import { Response } from "express";
 import { notifyUser } from "../../../utils/notifyUser";
 
 // create comment 
-const createComment = async (commentBody: TComment) => {
-    const { comment, topicId, author , commenterId } = commentBody;
+const createComment = async (commentBody: TComment , res:Response) => {
+    const { comment, topicId,postId, author , commenterId } = commentBody;
 
-    if (!comment || !topicId || !author || !commenterId) {
+    if (!comment || !(topicId && postId) || !author || !commenterId) {
         throw new AppError(400, "please provide all fields");
     }
 
-    const topic= await prismadb.topic.findFirst({
-        where: {
-            id: topicId,
-        },
-    });
+    let newComment;
 
+    if(topicId){
+        const topic= await prismadb.topic.findFirst({
+            where: {
+                id: topicId,
+            },
+        });
+        const id= topic?.forumId;
+        const forum= await prismadb.forum.findFirst({
+            where: {
+                id: id
+            },
+        });
 
-    const id= topic?.forumId;
+        if(!forum){
+            return(
+                sendResponse(res, {
+                    statusCode: 404,
+                    success: false,
+                    message: "Forum not found",
+                })
+            );
+        }
     
-    const forum= await prismadb.forum.findFirst({
-        where: {
-            id: id
-        },
-    });
-
-  if (forum?.userId && forum.userId !== commenterId) {
-    await prismadb.notification.create({
-      data: {
-        type: "COMMENT",
-        message: `Someone commented on your topic "${topic?.title}"`,
-        recipient: forum.userId,
-        sender: commenterId
-      },
-        })
-    };
-
-    // send real time notification to the user
-    if(forum){
-        notifyUser(forum?.userId, {
+        await prismadb.notification.create({
+          data: {
             type: "COMMENT",
             message: `Someone commented on your topic "${topic?.title}"`,
             recipient: forum.userId,
             sender: commenterId
+          },
+            })
+    
+        // send real time notification to the user
+        if(forum){
+            notifyUser(forum?.userId, {
+                type: "COMMENT",
+                message: `Someone commented on your topic "${topic?.title}"`,
+                recipient: forum.userId,
+                sender: commenterId
+            });
+        }
+    
+         newComment = await prismadb.comment.create({
+            data: {
+                comment,
+                topicId,
+                author,
+                commenterId
+            },
         });
+        return {comment:newComment};
     }
+    if(postId){
+        const post= await prismadb.post.findFirst({
+            where: {
+                id: postId,
+            },
+        });
 
-    const newComment = await prismadb.comment.create({
-        data: {
-            comment,
-            topicId,
-            author,
-            commenterId
-        },
-    });
-    return {comment:newComment};
+        if(!post){
+            return(
+                sendResponse(res, {
+                    statusCode: 404,
+                    success: false,
+                    message: "Post not found",
+                })
+            );
+        }
+
+        await prismadb.notification.create({
+          data: {
+            type: "COMMENT",
+            message: `Someone commented on your post "${post?.title}"`,
+            recipient: post.businessId,
+            sender: commenterId
+          },
+        })
+
+        notifyUser(post.businessId, {
+            type: "COMMENT",
+            message: `Someone commented on your post "${post?.title}"`,
+            recipient: post.businessId,
+            sender: commenterId
+        });
+
+        newComment = await prismadb.comment.create({
+            data: {
+                comment,
+                postId,
+                author,
+                commenterId
+            },
+        });
+
+        return {comment:newComment};
+    }
+    
 }
 
 // get all notifications

@@ -16,6 +16,8 @@ import { reactionsRouter } from "../modules/Reactions/reactions.routes";
 import { groupChatRouter } from "../modules/chat/groupChat/groupChat.routes";
 import { liveConventionRoutes } from "../modules/liveConvention/liveConvention.routes";
 import { bookingRouter } from "../modules/booking/booking.routes";
+import { postRoutes } from "../modules/post/post.routes";
+
 
 const router = Router();
 
@@ -89,6 +91,10 @@ const moduleRoutes=[
     { 
         path: "/booking",
         route: bookingRouter
+    } , 
+    {
+        path :"/post",
+        route: postRoutes
     }
 ]
 
