@@ -52,6 +52,7 @@ model User{
     representativePageFollower RepresentativePageFollower[] @relation("userToRepresentativePageFollower")
     groupMessage GroupMessage[] @relation("userToGroupMessage")
     booking Booking[] @relation("userToBooking")
+    shreadPost SharedPost[] @relation("userToSharedPost")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -173,6 +174,10 @@ model business{
     groupChat GroupChat? @relation("businessToGroupChat")
     representative Representative[] @relation("businessToRepresentative")
     businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
+    post Post[] @relation("businessToPost")
+
+    cretedAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model BusinessCategory{
@@ -231,9 +236,12 @@ model Comment{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     comment String
     author String
-    topicId String @db.ObjectId
+    topicId String? @db.ObjectId
     commenterId String? @db.ObjectId
-    Topic Topic @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    Topic Topic? @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    postId String? @db.ObjectId
+    post Post? @relation("postToComment" , fields: [postId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
     flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
     reactions Reactions[] @relation("commentToReactions")
 
@@ -454,8 +462,10 @@ model Reactions{
     reactionType ReactionType 
     topicId String? @db.ObjectId
     commentId String? @db.ObjectId
+    postId String? @db.ObjectId
     Topic Topic? @relation("topicToReactions", fields: [topicId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     Comment Comment? @relation("commentToReactions", fields: [commentId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    Post Post? @relation("postToReactions", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -482,8 +492,25 @@ model Post{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     title String
     description String
+    businessId String @db.ObjectId
+    Business business @relation("businessToPost", fields: [businessId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     media Media[] @relation("postToMedia")
+    comments Comment[] @relation("postToComment")
+    reactions Reactions[] @relation("postToReactions")
+    sharedPosts SharedPost[] @relation("postToSharedPost")
     
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// shared posts
+model SharedPost{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    postId String @db.ObjectId
+    Post Post @relation("postToSharedPost", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId
+    user User @relation("userToSharedPost", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -496,6 +523,6 @@ model Media{
     thumbnailUrl String?
     fileType String?
 
-    postId String @db.ObjectId
-    Post Post @relation("postToMedia", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    postId String? @db.ObjectId
+    Post Post? @relation("postToMedia", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 }

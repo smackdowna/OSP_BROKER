@@ -10,13 +10,14 @@ import prismadb from "../../../db/prismaDb";
 const createComment = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const  commenterId  = req.user.userId;
-    const { comment, author, topicId } = req.body;
+    const { comment, author, topicId , postId } = req.body;
     const newComment = await commentServices.createComment({
       comment,
       author,
       topicId,
+      postId,
       commenterId,
-    });
+    } , res);
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -183,11 +184,22 @@ const deleteComment = catchAsyncError(
         },
       });
 
-      const topic = await prismadb.topic.findFirst({
-        where: {
-          id: comment?.topicId,
-        },
-      });
+      if(!comment) {
+        return sendResponse(res, {
+          statusCode: 404,
+          success: false,
+          message: "Comment not found",
+        });
+      }
+
+      let topic = null;
+      if (comment.topicId) {
+        topic = await prismadb.topic.findFirst({
+          where: {
+            id: comment.topicId,
+          },
+        });
+      }
 
       const forum = await prismadb.forum.findFirst({
         where: {

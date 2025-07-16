@@ -77,7 +77,30 @@ const getCategoryById = (categoryId, res) => __awaiter(void 0, void 0, void 0, f
             message: "Category not found with this id",
         }));
     }
-    return { category };
+    const moderator = yield prismaDb_1.default.moderator.findFirst({
+        where: {
+            categoryIds: {
+                has: categoryId // Checks if the array contains this specific categoryId
+            }
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    fullName: true,
+                }
+            }
+        }
+    });
+    const moderatorImage = yield prismaDb_1.default.userProfile.findFirst({
+        where: {
+            userId: moderator === null || moderator === void 0 ? void 0 : moderator.user.id
+        },
+        select: {
+            profileImageUrl: true
+        }
+    });
+    return { category, moderatorName: moderator === null || moderator === void 0 ? void 0 : moderator.user.fullName, moderatorImage: moderatorImage === null || moderatorImage === void 0 ? void 0 : moderatorImage.profileImageUrl };
 });
 // update category
 const updateCategory = (categoryId, res, category) => __awaiter(void 0, void 0, void 0, function* () {

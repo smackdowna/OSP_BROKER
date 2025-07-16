@@ -18,6 +18,7 @@ const reactions_routes_1 = require("../modules/Reactions/reactions.routes");
 const groupChat_routes_1 = require("../modules/chat/groupChat/groupChat.routes");
 const liveConvention_routes_1 = require("../modules/liveConvention/liveConvention.routes");
 const booking_routes_1 = require("../modules/booking/booking.routes");
+const post_routes_1 = require("../modules/post/post.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -87,6 +88,10 @@ const moduleRoutes = [
     {
         path: "/booking",
         route: booking_routes_1.bookingRouter
+    },
+    {
+        path: "/post",
+        route: post_routes_1.postRoutes
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

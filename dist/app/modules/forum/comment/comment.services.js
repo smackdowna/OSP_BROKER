@@ -18,23 +18,31 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 const notifyUser_1 = require("../../../utils/notifyUser");
 // create comment 
-const createComment = (commentBody) => __awaiter(void 0, void 0, void 0, function* () {
-    const { comment, topicId, author, commenterId } = commentBody;
-    if (!comment || !topicId || !author || !commenterId) {
+const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { comment, topicId, postId, author, commenterId } = commentBody;
+    if (!comment || !(topicId && postId) || !author || !commenterId) {
         throw new appError_1.default(400, "please provide all fields");
     }
-    const topic = yield prismaDb_1.default.topic.findFirst({
-        where: {
-            id: topicId,
-        },
-    });
-    const id = topic === null || topic === void 0 ? void 0 : topic.forumId;
-    const forum = yield prismaDb_1.default.forum.findFirst({
-        where: {
-            id: id
-        },
-    });
-    if ((forum === null || forum === void 0 ? void 0 : forum.userId) && forum.userId !== commenterId) {
+    let newComment;
+    if (topicId) {
+        const topic = yield prismaDb_1.default.topic.findFirst({
+            where: {
+                id: topicId,
+            },
+        });
+        const id = topic === null || topic === void 0 ? void 0 : topic.forumId;
+        const forum = yield prismaDb_1.default.forum.findFirst({
+            where: {
+                id: id
+            },
+        });
+        if (!forum) {
+            return ((0, sendResponse_1.default)(res, {
+                statusCode: 404,
+                success: false,
+                message: "Forum not found",
+            }));
+        }
         yield prismaDb_1.default.notification.create({
             data: {
                 type: "COMMENT",
@@ -43,26 +51,62 @@ const createComment = (commentBody) => __awaiter(void 0, void 0, void 0, functio
                 sender: commenterId
             },
         });
+        // send real time notification to the user
+        if (forum) {
+            (0, notifyUser_1.notifyUser)(forum === null || forum === void 0 ? void 0 : forum.userId, {
+                type: "COMMENT",
+                message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
+                recipient: forum.userId,
+                sender: commenterId
+            });
+        }
+        newComment = yield prismaDb_1.default.comment.create({
+            data: {
+                comment,
+                topicId,
+                author,
+                commenterId
+            },
+        });
+        return { comment: newComment };
     }
-    ;
-    // send real time notification to the user
-    if (forum) {
-        (0, notifyUser_1.notifyUser)(forum === null || forum === void 0 ? void 0 : forum.userId, {
+    if (postId) {
+        const post = yield prismaDb_1.default.post.findFirst({
+            where: {
+                id: postId,
+            },
+        });
+        if (!post) {
+            return ((0, sendResponse_1.default)(res, {
+                statusCode: 404,
+                success: false,
+                message: "Post not found",
+            }));
+        }
+        yield prismaDb_1.default.notification.create({
+            data: {
+                type: "COMMENT",
+                message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
+                recipient: post.businessId,
+                sender: commenterId
+            },
+        });
+        (0, notifyUser_1.notifyUser)(post.businessId, {
             type: "COMMENT",
-            message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
-            recipient: forum.userId,
+            message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
+            recipient: post.businessId,
             sender: commenterId
         });
+        newComment = yield prismaDb_1.default.comment.create({
+            data: {
+                comment,
+                postId,
+                author,
+                commenterId
+            },
+        });
+        return { comment: newComment };
     }
-    const newComment = yield prismaDb_1.default.comment.create({
-        data: {
-            comment,
-            topicId,
-            author,
-            commenterId
-        },
-    });
-    return { comment: newComment };
 });
 // get all notifications
 const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, function* () {

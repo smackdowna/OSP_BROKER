@@ -1,7 +1,9 @@
+
 export type TPost = {
   title: string;
   description: string;
-  media: TMedia[];
+  businessId: string;
+  media: TMedia[] | undefined;
 };
 
 
@@ -11,5 +13,4 @@ export type TMedia = {
   url: string;
   thumbnailUrl?: string;
   fileType?: string;
-  postId: string;
 };

@@ -26,7 +26,8 @@ export type TCategory = {
   
   export type TComment = {
     comment: string;
-    topicId: string;
+    topicId?: string ;
+    postId?: string;
     commenterId?: string;
     author: string;
   };
