@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.multipleUpload = exports.singleUpload = void 0;
 const multer_1 = __importStar(require("multer"));
 const storage = (0, multer_1.memoryStorage)();
-const singleUpload = (0, multer_1.default)({ storage }).single("file");
-const multipleUpload = (0, multer_1.default)({ storage }).array("files", 10);
-exports.default = { singleUpload, multipleUpload };
+exports.singleUpload = (0, multer_1.default)({ storage }).single("file");
+exports.multipleUpload = (0, multer_1.default)({ storage }).array("files", 10);

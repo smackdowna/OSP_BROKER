@@ -22,14 +22,14 @@ const createBusiness = (business, req) => __awaiter(void 0, void 0, void 0, func
     if (!businessName || !slogan || !mission || !industry || !companyType || !history || !servingAreas || !keyPeople || !ownership || !lastYearRevenue || !acquisitions || !strategicPartners || !websiteLinks || !accountOwnerUsername || !products || !services || !businessAdminId || !businessCategoryId) {
         throw new appError_1.default(400, "please provide all required fields");
     }
-    const existingBusiness = yield prismaDb_1.default.business.findFirst({
-        where: {
-            businessName: businessName
-        }
-    });
-    if (existingBusiness) {
-        throw new appError_1.default(400, "Business already exists with this name");
-    }
+    // const existingBusiness = await prismadb.business.findFirst({
+    //     where: {
+    //         businessName: businessName
+    //     }
+    // });
+    // if (existingBusiness) {
+    //     throw new AppError(400, "Business already exists with this name");
+    // }
     const cleanName = (name) => {
         return name
             .toLowerCase()

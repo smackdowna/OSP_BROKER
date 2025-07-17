@@ -26,9 +26,10 @@ const getFilesFromRequest = (files) => {
 };
 // create post
 const createPost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
     const { title, description, businessId } = req.body;
     let media = [];
-    if (req.files) {
+    if (req.files && req.files.length != 0) {
         try {
             const files = getFilesFromRequest(req.files);
             if (files.length === 0) {
@@ -40,7 +41,7 @@ const createPost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
             }
             media = yield Promise.all(files.map((file) => __awaiter(void 0, void 0, void 0, function* () {
                 const fileData = (0, getDataUri_1.default)(file);
-                return yield (0, uploadAsset_1.uploadFile)(fileData.content, fileData.fileName, "people");
+                return yield (0, uploadAsset_1.uploadFile)(fileData.content, fileData.fileName, "media");
             })));
             // Filter out failed uploads
             media = media.filter((item) => item != null);
@@ -58,7 +59,7 @@ const createPost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
             })));
         }
     }
-    const newPost = yield post_services_1.postServices.createPost({ title, description, businessId, media }, res, req);
+    const newPost = yield post_services_1.postServices.createPost({ title, description, businessId, userId, media }, res, req);
     (0, sendResponse_1.default)(res, {
         statusCode: 201,
         success: true,
@@ -103,7 +104,8 @@ const updatePost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
     const { id } = req.params;
     const { title, description } = req.body;
     let media = [];
-    if (req.files) {
+    console.log("req.files", req.files);
+    if (req.files && req.files.length != 0) {
         try {
             const files = getFilesFromRequest(req.files);
             if (files.length === 0) {

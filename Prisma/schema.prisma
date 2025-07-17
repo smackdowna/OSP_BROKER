@@ -53,6 +53,7 @@ model User{
     groupMessage GroupMessage[] @relation("userToGroupMessage")
     booking Booking[] @relation("userToBooking")
     shreadPost SharedPost[] @relation("userToSharedPost")
+    post Post[] @relation("userToPost")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -176,8 +177,6 @@ model business{
     businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
     post Post[] @relation("businessToPost")
 
-    cretedAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 model BusinessCategory{
@@ -494,6 +493,8 @@ model Post{
     description String
     businessId String @db.ObjectId
     Business business @relation("businessToPost", fields: [businessId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId
+    User User @relation("userToPost", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     media Media[] @relation("postToMedia")
     comments Comment[] @relation("postToComment")
     reactions Reactions[] @relation("postToReactions")
@@ -523,6 +524,6 @@ model Media{
     thumbnailUrl String?
     fileType String?
 
-    postId String? @db.ObjectId
+    postId String? @db.ObjectId @unique
     Post Post? @relation("postToMedia", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 }

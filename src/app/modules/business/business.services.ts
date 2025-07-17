@@ -37,15 +37,17 @@ const createBusiness = async (business: TBusiness , req:Request) => {
         throw new AppError(400, "please provide all required fields");
     }
 
-    const existingBusiness = await prismadb.business.findFirst({
-        where: {
-            businessName: businessName
-        }
-    });
 
-    if (existingBusiness) {
-        throw new AppError(400, "Business already exists with this name");
-    }
+    // const existingBusiness = await prismadb.business.findFirst({
+    //     where: {
+    //         businessName: businessName
+    //     }
+    // });
+
+    
+    // if (existingBusiness) {
+    //     throw new AppError(400, "Business already exists with this name");
+    // }
 
     const cleanName = (name: string): string => {
     return name

@@ -6,41 +6,59 @@ import sendResponse from "../../middlewares/sendResponse";
 
 // create post
 const createPost= async (post: TPost, res: Response , req:Request) => {
-    if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
-        return sendResponse(res, {
-            statusCode: 403,
-            success: false,
-            message: "unauthorized access",
-        });
+    if(req.cookies.user.role!=="ADMIN"){
+        if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
+            return sendResponse(res, {
+                statusCode: 403,
+                success: false,
+                message: "unauthorized access",
+            });
+        }
     }
 
-    const { title, description, media ,businessId } = post;
+    const { title, description, media ,userId,businessId } = post;
+    console.log("post " ,post)
 
-    if (!title || !description || !media || media.length === 0) {
+    if (!title || !description || !businessId || !userId) {
         throw new AppError(400, "Title, description and media are required");
     }
 
-    const newPost = await prismadb.post.create({
-        data: {
-            title,
-            description,
-            businessId,
-            media: {
-                create: media.map((item) => ({
-                    fileId: item.fileId,
-                    name: item.name,
-                    url: item.url,
-                    thumbnailUrl: item.thumbnailUrl,
-                    fileType: item.fileType
-                }))
+    if(media){
+        const newPost = await prismadb.post.create({
+            data: {
+                title,
+                description,
+                businessId,
+                userId,
+                media: {
+                    create: media.map((item) => ({
+                        fileId: item.fileId,
+                        name: item.name,
+                        url: item.url,
+                        thumbnailUrl: item.thumbnailUrl,
+                        fileType: item.fileType
+                    }))
+                }
+            },
+            include: {
+                media: true
             }
-        },
-        include: {
-            media: true
-        }
-    });
-
-    return { post: newPost };
+        });
+    
+        return { post: newPost };
+    }
+    else{
+        const newPost = await prismadb.post.create({
+            data: {
+                title,
+                description,
+                businessId,
+                userId,
+            }
+        });
+    
+        return { post: newPost };
+    }
 }
 
 // get all posts
@@ -110,12 +128,14 @@ const getPostById = async (id: string, res: Response) => {
 
 // update post
 const updatePost = async (id: string, postData: Partial<TPost>, res: Response , req:Request) => {
-    if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
-        return sendResponse(res, {
-            statusCode: 403,
-            success: false,
-            message: "unauthorized access",
-        });
+    if(req.cookies.user.role!=="ADMIN"){
+        if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
+            return sendResponse(res, {
+                statusCode: 403,
+                success: false,
+                message: "unauthorized access",
+            });
+        }
     }
 
     const { title, description, media } = postData;
@@ -174,6 +194,9 @@ const updatePost = async (id: string, postData: Partial<TPost>, res: Response , 
                         fileType: item.fileType
                     }))
                 }
+            },
+            include:{
+                media: true,
             }
         });
 
@@ -204,6 +227,9 @@ const updatePost = async (id: string, postData: Partial<TPost>, res: Response , 
                     }))
                 }
             },
+            include: {
+                media: true,
+            }
         });
 
         return { post: updatedPost };
@@ -212,12 +238,14 @@ const updatePost = async (id: string, postData: Partial<TPost>, res: Response , 
 
 // delete post
 const deletePost = async (id: string, res: Response , req:Request) => {
-    if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
-        return sendResponse(res, {
-            statusCode: 403,
-            success: false,
-            message: "unauthorized access",
-        });
+    if(req.cookies.user.role!=="ADMIN"){
+        if(req.cookies.user.role!=="BUSINESS_ADMIN" || req.cookies.user.role!=="REPRESENTATIVE"){
+            return sendResponse(res, {
+                statusCode: 403,
+                success: false,
+                message: "unauthorized access",
+            });
+        }
     }
 
     if(!id){
@@ -312,6 +340,7 @@ const getSharedPostsByUserId = async (userId: string, res: Response) => {
     if(!userId) {
         throw new AppError(400, "User id is required");
     }
+    console.log("userId", userId);
 
     const sharedPosts = await prismadb.sharedPost.findMany({
         where: {

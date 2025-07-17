@@ -3,6 +3,7 @@ export type TPost = {
   title: string;
   description: string;
   businessId: string;
+  userId: string;
   media: TMedia[] | undefined;
 };
 
