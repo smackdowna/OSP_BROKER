@@ -18,11 +18,12 @@ const getFilesFromRequest = (files: UploadedFiles): UploadedFile[] => {
 
 // create post
 const createPost = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const userId= req.user.userId;
     const {title , description , businessId} = req.body;
     let media: UploadFileResponse[] =[];
 
 
-if (req.files) {
+if (req.files && req.files.length != 0) {
   try {
     const files = getFilesFromRequest(req.files);
     
@@ -40,7 +41,7 @@ if (req.files) {
         return await uploadFile(
           fileData.content,
           fileData.fileName,
-          "people"
+          "media"
         );
       })
     );
@@ -67,7 +68,7 @@ if (req.files) {
   }
 }
 
-    const newPost = await postServices.createPost({title ,description , businessId , media}, res , req);
+    const newPost = await postServices.createPost({title ,description , businessId ,userId, media}, res , req);
     sendResponse(res, {
         statusCode: 201,
         success: true,
@@ -120,9 +121,11 @@ const updatePost = catchAsyncError(async (req: Request, res: Response, next: Nex
 
     let media: UploadFileResponse[] =[];
 
+    console.log("req.files", req.files);
 
-if (req.files) {
-  try {
+
+if (req.files && req.files.length != 0) {
+  try { 
     const files = getFilesFromRequest(req.files);
     
     if (files.length === 0) {
@@ -130,8 +133,8 @@ if (req.files) {
         statusCode: 400,
         success: false,
         message: "No files were uploaded",
-      });
-    }
+      });   
+    } 
 
     media = await Promise.all(
       files.map(async (file) => {

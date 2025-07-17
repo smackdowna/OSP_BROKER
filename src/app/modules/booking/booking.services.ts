@@ -121,11 +121,29 @@ const book = async(bookingId:string , updateData: Partial<TBooking> , res:Respon
         userId: userId
     });
 
+    await prismadb.notification.create({
+        data: {
+            sender: userId,
+            type: "BOOKING_CONFIRMED",
+            message: `Your booking for ${existingBooking.availableDate.toISOString()} has been confirmed with representative ${representativeName?.fullName}`,
+            recipient: existingBooking.representativeId
+        }
+    });
+
     notifyUser(userId , {
         type: "BOOKING_NOTIFICATION",
         message: `Your booking for ${existingBooking.availableDate.toISOString()} has been confirmed with representative ${representativeName?.fullName}`,
         bookingId: book.id,
         representativeId: existingBooking.representativeId
+    })
+
+    await prismadb.notification.create({
+        data: {
+            sender: existingBooking.representativeId,
+            type: "BOOKING_NOTIFICATION",
+            message: `You have a new booking for ${existingBooking.availableDate.toISOString()} from user ${userId}`,
+            recipient: userId
+        }
     })
 
     return {book};

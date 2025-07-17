@@ -113,11 +113,27 @@ const book = (bookingId, updateData, res) => __awaiter(void 0, void 0, void 0, f
         bookingId: book.id,
         userId: userId
     });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            sender: userId,
+            type: "BOOKING_CONFIRMED",
+            message: `Your booking for ${existingBooking.availableDate.toISOString()} has been confirmed with representative ${representativeName === null || representativeName === void 0 ? void 0 : representativeName.fullName}`,
+            recipient: existingBooking.representativeId
+        }
+    });
     (0, notifyUser_1.notifyUser)(userId, {
         type: "BOOKING_NOTIFICATION",
         message: `Your booking for ${existingBooking.availableDate.toISOString()} has been confirmed with representative ${representativeName === null || representativeName === void 0 ? void 0 : representativeName.fullName}`,
         bookingId: book.id,
         representativeId: existingBooking.representativeId
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            sender: existingBooking.representativeId,
+            type: "BOOKING_NOTIFICATION",
+            message: `You have a new booking for ${existingBooking.availableDate.toISOString()} from user ${userId}`,
+            recipient: userId
+        }
     });
     return { book };
 });
