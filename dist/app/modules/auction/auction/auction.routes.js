@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.auctionRouter = void 0;
+const express_1 = require("express");
+const requireAuth_1 = require("../../../middlewares/requireAuth");
+const authorizeRole_1 = require("../../../middlewares/authorizeRole");
+const category_controller_1 = require("../category/category.controller");
+const auction_controller_1 = require("./auction.controller");
+const multer_1 = require("../../../middlewares/multer");
+const router = (0, express_1.Router)();
+// Auction Category routes
+router.post("/category", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.createAuctionCategory);
+router.get("/category", category_controller_1.categoryController.getAllAuctionCategories);
+router.get("/category/:id", category_controller_1.categoryController.getAuctionsByCategoryById);
+router.put("/category/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.updateAuctionCategory);
+router.delete("/category/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.deleteAuctionCategory);
+// Auction routes
+router.post("/", requireAuth_1.verifyToken, multer_1.multipleUpload, auction_controller_1.auctionController.createAuction);
+router.get("/", auction_controller_1.auctionController.getAllAuctions);
+router.get("/:id", auction_controller_1.auctionController.getAuctionById);
+router.put("/:id", requireAuth_1.verifyToken, multer_1.multipleUpload, auction_controller_1.auctionController.updateAuction);
+router.delete("/:id", requireAuth_1.verifyToken, auction_controller_1.auctionController.deleteAuction);
+exports.auctionRouter = router;
