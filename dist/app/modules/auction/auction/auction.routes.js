@@ -6,8 +6,15 @@ const requireAuth_1 = require("../../../middlewares/requireAuth");
 const authorizeRole_1 = require("../../../middlewares/authorizeRole");
 const category_controller_1 = require("../category/category.controller");
 const auction_controller_1 = require("./auction.controller");
+const bid_controller_1 = require("../bid/bid.controller");
 const multer_1 = require("../../../middlewares/multer");
 const router = (0, express_1.Router)();
+// bid routes
+router.post("/bid/:auctionId", requireAuth_1.verifyToken, bid_controller_1.bidController.createBid);
+router.get("/bid/auctionId/:auctionId", bid_controller_1.bidController.getBidsByAuctionId);
+router.get("/bid/:id", bid_controller_1.bidController.getBidById);
+router.put("/bid/:id", requireAuth_1.verifyToken, bid_controller_1.bidController.updateBid);
+router.delete("/bid/:id", requireAuth_1.verifyToken, bid_controller_1.bidController.deleteBid);
 // Auction Category routes
 router.post("/category", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.createAuctionCategory);
 router.get("/category", category_controller_1.categoryController.getAllAuctionCategories);

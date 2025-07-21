@@ -149,8 +149,37 @@ const updateBusinessAdminRole= async(userId: string  ,res:Response)=>{
   
 }
 
+// approve auction
+const approveAuction= async( auctionId: string, res: Response) => {
+  const auction = await prismadb.auction.findFirst({
+    where: {
+      id: auctionId,
+    },
+  });
+
+  if (!auction) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Auction not found",
+    });
+  }
+
+  const updatedAuction = await prismadb.auction.update({
+    where: {
+      id: auctionId,
+    },
+    data: {
+      approved: true,
+    },
+  });
+
+  return {auction: updatedAuction};
+}
+
 export const adminServices = {
   assignModerator,
   removeModerator,
-  updateBusinessAdminRole
+  updateBusinessAdminRole,
+  approveAuction
 };
