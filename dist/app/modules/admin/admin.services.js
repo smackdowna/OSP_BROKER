@@ -141,8 +141,33 @@ const updateBusinessAdminRole = (userId, res) => __awaiter(void 0, void 0, void 
     }
     return { user: updatedUser };
 });
+// approve auction
+const approveAuction = (auctionId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const auction = yield prismaDb_1.default.auction.findFirst({
+        where: {
+            id: auctionId,
+        },
+    });
+    if (!auction) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Auction not found",
+        });
+    }
+    const updatedAuction = yield prismaDb_1.default.auction.update({
+        where: {
+            id: auctionId,
+        },
+        data: {
+            approved: true,
+        },
+    });
+    return { auction: updatedAuction };
+});
 exports.adminServices = {
     assignModerator,
     removeModerator,
-    updateBusinessAdminRole
+    updateBusinessAdminRole,
+    approveAuction
 };

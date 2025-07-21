@@ -3,9 +3,17 @@ import { verifyToken } from "../../../middlewares/requireAuth";
 import { authorizeRole } from "../../../middlewares/authorizeRole";
 import { categoryController } from "../category/category.controller";
 import { auctionController } from "./auction.controller";
+import { bidController } from "../bid/bid.controller";
 import { multipleUpload } from "../../../middlewares/multer";
 
 const router = Router();
+
+// bid routes
+router.post("/bid/:auctionId", verifyToken, bidController.createBid);
+router.get("/bid/auctionId/:auctionId", bidController.getBidsByAuctionId);
+router.get("/bid/:id", bidController.getBidById);
+router.put("/bid/:id", verifyToken, bidController.updateBid);
+router.delete("/bid/:id", verifyToken, bidController.deleteBid);
 
 
 // Auction Category routes

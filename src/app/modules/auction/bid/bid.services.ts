@@ -1,0 +1,109 @@
+import { TAuctionBid } from "./bid.interface";
+import prismadb from "../../../db/prismaDb";
+import AppError from "../../../errors/appError";
+
+
+// create a new bid
+const createBid = async (bid: TAuctionBid) => {
+    const { auctionId, userId, response } = bid;
+
+    if (!auctionId || !userId || !response) {
+        throw new AppError(400, "All fields are required");
+    }
+
+    const existingBid = await prismadb.auctionBid.findFirst({
+        where: {
+            auctionId,
+            userId,
+        },
+    });
+
+    if (existingBid) {
+        throw new AppError(400, "You have already placed a bid on this auction");
+    }
+
+    const newBid = await prismadb.auctionBid.create({
+        data: {
+            auctionId,
+            userId,
+            response,
+        },
+    });
+
+    return { bid: newBid };
+}
+
+// get all bids for an auction
+const getBidsByAuctionId = async (auctionId: string) => {
+    if (!auctionId) {
+        throw new AppError(400, "Auction ID is required");
+    }
+
+    const bids = await prismadb.auctionBid.findMany({
+        where: { auctionId },
+        include: {
+            User: true, // Include user details if needed
+        },
+    });
+
+    return { bids };
+}
+
+// get bid by ID
+const getBidById = async (id: string) => {
+    if (!id) {
+        throw new AppError(400, "Bid ID is required");
+    }
+
+    const bid = await prismadb.auctionBid.findUnique({
+        where: { id: id },
+        include: {
+            User: true, // Include user details if needed
+            Auction: true, // Include auction details if needed
+        },
+    });
+
+    if (!bid) {
+        throw new AppError(404, "Bid not found");
+    }
+
+    return { bid };
+}
+
+// update a bid
+const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
+    const { response, matched } = updateData;
+
+    if (!id || !response || !matched ) {
+        throw new AppError(400, "Bid ID and update data are required");
+    }
+
+    const updatedBid = await prismadb.auctionBid.update({
+        where: { id: id },
+        data: updateData,
+    });
+
+    return { bid: updatedBid };
+}
+
+// delete a bid
+const deleteBid = async (id: string) => {
+    if (!id) {
+        throw new AppError(400, "Bid ID is required");
+    }
+
+    const deletedBid = await prismadb.auctionBid.delete({
+        where: { id: id },
+    });
+
+    return { bid: deletedBid };
+}
+
+
+export const bidServices = {
+    createBid,
+    getBidsByAuctionId,
+    getBidById,
+    updateBid,
+    deleteBid,
+};

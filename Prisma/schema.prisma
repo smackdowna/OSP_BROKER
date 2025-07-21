@@ -54,6 +54,7 @@ model User{
     booking Booking[] @relation("userToBooking")
     shreadPost SharedPost[] @relation("userToSharedPost")
     post Post[] @relation("userToPost")
+    auctionBid AuctionBid[] @relation("userToAuctionBid")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -545,6 +546,9 @@ model Auction{
     categoryIds String[] @db.ObjectId 
     auctionCategory AuctionCategory @relation("auctionCategoryToAuction", fields: [categoryIds], references: [id], onDelete: Cascade , onUpdate: Cascade)
     timeFrame DateTime
+    approved Boolean @default(false)
+
+    auctionBids AuctionBid[] @relation("auctionToAuctionBid")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -555,6 +559,20 @@ model AuctionCategory{
     name String @unique
     description String
     auctions Auction[] @relation("auctionCategoryToAuction")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// auction bid
+model AuctionBid{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    auctionId String @db.ObjectId
+    Auction Auction @relation("auctionToAuctionBid", fields: [auctionId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userId String @db.ObjectId
+    User User @relation("userToAuctionBid", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    response String
+    matched Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
