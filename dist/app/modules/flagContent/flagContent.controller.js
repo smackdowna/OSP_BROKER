@@ -52,6 +52,30 @@ const flagUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(vo
         data: flaggedUser,
     });
 }));
+// flag auction
+const flagAuction = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { auctionId } = req.params;
+    const { flaggedBy, contentType, reason } = req.body;
+    const flaggedAuction = yield flagContent_services_1.flagContentServices.flagAuction(res, auctionId, { flaggedBy, contentType, reason });
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction flagged successfully",
+        data: flaggedAuction,
+    });
+}));
+// flag auction bid
+const flagAuctionBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { auctionBidId } = req.params;
+    const { flaggedBy, contentType, reason } = req.body;
+    const flaggedAuctionBid = yield flagContent_services_1.flagContentServices.flagAuctionBid(res, auctionBidId, { flaggedBy, contentType, reason });
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction bid flagged successfully",
+        data: flaggedAuctionBid,
+    });
+}));
 // get all flagged content
 const getAllFlaggedContent = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const flaggedContent = yield flagContent_services_1.flagContentServices.getAllFlaggedContent(req, res);
@@ -87,6 +111,8 @@ exports.flagContentController = {
     flagTopic,
     flagComment,
     flagUser,
+    flagAuction,
+    flagAuctionBid,
     getAllFlaggedContent,
     getFlaggedContentById,
     getAllFlaggedUsers

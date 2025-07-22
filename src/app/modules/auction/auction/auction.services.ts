@@ -7,7 +7,7 @@ import sendResponse from "../../../middlewares/sendResponse";
 
 // Create a new auction
 const createAuction = async (auction: TAuction) => {
-    const { title, description, media, categoryIds, timeFrame } = auction;
+    const { title, description,userId, media, categoryIds, timeFrame } = auction;
 
     if(!title || !description  || !categoryIds || !timeFrame) {
         throw new AppError(400, "All fields are required");
@@ -28,6 +28,7 @@ const createAuction = async (auction: TAuction) => {
             data: {
                 title,
                 description,
+                userId,
                 media: {
                     create: media.map((m) => ({
                         fileId: m.fileId,
@@ -52,6 +53,7 @@ const createAuction = async (auction: TAuction) => {
             data: {
                 title,
                 description,
+                userId,
                 categoryIds,
                 timeFrame,
             },

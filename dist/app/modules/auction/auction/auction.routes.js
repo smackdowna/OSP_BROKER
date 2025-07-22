@@ -11,6 +11,7 @@ const multer_1 = require("../../../middlewares/multer");
 const router = (0, express_1.Router)();
 // bid routes
 router.post("/bid/:auctionId", requireAuth_1.verifyToken, bid_controller_1.bidController.createBid);
+router.get("/bid", bid_controller_1.bidController.getAllBids);
 router.get("/bid/auctionId/:auctionId", bid_controller_1.bidController.getBidsByAuctionId);
 router.get("/bid/:id", bid_controller_1.bidController.getBidById);
 router.put("/bid/:id", requireAuth_1.verifyToken, bid_controller_1.bidController.updateBid);

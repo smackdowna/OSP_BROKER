@@ -20,6 +20,18 @@ const createBid = catchAsyncError(async (req: Request , res: Response , next: Ne
     });
 });
 
+// get all bids
+const getAllBids = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const bids = await bidServices.getAllBids();
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Bids retrieved successfully",
+        data: bids,
+    });
+});
+
 // Get all bids for an auction
 const getBidsByAuctionId = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { auctionId } = req.params;
@@ -52,6 +64,7 @@ const getBidById = catchAsyncError(async (req: Request, res: Response, next: Nex
 const updateBid = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { response, matched } = req.body;
+    console.log("Update Bid Data:", { id, response, matched }); 
 
     const updatedBid = await bidServices.updateBid(id, { response, matched });
 
@@ -79,6 +92,7 @@ const deleteBid = catchAsyncError(async (req: Request, res: Response, next: Next
 
 export const bidController = {
     createBid,
+    getAllBids,
     getBidsByAuctionId,
     getBidById,
     updateBid,

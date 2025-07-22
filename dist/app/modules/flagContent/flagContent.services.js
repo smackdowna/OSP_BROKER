@@ -110,6 +110,66 @@ const flagUser = (res, userId, flaggedContentBody) => __awaiter(void 0, void 0, 
         userId: flaggedUser.userId,
     };
 });
+// flag auction
+const flagAuction = (res, auctionId, flaggedContentBody) => __awaiter(void 0, void 0, void 0, function* () {
+    const { flaggedBy, contentType, reason } = flaggedContentBody;
+    const existingFlaggedAuction = yield prismaDb_1.default.flaggedContent.findFirst({
+        where: {
+            auctionId: auctionId,
+        },
+    });
+    if (existingFlaggedAuction) {
+        return ((0, sendResponse_1.default)(res, {
+            success: false,
+            statusCode: 409,
+            message: "Auction already flagged",
+        }));
+    }
+    const flaggedAuction = yield prismaDb_1.default.flaggedContent.create({
+        data: {
+            flaggedBy: flaggedBy,
+            contentType: contentType,
+            reason: reason,
+            auctionId: auctionId
+        },
+    });
+    return {
+        flaggedBy: flaggedAuction.flaggedBy,
+        contentType: flaggedAuction.contentType,
+        reason: flaggedAuction.reason,
+        auctionId: flaggedAuction.auctionId
+    };
+});
+// flag auction bid
+const flagAuctionBid = (res, auctionBidId, flaggedContentBody) => __awaiter(void 0, void 0, void 0, function* () {
+    const { flaggedBy, contentType, reason } = flaggedContentBody;
+    const existingFlaggedAuctionBid = yield prismaDb_1.default.flaggedContent.findFirst({
+        where: {
+            auctionBidId: auctionBidId,
+        },
+    });
+    if (existingFlaggedAuctionBid) {
+        return ((0, sendResponse_1.default)(res, {
+            success: false,
+            statusCode: 409,
+            message: "Auction bid already flagged",
+        }));
+    }
+    const flaggedAuctionBid = yield prismaDb_1.default.flaggedContent.create({
+        data: {
+            flaggedBy: flaggedBy,
+            contentType: contentType,
+            reason: reason,
+            auctionBidId: auctionBidId
+        },
+    });
+    return {
+        flaggedBy: flaggedAuctionBid.flaggedBy,
+        contentType: flaggedAuctionBid.contentType,
+        reason: flaggedAuctionBid.reason,
+        auctionBidId: flaggedAuctionBid.auctionBidId
+    };
+});
 const getAllFlaggedContent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const flaggedContent = yield prismaDb_1.default.flaggedContent.findMany({
@@ -185,6 +245,8 @@ exports.flagContentServices = {
     flagTopic,
     flagComment,
     flagUser,
+    flagAuction,
+    flagAuctionBid,
     getAllFlaggedContent,
     getFlaggedContentById,
     getFlaggedUsers

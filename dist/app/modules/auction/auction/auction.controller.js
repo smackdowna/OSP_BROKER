@@ -26,7 +26,7 @@ const getFilesFromRequest = (files) => {
 };
 // Create a new auction
 const createAuction = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("req.body", req.body);
+    const userId = req.user.userId;
     const { title, description, categoryIds, timeFrame } = req.body;
     let media = [];
     if (req.files && req.files.length != 0) {
@@ -59,7 +59,7 @@ const createAuction = (0, catchAsyncError_1.default)((req, res, next) => __await
             })));
         }
     }
-    const auction = yield auction_services_1.auctionServices.createAuction({ title, media, description, categoryIds, timeFrame });
+    const auction = yield auction_services_1.auctionServices.createAuction({ title, media, userId, description, categoryIds, timeFrame });
     (0, sendResponse_1.default)(res, {
         statusCode: 201,
         success: true,
