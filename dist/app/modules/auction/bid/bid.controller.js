@@ -29,6 +29,16 @@ const createBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
         data: bid,
     });
 }));
+// get all bids
+const getAllBids = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const bids = yield bid_services_1.bidServices.getAllBids();
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Bids retrieved successfully",
+        data: bids,
+    });
+}));
 // Get all bids for an auction
 const getBidsByAuctionId = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { auctionId } = req.params;
@@ -55,6 +65,7 @@ const getBidById = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
 const updateBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { response, matched } = req.body;
+    console.log("Update Bid Data:", { id, response, matched });
     const updatedBid = yield bid_services_1.bidServices.updateBid(id, { response, matched });
     return (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -76,6 +87,7 @@ const deleteBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
 }));
 exports.bidController = {
     createBid,
+    getAllBids,
     getBidsByAuctionId,
     getBidById,
     updateBid,

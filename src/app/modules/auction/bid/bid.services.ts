@@ -1,6 +1,7 @@
 import { TAuctionBid } from "./bid.interface";
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
+import { notifyUser } from "../../../utils/notifyUser";
 
 
 // create a new bid
@@ -31,6 +32,18 @@ const createBid = async (bid: TAuctionBid) => {
     });
 
     return { bid: newBid };
+}
+
+// get all bids
+const getAllBids = async () => {
+    const bids = await prismadb.auctionBid.findMany({
+        include: {
+            User: true,
+            Auction: true, 
+        },
+    });
+
+    return { bids };
 }
 
 // get all bids for an auction
@@ -74,14 +87,43 @@ const getBidById = async (id: string) => {
 const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
     const { response, matched } = updateData;
 
-    if (!id || !response || !matched ) {
+    if (!id || !response ) {
         throw new AppError(400, "Bid ID and update data are required");
     }
 
     const updatedBid = await prismadb.auctionBid.update({
         where: { id: id },
-        data: updateData,
+        data: {
+            response,
+            matched: matched !== undefined ? matched : false,
+        },
     });
+
+    const {auctionId}= updatedBid;
+
+    const auction= await prismadb.auction.findFirst({
+        where: { id: auctionId },
+        include: {
+            User: true,
+        },
+    });
+
+    if(updatedBid.matched===true){
+        // notify the admin
+        const admin= await prismadb.user.findFirst({
+            where: { role: "ADMIN" },
+        });
+
+        if(admin){
+            notifyUser(admin.id,{
+                message: `Bid matched for auction ${auction?.title}`,
+                bidId: updatedBid.id,
+                auctionId: updatedBid.auctionId,
+                auctionCreaterId: auction?.User.id,
+                bidCreaterId: updatedBid.userId,
+            })
+        }
+    }
 
     return { bid: updatedBid };
 }
@@ -102,6 +144,7 @@ const deleteBid = async (id: string) => {
 
 export const bidServices = {
     createBid,
+    getAllBids,
     getBidsByAuctionId,
     getBidById,
     updateBid,

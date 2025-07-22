@@ -54,6 +54,7 @@ model User{
     booking Booking[] @relation("userToBooking")
     shreadPost SharedPost[] @relation("userToSharedPost")
     post Post[] @relation("userToPost")
+    auctions Auction[] @relation("userToAuction")
     auctionBid AuctionBid[] @relation("userToAuctionBid")
 
     createdAt DateTime @default(now())
@@ -373,6 +374,10 @@ model FlaggedContent{
     comment Comment? @relation("commentToFlaggedContent",fields: [commentId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     userId String? @db.ObjectId
     user User? @relation("userToFlaggedContent",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    auctionId String? @db.ObjectId
+    auction Auction? @relation("auctionToFlaggedContent",fields: [auctionId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    auctionBidId String? @db.ObjectId
+    auctionBid AuctionBid? @relation("auctionBidToFlaggedContent",fields: [auctionBidId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -547,8 +552,11 @@ model Auction{
     auctionCategory AuctionCategory @relation("auctionCategoryToAuction", fields: [categoryIds], references: [id], onDelete: Cascade , onUpdate: Cascade)
     timeFrame DateTime
     approved Boolean @default(false)
+    userId String @db.ObjectId
+    User User @relation("userToAuction", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     auctionBids AuctionBid[] @relation("auctionToAuctionBid")
+    flaggedContent FlaggedContent[] @relation("auctionToFlaggedContent")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -573,6 +581,8 @@ model AuctionBid{
     User User @relation("userToAuctionBid", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     response String
     matched Boolean @default(false)
+
+    flaggedContent FlaggedContent[] @relation("auctionBidToFlaggedContent")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

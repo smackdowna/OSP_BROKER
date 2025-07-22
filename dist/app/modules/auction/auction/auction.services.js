@@ -18,7 +18,7 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // Create a new auction
 const createAuction = (auction) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, description, media, categoryIds, timeFrame } = auction;
+    const { title, description, userId, media, categoryIds, timeFrame } = auction;
     if (!title || !description || !categoryIds || !timeFrame) {
         throw new appError_1.default(400, "All fields are required");
     }
@@ -34,6 +34,7 @@ const createAuction = (auction) => __awaiter(void 0, void 0, void 0, function* (
             data: {
                 title,
                 description,
+                userId,
                 media: {
                     create: media.map((m) => ({
                         fileId: m.fileId,
@@ -57,6 +58,7 @@ const createAuction = (auction) => __awaiter(void 0, void 0, void 0, function* (
             data: {
                 title,
                 description,
+                userId,
                 categoryIds,
                 timeFrame,
             },

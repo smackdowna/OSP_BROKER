@@ -43,6 +43,33 @@ const flagUser = catchAsyncError(async (req: Request, res: Response, next: NextF
     });
 });
 
+// flag auction
+const flagAuction = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { auctionId } = req.params;
+    const { flaggedBy ,contentType , reason  } = req.body;
+    const flaggedAuction = await flagContentServices.flagAuction(res ,auctionId , {flaggedBy ,contentType , reason });
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction flagged successfully",
+        data: flaggedAuction,
+    });
+});
+
+// flag auction bid
+const flagAuctionBid = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { auctionBidId } = req.params;
+    const { flaggedBy ,contentType , reason  } = req.body;
+    const flaggedAuctionBid = await flagContentServices.flagAuctionBid(res ,auctionBidId , {flaggedBy ,contentType , reason });
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction bid flagged successfully",
+        data: flaggedAuctionBid,
+    });
+});
+
+
 // get all flagged content
 const getAllFlaggedContent = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const flaggedContent = await flagContentServices.getAllFlaggedContent(req,res);
@@ -81,6 +108,8 @@ export const flagContentController = {
     flagTopic,
     flagComment,
     flagUser,
+    flagAuction,
+    flagAuctionBid,
     getAllFlaggedContent,
     getFlaggedContentById,
     getAllFlaggedUsers

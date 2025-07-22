@@ -6,4 +6,6 @@ export type TFlaggedContent = {
   commentId?: string;
   userId?: string;
   categoryId?: string;
+  auctionId?: string;
+  auctionBidId?: string;
 };

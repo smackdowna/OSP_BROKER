@@ -17,7 +17,7 @@ const getFilesFromRequest = (files: UploadedFiles): UploadedFile[] => {
 
 // Create a new auction
 const createAuction = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    console.log("req.body" , req.body);
+  const userId= req.user.userId;
     const {title , description , categoryIds , timeFrame} = req.body;
         let media: UploadFileResponse[] =[];
 
@@ -67,7 +67,7 @@ if (req.files && req.files.length != 0) {
   }
 }
 
-    const auction = await auctionServices.createAuction({title ,media , description , categoryIds , timeFrame} );
+    const auction = await auctionServices.createAuction({title ,media ,userId, description , categoryIds , timeFrame} );
     sendResponse(res, {
         statusCode: 201,
         success: true,

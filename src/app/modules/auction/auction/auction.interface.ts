@@ -3,6 +3,7 @@ export type TAuction = {
   description: string;
   media: TMedia[];
   categoryIds: string[]; 
+  userId: string; 
   timeFrame: string; // or Date, depending on usage
 };
 

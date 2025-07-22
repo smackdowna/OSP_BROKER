@@ -10,6 +10,7 @@ const router = Router();
 
 // bid routes
 router.post("/bid/:auctionId", verifyToken, bidController.createBid);
+router.get("/bid", bidController.getAllBids);
 router.get("/bid/auctionId/:auctionId", bidController.getBidsByAuctionId);
 router.get("/bid/:id", bidController.getBidById);
 router.put("/bid/:id", verifyToken, bidController.updateBid);

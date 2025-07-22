@@ -1,7 +1,7 @@
 import prismadb from "../../db/prismaDb";
 import sendResponse from "../../middlewares/sendResponse";
 import { Response , Request } from "express";
-import { TFlaggedContent } from "./flagContent.interaface";
+import { TFlaggedContent } from "./flagContent.interface";
 import { getCategoryId } from "../../utils/getCategoryId";
 
 // flag topic
@@ -117,6 +117,74 @@ const flagUser = async (res: Response, userId: string , flaggedContentBody: TFla
     };
 }
 
+// flag auction
+const flagAuction = async (res: Response, auctionId: string , flaggedContentBody: TFlaggedContent) => {
+    const { flaggedBy ,contentType , reason  } = flaggedContentBody
+    const existingFlaggedAuction = await prismadb.flaggedContent.findFirst({
+        where: {
+            auctionId: auctionId,
+        },
+    });
+    if (existingFlaggedAuction) {
+        return(
+            sendResponse(res,{
+                success: false,
+                statusCode: 409,
+                message: "Auction already flagged",
+            })
+        )
+    }
+
+    const flaggedAuction = await prismadb.flaggedContent.create({
+        data: {
+            flaggedBy: flaggedBy,
+            contentType: contentType,
+            reason: reason,
+            auctionId: auctionId
+        },
+    });
+
+    return {
+        flaggedBy: flaggedAuction.flaggedBy,
+        contentType: flaggedAuction.contentType,
+        reason: flaggedAuction.reason,
+        auctionId: flaggedAuction.auctionId
+    };
+}
+
+// flag auction bid
+const flagAuctionBid = async (res: Response, auctionBidId: string , flaggedContentBody: TFlaggedContent) => {
+    const { flaggedBy ,contentType , reason  } = flaggedContentBody;
+    const existingFlaggedAuctionBid = await prismadb.flaggedContent.findFirst({
+        where: {
+            auctionBidId: auctionBidId,
+        },
+    });
+    if (existingFlaggedAuctionBid) {
+        return(
+            sendResponse(res,{
+                success: false,
+                statusCode: 409,
+                message: "Auction bid already flagged",
+            })
+        )
+    }
+    const flaggedAuctionBid = await prismadb.flaggedContent.create({
+        data: {
+            flaggedBy: flaggedBy,
+            contentType: contentType,
+            reason: reason,
+            auctionBidId: auctionBidId
+        },
+    });
+    return {
+        flaggedBy: flaggedAuctionBid.flaggedBy,
+        contentType: flaggedAuctionBid.contentType,
+        reason: flaggedAuctionBid.reason,
+        auctionBidId: flaggedAuctionBid.auctionBidId
+    };
+}
+
 const getAllFlaggedContent = async (req: Request, res: Response) => {
     try {
         const flaggedContent = await prismadb.flaggedContent.findMany({
@@ -207,6 +275,8 @@ export const flagContentServices = {
     flagTopic,
     flagComment,
     flagUser,
+    flagAuction,
+    flagAuctionBid,
     getAllFlaggedContent,
     getFlaggedContentById,
     getFlaggedUsers
