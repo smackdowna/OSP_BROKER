@@ -20,6 +20,7 @@ const liveConvention_routes_1 = require("../modules/liveConvention/liveConventio
 const booking_routes_1 = require("../modules/booking/booking.routes");
 const post_routes_1 = require("../modules/post/post.routes");
 const auction_routes_1 = require("../modules/auction/auction/auction.routes");
+const shop_routes_1 = require("../modules/auction/shop/shop.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -97,6 +98,10 @@ const moduleRoutes = [
     {
         path: "/auction",
         route: auction_routes_1.auctionRouter
+    },
+    {
+        path: "/shop",
+        route: shop_routes_1.shopRouter
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

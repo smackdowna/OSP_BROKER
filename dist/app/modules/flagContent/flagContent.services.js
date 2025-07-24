@@ -107,7 +107,7 @@ const flagUser = (res, userId, flaggedContentBody) => __awaiter(void 0, void 0, 
         flaggedBy: flaggedUser.flaggedBy,
         contentType: flaggedUser.contentType,
         reason: flaggedUser.reason,
-        userId: flaggedUser.userId,
+        userId: flaggedUser.userId
     };
 });
 // flag auction

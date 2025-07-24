@@ -587,3 +587,15 @@ model AuctionBid{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
+
+
+// shop category
+
+model shopCategory{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String @unique
+    description String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

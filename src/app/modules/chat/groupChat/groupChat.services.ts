@@ -91,7 +91,7 @@ const joinGroupChat = async (groupChatId: string,businessId: string, userId: str
     const businessPageFollower= await prismadb.businessPageFollower.findFirst({
         where: {
             businessId: businessId,
-            userId: userId
+              userId: userId
         }
     });
 
