@@ -18,6 +18,7 @@ import { liveConventionRoutes } from "../modules/liveConvention/liveConvention.r
 import { bookingRouter } from "../modules/booking/booking.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { auctionRouter } from "../modules/auction/auction/auction.routes";
+import { shopRouter } from "../modules/auction/shop/shop.routes";
 
 
 const router = Router();
@@ -100,6 +101,10 @@ const moduleRoutes=[
     {
         path: "/auction",
         route: auctionRouter
+    },
+    {
+        path: "/shop",
+        route: shopRouter
     }
 ]
 

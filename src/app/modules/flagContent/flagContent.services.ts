@@ -113,7 +113,7 @@ const flagUser = async (res: Response, userId: string , flaggedContentBody: TFla
         flaggedBy: flaggedUser.flaggedBy,
         contentType: flaggedUser.contentType,
         reason: flaggedUser.reason,
-        userId: flaggedUser.userId,
+        userId: flaggedUser.userId
     };
 }
 

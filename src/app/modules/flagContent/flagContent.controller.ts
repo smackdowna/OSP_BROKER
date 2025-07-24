@@ -7,7 +7,8 @@ import { flagContentServices } from "./flagContent.services";
 // flag topic
 const flagTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { topicId } = req.params;
-    const { flaggedBy ,contentType , reason , categoryId  } = req.body;
+    const flaggedBy= req.user.userId;
+    const { contentType , reason , categoryId  } = req.body;
     const flaggedTopic = await flagContentServices.flagTopic(res ,topicId , {flaggedBy ,contentType , reason ,categoryId });
     sendResponse(res, {
         statusCode: 200,
@@ -20,7 +21,8 @@ const flagTopic = catchAsyncError(async (req: Request, res: Response, next: Next
 // flag comment
 const flagComment = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { commentId } = req.params;
-    const { flaggedBy ,contentType , reason , categoryId  } = req.body;
+    const flaggedBy= req.user.userId;
+    const { contentType , reason , categoryId  } = req.body;
     const flaggedComment = await flagContentServices.flagComment(res ,commentId , {flaggedBy ,contentType , reason , categoryId});
     sendResponse(res, {
         statusCode: 200,
@@ -33,7 +35,8 @@ const flagComment = catchAsyncError(async (req: Request, res: Response, next: Ne
 // flag user
 const flagUser = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { userId } = req.params;
-    const { flaggedBy ,contentType , reason  } = req.body;
+    const flaggedBy= req.user.userId;
+    const { contentType , reason  } = req.body;
     const flaggedUser = await flagContentServices.flagUser(res ,userId , {flaggedBy ,contentType , reason });
     sendResponse(res, {
         statusCode: 200,
@@ -46,7 +49,8 @@ const flagUser = catchAsyncError(async (req: Request, res: Response, next: NextF
 // flag auction
 const flagAuction = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { auctionId } = req.params;
-    const { flaggedBy ,contentType , reason  } = req.body;
+    const flaggedBy= req.user.userId;
+    const { contentType , reason  } = req.body;
     const flaggedAuction = await flagContentServices.flagAuction(res ,auctionId , {flaggedBy ,contentType , reason });
     sendResponse(res, {
         statusCode: 200,
@@ -59,7 +63,8 @@ const flagAuction = catchAsyncError(async (req: Request, res: Response, next: Ne
 // flag auction bid
 const flagAuctionBid = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { auctionBidId } = req.params;
-    const { flaggedBy ,contentType , reason  } = req.body;
+    const flaggedBy= req.user.userId;
+    const {  contentType , reason  } = req.body;
     const flaggedAuctionBid = await flagContentServices.flagAuctionBid(res ,auctionBidId , {flaggedBy ,contentType , reason });
     sendResponse(res, {
         statusCode: 200,
