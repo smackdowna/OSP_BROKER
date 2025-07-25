@@ -20,7 +20,7 @@ const liveConvention_routes_1 = require("../modules/liveConvention/liveConventio
 const booking_routes_1 = require("../modules/booking/booking.routes");
 const post_routes_1 = require("../modules/post/post.routes");
 const auction_routes_1 = require("../modules/auction/auction/auction.routes");
-const shop_routes_1 = require("../modules/auction/shop/shop.routes");
+const shop_routes_1 = require("../modules/shop/shop.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {

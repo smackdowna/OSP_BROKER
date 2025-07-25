@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { categoryController } from "./category/category.controller";
-import { verifyToken } from "../../../middlewares/requireAuth";
-import { authorizeRole } from "../../../middlewares/authorizeRole";
+import { verifyToken } from "../../middlewares/requireAuth";
+import { authorizeRole } from "../../middlewares/authorizeRole";
 
 const router= Router();
 

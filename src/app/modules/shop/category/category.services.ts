@@ -1,8 +1,8 @@
-import prismadb from "../../../../db/prismaDb";
-import AppError from "../../../../errors/appError";
-import { Response, Request } from "express";
+import prismadb from "../../../db/prismaDb";
+import AppError from "../../../errors/appError";
+import { Response } from "express";
 import { Tcategory } from "./category.interface";
-import sendResponse from "../../../../middlewares/sendResponse";
+import sendResponse from "../../../middlewares/sendResponse";
 
 
 
