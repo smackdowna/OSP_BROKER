@@ -1,7 +1,7 @@
 import { categoryService } from "./category.services";
 import { Request, Response } from "express";
-import sendResponse from "../../../../middlewares/sendResponse";
-import catchAsyncError from "../../../../utils/catchAsyncError";
+import sendResponse from "../../../middlewares/sendResponse";
+import catchAsyncError from "../../../utils/catchAsyncError";
 
 // Create a new category
 const createCategory = catchAsyncError( async (req: Request, res: Response) => {
