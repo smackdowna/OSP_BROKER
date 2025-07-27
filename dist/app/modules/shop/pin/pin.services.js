@@ -18,7 +18,7 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create pin
 const createPin = (pin, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { image, color } = pin;
+    const { image, color, duration, price } = pin;
     if (!image || !color) {
         throw new appError_1.default(400, "Image and color are required fields.");
     }
@@ -34,6 +34,8 @@ const createPin = (pin, res) => __awaiter(void 0, void 0, void 0, function* () {
                 }
             },
             color,
+            duration,
+            price,
         },
     });
     return { pin: newPin };
@@ -43,8 +45,6 @@ const getAllPins = (res) => __awaiter(void 0, void 0, void 0, function* () {
     const pins = yield prismaDb_1.default.pin.findMany({
         include: {
             image: true,
-            user: true,
-            topic: true,
         },
     });
     if (!pins || pins.length === 0) {
@@ -62,9 +62,7 @@ const getPinById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const pin = yield prismaDb_1.default.pin.findFirst({
         where: { id },
         include: {
-            image: true,
-            user: true,
-            topic: true,
+            image: true
         },
     });
     if (!pin) {
@@ -78,69 +76,72 @@ const getPinById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     return { pin };
 });
 // update pin
-// const updatePin = async (id: string, pinData: Partial<TPin>, res: Response) => {
-//     const { image, color } = pinData;
-//     const existingPin = await prismadb.pin.findFirst({
-//         where: { id },
-//         include: {
-//             image: true,
-//         },
-//     });
-//     if (!existingPin) {
-//         return sendResponse(res, {
-//             statusCode: 404,
-//             success: false,
-//             message: "Pin not found",
-//         });
-//     }
-//     let updatedPin;
-//     if(image){
-//         await prismadb.media.deleteMany({
-//             where: {
-//                 pinId: id,
-//             },
-//         });
-//         updatedPin = await prismadb.pin.update({
-//             where: { id },
-//             data: {
-//                 image: {
-//                     create:{
-//                         fileId: image.fileId,
-//                         name: image.name,
-//                         url: image.url,
-//                         thumbnailUrl: image.thumbnailUrl,
-//                         fileType: image.fileType,
-//                     }
-//                 },
-//                 color,
-//             },
-//             include: {
-//                 image: true
-//             },
-//         });
-//     }
-//     if(!image){
-//         updatedPin = await prismadb.pin.update({
-//             where: { id },
-//             data: {
-//                 color,
-//                 image: {
-//                     create:{
-//                         fileId: existingPin.image?.[0]?.fileId,
-//                         name: existingPin.image?.[0]?.name,
-//                         url: existingPin.image?.[0]?.url,
-//                         thumbnailUrl: existingPin.image?.[0]?.thumbnailUrl,
-//                         fileType: existingPin.image?.[0]?.fileType,
-//                     }
-//                 },
-//             },
-//             include: {
-//                 image: true
-//             },
-//         });
-//     }
-//     return { pin: updatedPin };
-// }
+const updatePin = (id, pinData, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    const { image, color, duration, price } = pinData;
+    const existingPin = yield prismaDb_1.default.pin.findFirst({
+        where: { id },
+        include: {
+            image: true,
+        },
+    });
+    if (!existingPin) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Pin not found",
+        });
+    }
+    let updatedPin;
+    if (image) {
+        yield prismaDb_1.default.media.deleteMany({
+            where: {
+                pinId: id,
+            },
+        });
+        updatedPin = yield prismaDb_1.default.pin.update({
+            where: { id },
+            data: {
+                image: {
+                    create: {
+                        fileId: image.fileId,
+                        name: image.name,
+                        url: image.url,
+                        thumbnailUrl: image.thumbnailUrl,
+                        fileType: image.fileType,
+                    }
+                },
+                color,
+                duration,
+                price
+            },
+            include: {
+                image: true
+            },
+        });
+    }
+    if (!image) {
+        updatedPin = yield prismaDb_1.default.pin.update({
+            where: { id },
+            data: {
+                color,
+                image: {
+                    create: {
+                        fileId: existingPin.image[0].fileId,
+                        name: (_a = existingPin.image[0]) === null || _a === void 0 ? void 0 : _a.name,
+                        url: (_b = existingPin.image[0]) === null || _b === void 0 ? void 0 : _b.url,
+                        thumbnailUrl: (_c = existingPin.image[0]) === null || _c === void 0 ? void 0 : _c.thumbnailUrl,
+                        fileType: (_d = existingPin.image[0]) === null || _d === void 0 ? void 0 : _d.fileType,
+                    }
+                },
+            },
+            include: {
+                image: true
+            },
+        });
+    }
+    return { pin: updatedPin };
+});
 // delete pin
 const deletePin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingPin = yield prismaDb_1.default.pin.findFirst({
@@ -162,10 +163,64 @@ const deletePin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
         message: "Pin deleted successfully",
     });
 });
+// buy pin
+const buyPin = (userPIn, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId, count, totalCost, pindId } = userPIn;
+    if (!userId || !count || !totalCost || !pindId) {
+        throw new appError_1.default(400, "All fields are required.");
+    }
+    const userPin = yield prismaDb_1.default.userPin.create({
+        data: {
+            userId,
+            count,
+            totalCost,
+            pindId,
+        },
+    });
+    if (!userPin) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to buy pin",
+        });
+    }
+    return userPIn;
+});
+// pin topic
+const pinTopic = (pinnedTopic, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userPinId, topicId, pinId } = pinnedTopic;
+    if (!userPinId || !topicId || !pinId) {
+        throw new appError_1.default(400, "All fields are required.");
+    }
+    const existingPinnedTopic = yield prismaDb_1.default.pinnedTopic.findFirst({
+        where: {
+            userPinId,
+            topicId,
+            pinId,
+        },
+    });
+    if (existingPinnedTopic) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "This topic is already pinned with this pin.",
+        });
+    }
+    const newPinnedTopic = yield prismaDb_1.default.pinnedTopic.create({
+        data: {
+            userPinId,
+            topicId,
+            pinId,
+        },
+    });
+    return newPinnedTopic;
+});
 exports.pinServices = {
     createPin,
     getAllPins,
     getPinById,
-    // updatePin,
+    updatePin,
     deletePin,
+    buyPin,
+    pinTopic,
 };

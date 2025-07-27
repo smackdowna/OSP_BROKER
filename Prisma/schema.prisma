@@ -56,9 +56,7 @@ model User{
     post Post[] @relation("userToPost")
     auctions Auction[] @relation("userToAuction")
     auctionBid AuctionBid[] @relation("userToAuctionBid")
-
-    pindId String? @db.ObjectId
-    pin pin? @relation("userToPin", fields: [pindId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    userPin UserPin[] @relation("userToPin")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -231,9 +229,8 @@ model Topic{
     comments Comment[] @relation("topicToComment")
     flaggedContent FlaggedContent[] @relation("topicToFlaggedContent")
     reactions Reactions[] @relation("topicToReactions")
+    pinnedTopic pinnedTopic[] @relation("pinToTopic")
 
-    pinId String? @db.ObjectId
-    pin pin? @relation("pinToTopic", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -252,8 +249,6 @@ model Comment{
     flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
     reactions Reactions[] @relation("commentToReactions")
 
-    pinId String? @db.ObjectId
-    pin pin? @relation("pinToComment", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -570,8 +565,6 @@ model Auction{
     auctionBids AuctionBid[] @relation("auctionToAuctionBid")
     flaggedContent FlaggedContent[] @relation("auctionToFlaggedContent")
 
-    pinId String? @db.ObjectId
-    pin pin? @relation("pinToAuction", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -597,8 +590,6 @@ model AuctionBid{
     response String
     matched Boolean @default(false)
 
-    pinId String? @db.ObjectId 
-    pin pin? @relation("pinToAuctionBid", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     flaggedContent FlaggedContent[] @relation("auctionBidToFlaggedContent")
 
     createdAt DateTime @default(now())
@@ -622,14 +613,43 @@ model pin{
 
     image Media[] @relation("pinToMedia")
     color String
+    price Float
     bought Boolean? @default(false)
-    duratoin DateTime
+    duration DateTime
 
-    user User[] @relation("userToPin")
-    topic Topic[] @relation("pinToTopic")
-    comment Comment[] @relation("pinToComment")
-    auction Auction[] @relation("pinToAuction")
-    bid AuctionBid[] @relation("pinToAuctionBid")
+    userPin UserPin[] @relation("userToPin")
+    pinnedTopic pinnedTopic[] @relation("pinToTopic")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model UserPin{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    User User @relation("userToPin", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    count Int @default(0) //buy number of pins
+    totalCost Float @default(0)
+
+    pindId String @db.ObjectId
+    pin pin @relation("userToPin", fields: [pindId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    pinnedTopic pinnedTopic[] @relation("userToPin")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+} 
+
+model pinnedTopic{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+
+    userPinId String @db.ObjectId
+    UserPin UserPin @relation("userToPin", fields: [userPinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    topicId String @db.ObjectId
+    Topic Topic @relation("pinToTopic", fields: [topicId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    pinId String @db.ObjectId
+    Pin pin @relation("pinToTopic", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
