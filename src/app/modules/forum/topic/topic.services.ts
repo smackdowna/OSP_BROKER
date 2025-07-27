@@ -44,6 +44,7 @@ const getAllTopics = async () => {
     if (!topics) {
         throw new AppError(404, "No topics found");
     }
+
     return {topics};
 }
 
