@@ -248,6 +248,7 @@ model Comment{
 
     flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
     reactions Reactions[] @relation("commentToReactions")
+    pinnedComment pinnedComment[] @relation("pinToComment")
 
 
     createdAt DateTime @default(now())
@@ -564,6 +565,7 @@ model Auction{
 
     auctionBids AuctionBid[] @relation("auctionToAuctionBid")
     flaggedContent FlaggedContent[] @relation("auctionToFlaggedContent")
+    pinnedAuction pinnedAuction[] @relation("pinToAuction")
 
 
     createdAt DateTime @default(now())
@@ -591,6 +593,7 @@ model AuctionBid{
     matched Boolean @default(false)
 
     flaggedContent FlaggedContent[] @relation("auctionBidToFlaggedContent")
+    pinnedAuctionBid pinnedAuctionBid[] @relation("pinToAuctionBid")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -619,6 +622,9 @@ model pin{
 
     userPin UserPin[] @relation("userToPin")
     pinnedTopic pinnedTopic[] @relation("pinToTopic")
+    pinnedComment pinnedComment[] @relation("pinToComment")
+    pinnedAuction pinnedAuction[] @relation("pinToAuction")
+    pinnedAuctionBid pinnedAuctionBid[] @relation("pinToAuctionBid")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -631,10 +637,13 @@ model UserPin{
     count Int @default(0) //buy number of pins
     totalCost Float @default(0)
 
-    pindId String @db.ObjectId
-    pin pin @relation("userToPin", fields: [pindId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    pinId String @db.ObjectId
+    pin pin @relation("userToPin", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     pinnedTopic pinnedTopic[] @relation("userToPin")
+    pinnedComment pinnedComment[] @relation("userToPin")
+    pinnedAuction pinnedAuction[] @relation("userToPin")
+    pinnedAuctionBid pinnedAuctionBid[] @relation("userToPin")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -650,6 +659,51 @@ model pinnedTopic{
     Topic Topic @relation("pinToTopic", fields: [topicId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     pinId String @db.ObjectId
     Pin pin @relation("pinToTopic", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model pinnedComment{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userPinId String @db.ObjectId
+    UserPin UserPin @relation("userToPin", fields: [userPinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    commentId String @db.ObjectId
+    Comment Comment @relation("pinToComment", fields: [commentId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    pinId String @db.ObjectId
+    Pin pin @relation("pinToComment", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model pinnedAuction{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userPinId String @db.ObjectId
+    UserPin UserPin @relation("userToPin", fields: [userPinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    auctionId String @db.ObjectId
+    Auction Auction @relation("pinToAuction", fields: [auctionId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    pinId String @db.ObjectId
+    Pin pin @relation("pinToAuction", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model pinnedAuctionBid{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userPinId String @db.ObjectId
+    UserPin UserPin @relation("userToPin", fields: [userPinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    auctionBidId String @db.ObjectId
+    AuctionBid AuctionBid @relation("pinToAuctionBid", fields: [auctionBidId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    pinId String @db.ObjectId
+    Pin pin @relation("pinToAuctionBid", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -19,4 +19,9 @@ router.get("/pin", requireAuth_1.verifyToken, pin_controller_1.pinController.get
 router.get("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.getPinById);
 router.put("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.updatePin);
 router.delete("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.deletePin);
+router.post("/pin/buy/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.buyPin);
+router.post("/pin/topic/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.pinTopic);
+router.post("/pin/comment/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.pinComment);
+router.post("/pin/auction/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.pinAuction);
+router.post("/pin/auctionBid/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.pinAuctionBid);
 exports.shopRouter = router;
