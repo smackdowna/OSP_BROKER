@@ -165,8 +165,8 @@ const deletePin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // buy pin
 const buyPin = (userPIn, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, count, totalCost, pindId } = userPIn;
-    if (!userId || !count || !totalCost || !pindId) {
+    const { userId, count, totalCost, pinId } = userPIn;
+    if (!userId || !count || !totalCost || !pinId) {
         throw new appError_1.default(400, "All fields are required.");
     }
     const userPin = yield prismaDb_1.default.userPin.create({
@@ -174,7 +174,7 @@ const buyPin = (userPIn, res) => __awaiter(void 0, void 0, void 0, function* () 
             userId,
             count,
             totalCost,
-            pindId,
+            pinId,
         },
     });
     if (!userPin) {
@@ -213,7 +213,94 @@ const pinTopic = (pinnedTopic, res) => __awaiter(void 0, void 0, void 0, functio
             pinId,
         },
     });
-    return newPinnedTopic;
+    return { pinnedTopic: newPinnedTopic };
+});
+// pin comment
+const pinComment = (pinnedComment, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userPinId, commentId, pinId } = pinnedComment;
+    if (!userPinId || !commentId || !pinId) {
+        throw new appError_1.default(400, "All fields are required.");
+    }
+    const existingPinnedComment = yield prismaDb_1.default.pinnedComment.findFirst({
+        where: {
+            userPinId,
+            commentId,
+            pinId,
+        },
+    });
+    if (existingPinnedComment) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "This comment is already pinned with this pin.",
+        });
+    }
+    const newPinnedComment = yield prismaDb_1.default.pinnedComment.create({
+        data: {
+            userPinId,
+            commentId,
+            pinId,
+        },
+    });
+    return { pinnedComment: newPinnedComment };
+});
+// pin auction
+const pinAuction = (pinnedAuction, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userPinId, auctionId, pinId } = pinnedAuction;
+    if (!userPinId || !auctionId || !pinId) {
+        throw new appError_1.default(400, "All fields are required.");
+    }
+    const existingPinnedAuction = yield prismaDb_1.default.pinnedAuction.findFirst({
+        where: {
+            userPinId,
+            auctionId,
+            pinId,
+        },
+    });
+    if (existingPinnedAuction) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "This auction is already pinned with this pin.",
+        });
+    }
+    const newPinnedAuction = yield prismaDb_1.default.pinnedAuction.create({
+        data: {
+            userPinId,
+            auctionId,
+            pinId,
+        },
+    });
+    return { pinnedAuction: newPinnedAuction };
+});
+// pin auction bid
+const pinAuctionBid = (pinnedAuctionBid, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userPinId, auctionBidId, pinId } = pinnedAuctionBid;
+    if (!userPinId || !auctionBidId || !pinId) {
+        throw new appError_1.default(400, "All fields are required.");
+    }
+    const existingPinnedAuctionBid = yield prismaDb_1.default.pinnedAuctionBid.findFirst({
+        where: {
+            userPinId,
+            auctionBidId,
+            pinId,
+        },
+    });
+    if (existingPinnedAuctionBid) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "This auction bid is already pinned with this pin.",
+        });
+    }
+    const newPinnedAuctionBid = yield prismaDb_1.default.pinnedAuctionBid.create({
+        data: {
+            userPinId,
+            auctionBidId,
+            pinId,
+        },
+    });
+    return { pinnedAuctionBid: newPinnedAuctionBid };
 });
 exports.pinServices = {
     createPin,
@@ -223,4 +310,7 @@ exports.pinServices = {
     deletePin,
     buyPin,
     pinTopic,
+    pinComment,
+    pinAuction,
+    pinAuctionBid
 };

@@ -110,10 +110,76 @@ const deletePin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0,
         message: "Pin deleted successfully",
     });
 }));
+// buy pin
+const buyPin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pinId } = req.params;
+    const userId = req.user.userId;
+    const { count, totalCost } = req.body;
+    const userPin = yield pin_services_1.pinServices.buyPin({ userId, count, totalCost, pinId }, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Pin bought successfully",
+        data: userPin,
+    });
+}));
+// pin topic
+const pinTopic = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pinId } = req.params;
+    const { userPinId, topicId } = req.body;
+    const pinnedTopic = yield pin_services_1.pinServices.pinTopic({ userPinId, pinId, topicId }, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 201,
+        success: true,
+        message: "Topic pinned successfully",
+        data: pinnedTopic,
+    });
+}));
+// pin comment
+const pinComment = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pinId } = req.params;
+    const { userPinId, commentId } = req.body;
+    const pinnedComment = yield pin_services_1.pinServices.pinComment({ userPinId, commentId, pinId }, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 201,
+        success: true,
+        message: "Comment pinned successfully",
+        data: pinnedComment,
+    });
+}));
+// pin auction
+const pinAuction = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pinId } = req.params;
+    const { userPinId, auctionId } = req.body;
+    const pinnedAuction = yield pin_services_1.pinServices.pinAuction({ userPinId, auctionId, pinId }, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 201,
+        success: true,
+        message: "Auction pinned successfully",
+        data: pinnedAuction,
+    });
+}));
+// pin auction bid
+const pinAuctionBid = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { pinId } = req.params;
+    const { userPinId, auctionBidId } = req.body;
+    const pinnedAuctionBid = yield pin_services_1.pinServices.pinAuctionBid({ userPinId, auctionBidId, pinId }, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 201,
+        success: true,
+        message: "Auction bid pinned successfully",
+        data: pinnedAuctionBid,
+    });
+}));
 exports.pinController = {
     createPin,
     getAllPins,
     getPinById,
     updatePin,
     deletePin,
+    buyPin,
+    pinTopic,
+    pinComment,
+    pinAuction,
+    pinAuctionBid
 };
