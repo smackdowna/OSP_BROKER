@@ -45,7 +45,6 @@ model User{
     businessAdmin BusinessAdmin? @relation("userToBusinessAdmin")
     moderator Moderator? @relation("userToModerator")
     admin Admin? @relation("userToAdmin") 
-    userMembership userMembership[] @relation("userToUserMembership")
     forum Forum[] @relation("userToForum")
     flaggedContent FlaggedContent[] @relation("userToFlaggedContent")
     businessPageFollower BusinessPageFollower[] @relation("userToBusinessPageFollower")
@@ -56,7 +55,10 @@ model User{
     post Post[] @relation("userToPost")
     auctions Auction[] @relation("userToAuction")
     auctionBid AuctionBid[] @relation("userToAuctionBid")
+    userMembership userMembership[] @relation("userToUserMembership")
     userPin UserPin[] @relation("userToPin")
+    userKudoCoin userKudoCoin[] @relation("userToUserKudoCoin")
+    userBadge UserBadge[] @relation("userToUserBadge")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -354,12 +356,16 @@ model userMembership{
 
 model paymentRecord{
     id String @id @default(auto()) @map("_id") @db.ObjectId
-    userMembershipId String @db.ObjectId
     amount Float
     paymentMethod String
     status String
     transactionId String @unique
-    UserMembership userMembership @relation("userMembershipToPaymentRecord",fields: [userMembershipId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    userMembershipId String? @db.ObjectId
+    UserMembership userMembership? @relation("userMembershipToPaymentRecord",fields: [userMembershipId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    userKudoCoinId String? @db.ObjectId
+    UserKudoCoin userKudoCoin? @relation("userKudoCoinToPaymentRecord", fields: [userKudoCoinId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -702,6 +708,55 @@ model pinnedAuctionBid{
 
     pinId String @db.ObjectId
     Pin pin @relation("pinToAuctionBid", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// model kudo coin
+model kudoCoin{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    price Float
+    description String
+
+    userKudoCoin userKudoCoin[] @relation("kudoCoinToUserKudoCoin")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// model user kudo coin
+model userKudoCoin{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    User User @relation("userToUserKudoCoin", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    kudoCoinId String @db.ObjectId
+    KudoCoin kudoCoin @relation("kudoCoinToUserKudoCoin", fields: [kudoCoinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    quantity Int @default(0) //number of kudo coins user has
+
+    paymentRecord paymentRecord[] @relation("userKudoCoinToPaymentRecord")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// badges model 
+model Badge{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    description String
+    userBadge UserBadge[] @relation("badgeToUserBadge")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model UserBadge{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId String @db.ObjectId
+    User User @relation("userToUserBadge", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    badgeId String @db.ObjectId
+    Badge Badge @relation("badgeToUserBadge", fields: [badgeId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -69,7 +69,33 @@ const createAuction = async (auction: TAuction) => {
 
 // Get all auctions
 const getAllAuctions = async () => {
+        const pinnedAuctions = await prismadb.pinnedAuction.findMany({
+        include:{
+            UserPin:{
+                select:{
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+
+    if(!pinnedAuctions) {
+        throw new AppError(404, "No pinned comments found");
+    }
+
+    const filterPinnedAuctions= pinnedAuctions.filter((pinnedAuction) => {
+        const expirationDate = pinnedAuction.UserPin?.expirationDate;
+        if (!expirationDate) return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
+
     const auctions = await prismadb.auction.findMany({
+        where:{
+            id:{
+                notIn: filterPinnedAuctions.map((pinnedAuction) => pinnedAuction.auctionId),
+            }
+        },
         include: {
             media: true,
         },

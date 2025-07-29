@@ -122,7 +122,33 @@ const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, functi
 });
 // get all comments
 const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
+    // fetch pinned comments
+    const pinnedComments = yield prismaDb_1.default.pinnedComment.findMany({
+        include: {
+            UserPin: {
+                select: {
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+    if (!pinnedComments) {
+        throw new appError_1.default(404, "No pinned comments found");
+    }
+    const filterPinnedComments = pinnedComments.filter((pinnedComment) => {
+        var _a;
+        const expirationDate = (_a = pinnedComment.UserPin) === null || _a === void 0 ? void 0 : _a.expirationDate;
+        if (!expirationDate)
+            return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
     const comments = yield prismaDb_1.default.comment.findMany({
+        where: {
+            id: {
+                notIn: filterPinnedComments.map((pinnedComment) => pinnedComment.commentId),
+            }
+        },
         include: {
             Topic: {
                 select: {
@@ -135,7 +161,10 @@ const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!comments) {
         throw new appError_1.default(404, "No comments found");
     }
-    return { comments };
+    return { comments: {
+            pinnedComments: filterPinnedComments,
+            remainingComments: comments,
+        } };
 });
 // get comment by topic id
 const getCommentByTopicId = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {
