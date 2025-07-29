@@ -6,23 +6,14 @@ import sendResponse from "../../../middlewares/sendResponse";
 
 // create pin
 const createPin = async (pin: TPin, res: Response) => {
-    const { image, color , duration , price } = pin;
+    const {  color , duration , price } = pin;
 
-    if (!image || !color) {
+    if ( !color) {
         throw new AppError(400, "Image and color are required fields.");
     }
 
     const newPin = await prismadb.pin.create({
         data: {
-            image: {
-                create:{
-                    fileId: image.fileId,
-                    name: image.name,
-                    url: image.url,
-                    thumbnailUrl: image.thumbnailUrl,
-                    fileType: image.fileType,
-                }
-            },
             color,
             duration,
             price,
@@ -34,11 +25,7 @@ const createPin = async (pin: TPin, res: Response) => {
 
 // get all pins
 const getAllPins = async (res: Response) => {
-    const pins = await prismadb.pin.findMany({
-        include: {
-            image: true,
-        },
-    });
+    const pins = await prismadb.pin.findMany();
 
     if(!pins || pins.length === 0) {
         return sendResponse(res, {
@@ -55,10 +42,7 @@ const getAllPins = async (res: Response) => {
 // get pin by id
 const getPinById = async (id: string, res: Response) => {
     const pin = await prismadb.pin.findFirst({
-        where: { id },
-        include: {
-            image: true
-        },
+        where: { id }
     });
 
     if (!pin) {
@@ -75,13 +59,10 @@ const getPinById = async (id: string, res: Response) => {
 
 // update pin
 const updatePin = async (id: string, pinData: Partial<TPin>, res: Response) => {
-    const { image, color , duration , price } = pinData;
+    const {  color , duration , price } = pinData;
 
     const existingPin = await prismadb.pin.findFirst({
-        where: { id },
-        include: {
-            image: true,
-        },
+        where: { id }
     });
 
     if (!existingPin) {
@@ -94,55 +75,16 @@ const updatePin = async (id: string, pinData: Partial<TPin>, res: Response) => {
 
     let updatedPin;
 
-    if(image){
-        await prismadb.media.deleteMany({
-            where: {
-                pinId: id,
-            },
-        });
 
         updatedPin = await prismadb.pin.update({
             where: { id },
             data: {
-                image: {
-                    create:{
-                        fileId: image.fileId,
-                        name: image.name,
-                        url: image.url,
-                        thumbnailUrl: image.thumbnailUrl,
-                        fileType: image.fileType,
-                    }
-                },
                 color,
-                duration ,
-                price
-            },
-            include: {
-                image: true
-            },
+                duration,
+                price,
+            }
         });
-    }
 
-    if(!image){
-        updatedPin = await prismadb.pin.update({
-            where: { id },
-            data: {
-                color,
-                image: {
-                    create:{
-                        fileId: existingPin.image[0].fileId,
-                        name: existingPin.image[0]?.name,
-                        url: existingPin.image[0]?.url,
-                        thumbnailUrl: existingPin.image[0]?.thumbnailUrl,
-                        fileType: existingPin.image[0]?.fileType,
-                    }
-                },
-            },
-            include: {
-                image: true
-            },
-        });
-    }
     return { pin: updatedPin };
 }
 
@@ -340,8 +282,6 @@ const pinAuctionBid = async (pinnedAuctionBid: TPinnedAuctionBid, res: Response)
 
     return { pinnedAuctionBid: newPinnedAuctionBid };
 }
-
-
 
 
 export const pinServices = {

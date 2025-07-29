@@ -42,7 +42,33 @@ const createTopic = (topic) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // get all topics
 const getAllTopics = () => __awaiter(void 0, void 0, void 0, function* () {
+    // fetch pinned topics
+    const pinnedTopics = yield prismaDb_1.default.pinnedTopic.findMany({
+        include: {
+            UserPin: {
+                select: {
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+    if (!pinnedTopics) {
+        throw new appError_1.default(404, "No pinned topics found");
+    }
+    const filterPinnedTopics = pinnedTopics.filter((pinnedTopic) => {
+        var _a;
+        const expirationDate = (_a = pinnedTopic.UserPin) === null || _a === void 0 ? void 0 : _a.expirationDate;
+        if (!expirationDate)
+            return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
     const topics = yield prismaDb_1.default.topic.findMany({
+        where: {
+            id: {
+                notIn: filterPinnedTopics.map((pinnedTopic) => pinnedTopic.topicId),
+            }
+        },
         include: {
             comments: {
                 select: {
@@ -54,7 +80,10 @@ const getAllTopics = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!topics) {
         throw new appError_1.default(404, "No topics found");
     }
-    return { topics };
+    return { topics: {
+            pinnedTopics: filterPinnedTopics,
+            remainingTopics: topics,
+        } };
 });
 // get topic by id
 const getTopicById = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {

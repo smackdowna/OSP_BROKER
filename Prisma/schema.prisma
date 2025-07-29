@@ -545,8 +545,6 @@ model Media{
     auctionId String? @db.ObjectId
     Auction Auction? @relation("auctionToMedia", fields: [auctionId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
-    pinId String? @db.ObjectId
-    Pin pin? @relation("pinToMedia", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 }
 
 
@@ -614,11 +612,10 @@ model shopCategory{
 model pin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
 
-    image Media[] @relation("pinToMedia")
     color String
     price Float
     bought Boolean? @default(false)
-    duration DateTime
+    duration Int //in days
 
     userPin UserPin[] @relation("userToPin")
     pinnedTopic pinnedTopic[] @relation("pinToTopic")
@@ -633,9 +630,10 @@ model pin{
 model UserPin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     userId String @db.ObjectId
-    User User @relation("userToPin", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+     User User @relation("userToPin", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     count Int @default(0) //buy number of pins
     totalCost Float @default(0)
+    expirationDate DateTime? //when the pin will expire
 
     pinId String @db.ObjectId
     pin pin @relation("userToPin", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
