@@ -32,7 +32,35 @@ const createTopic = async (topic: TTopic) => {
 
 // get all topics
 const getAllTopics = async () => {
+    // fetch pinned topics
+    const pinnedTopics = await prismadb.pinnedTopic.findMany({
+        include:{
+            UserPin:{
+                select:{
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+
+    if (!pinnedTopics) {
+        throw new AppError(404, "No pinned topics found");
+    }
+
+    const filterPinnedTopics= pinnedTopics.filter((pinnedTopic) => {
+        const expirationDate = pinnedTopic.UserPin?.expirationDate;
+        if (!expirationDate) return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
+
+
     const topics = await prismadb.topic.findMany({
+        where:{
+            id:{
+                notIn: filterPinnedTopics.map((pinnedTopic) => pinnedTopic.topicId),
+            }
+        },
         include: {
             comments: {
                 select:{
@@ -45,7 +73,10 @@ const getAllTopics = async () => {
         throw new AppError(404, "No topics found");
     }
 
-    return {topics};
+    return {topics:{
+        pinnedTopics: filterPinnedTopics,
+        remainingTopics: topics,
+    }};
 }
 
 
