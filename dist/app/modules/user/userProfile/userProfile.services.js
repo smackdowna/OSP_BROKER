@@ -103,7 +103,55 @@ const getUserProfileByUserId = (userId, res, req) => __awaiter(void 0, void 0, v
             features: true,
         }
     });
-    return { userProfile, userMembership, membershipPlans };
+    const userPIn = yield prismaDb_1.default.userPin.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            pin: {
+                select: {
+                    color: true,
+                    price: true,
+                    duration: true,
+                }
+            }
+        }
+    });
+    const userKudoCoin = yield prismaDb_1.default.userKudoCoin.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            KudoCoin: {
+                select: {
+                    price: true,
+                    description: true,
+                }
+            },
+        }
+    });
+    const userBadge = yield prismaDb_1.default.userBadge.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            Badge: {
+                select: {
+                    name: true,
+                    description: true,
+                }
+            }
+        }
+    });
+    return { userProfile,
+        userMembership,
+        membershipPlans,
+        inventory: {
+            userPIn,
+            userKudoCoin,
+            userBadge
+        }
+    };
 });
 // update user profile
 const updateUserProfile = (userId, res, profileData) => __awaiter(void 0, void 0, void 0, function* () {

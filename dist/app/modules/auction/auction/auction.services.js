@@ -71,7 +71,32 @@ const createAuction = (auction) => __awaiter(void 0, void 0, void 0, function* (
 });
 // Get all auctions
 const getAllAuctions = () => __awaiter(void 0, void 0, void 0, function* () {
+    const pinnedAuctions = yield prismaDb_1.default.pinnedAuction.findMany({
+        include: {
+            UserPin: {
+                select: {
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+    if (!pinnedAuctions) {
+        throw new appError_1.default(404, "No pinned comments found");
+    }
+    const filterPinnedAuctions = pinnedAuctions.filter((pinnedAuction) => {
+        var _a;
+        const expirationDate = (_a = pinnedAuction.UserPin) === null || _a === void 0 ? void 0 : _a.expirationDate;
+        if (!expirationDate)
+            return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
     const auctions = yield prismaDb_1.default.auction.findMany({
+        where: {
+            id: {
+                notIn: filterPinnedAuctions.map((pinnedAuction) => pinnedAuction.auctionId),
+            }
+        },
         include: {
             media: true,
         },

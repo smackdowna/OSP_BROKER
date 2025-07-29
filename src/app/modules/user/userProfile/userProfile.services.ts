@@ -112,8 +112,58 @@ const getUserProfileByUserId = async (userId: string , res: Response , req: Requ
         }
     });
 
+    const userPIn= await prismadb.userPin.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            pin: {
+                select: {
+                    color: true,
+                    price: true,
+                    duration: true,
+                }
+            }
+        }
+    })
 
-    return {userProfile , userMembership , membershipPlans };
+    const userKudoCoin = await prismadb.userKudoCoin.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            KudoCoin: {
+                select: {
+                    price: true,
+                    description: true,
+                }
+            },
+        }
+    });
+
+    const userBadge = await prismadb.userBadge.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            Badge: {
+                select: {
+                    name: true,
+                    description: true,
+                }
+            }
+        }
+    });
+
+
+    return {userProfile ,
+         userMembership ,
+          membershipPlans ,
+        inventory:{
+            userPIn,
+            userKudoCoin,
+            userBadge}
+        };
 };
 
 // update user profile

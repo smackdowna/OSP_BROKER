@@ -130,7 +130,34 @@ const getAllNotifications = async (userId: string) => {
 
 // get all comments
 const getAllComments = async () => {
+    // fetch pinned comments
+    const pinnedComments = await prismadb.pinnedComment.findMany({
+        include:{
+            UserPin:{
+                select:{
+                    expirationDate: true,
+                }
+            }
+        }
+    });
+
+    if(!pinnedComments) {
+        throw new AppError(404, "No pinned comments found");
+    }
+
+    const filterPinnedComments= pinnedComments.filter((pinnedComment) => {
+        const expirationDate = pinnedComment.UserPin?.expirationDate;
+        if (!expirationDate) return true; // If no expiration date, consider it valid
+        const currentDate = new Date();
+        return new Date(expirationDate) > currentDate; // Check if the pin is still valid
+    });
+
     const comments = await prismadb.comment.findMany({
+        where:{
+            id:{
+                notIn: filterPinnedComments.map((pinnedComment) => pinnedComment.commentId),
+            }
+        },  
         include: {
             Topic: {
                 select:{
@@ -143,7 +170,10 @@ const getAllComments = async () => {
     if (!comments) {
         throw new AppError(404, "No comments found");
     }
-    return {comments};
+    return {comments:{
+        pinnedComments: filterPinnedComments,
+        remainingComments: comments,
+    }};
 }
 
 // get comment by topic id
