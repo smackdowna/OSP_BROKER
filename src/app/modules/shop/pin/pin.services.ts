@@ -120,6 +120,18 @@ const buyPin = async (userPIn:TUserPin, res: Response) => {
 
     if (!userId || !count || !totalCost || !pinId) {
         throw new AppError(400, "All fields are required.");
+    }  
+
+    const existingPin = await prismadb.pin.findFirst({
+        where: { id: pinId },
+    });
+
+    if (!existingPin) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Pin not found",
+        });
     }
 
     const userPin = await prismadb.userPin.create({
@@ -128,6 +140,7 @@ const buyPin = async (userPIn:TUserPin, res: Response) => {
             count,
             totalCost,
             pinId,
+            expirationDate: new Date(Date.now() + existingPin.duration * 24 * 60 * 60 * 1000), // duration in days
         },
     });
 
@@ -174,6 +187,21 @@ const pinTopic = async (pinnedTopic: TPinnedTopic, res: Response) => {
         },
     });
 
+    if (!newPinnedTopic) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin topic",
+        });
+    }
+
+    await prismadb.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    })
+
     return {pinnedTopic:newPinnedTopic};
 }
 
@@ -209,6 +237,21 @@ const pinComment = async (pinnedComment: TPinnedComment, res: Response) => {
         },
     });
 
+    if (!newPinnedComment) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin comment",
+        });
+    }
+
+    await prismadb.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    });
+
     return { pinnedComment: newPinnedComment };
 }
 
@@ -241,6 +284,21 @@ const pinAuction = async (pinnedAuction: TPinnedAuction, res: Response) => {
             userPinId,
             auctionId,
             pinId,
+        },
+    });
+
+    if (!newPinnedAuction) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin auction",
+        });
+    }
+
+    await prismadb.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
         },
     });
 
@@ -280,7 +338,40 @@ const pinAuctionBid = async (pinnedAuctionBid: TPinnedAuctionBid, res: Response)
         },
     });
 
+    if (!newPinnedAuctionBid) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin auction bid",
+        });
+    }
+
+    // Decrement the count of userPin
+    await prismadb.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    });
+
     return { pinnedAuctionBid: newPinnedAuctionBid };
+}
+
+// get userPIn by userId
+const getUserPin = async (userId: string, res: Response) => {
+    const userPin = await prismadb.userPin.findMany({
+        where: { userId: userId },
+    });
+
+    if (!userPin) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "User pin not found",
+        });
+    }
+
+    return { userPin };
 }
 
 
@@ -294,5 +385,6 @@ export const pinServices = {
     pinTopic,
     pinComment,
     pinAuction,
-    pinAuctionBid
+    pinAuctionBid,
+    getUserPin
 };

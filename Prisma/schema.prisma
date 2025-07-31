@@ -639,7 +639,7 @@ model UserPin{
      User User @relation("userToPin", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     count Int @default(0) //buy number of pins
     totalCost Float @default(0)
-    expirationDate DateTime? //when the pin will expire
+    expirationDate DateTime  //when the pin will expire
 
     pinId String @db.ObjectId
     pin pin @relation("userToPin", fields: [pinId], references: [id], onDelete: Cascade , onUpdate: Cascade)

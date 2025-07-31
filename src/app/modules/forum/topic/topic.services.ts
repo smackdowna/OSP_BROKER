@@ -64,7 +64,7 @@ const getAllTopics = async () => {
         include: {
             comments: {
                 select:{
-                    topicId: true
+                    topicId: true 
                 }
             }
         },

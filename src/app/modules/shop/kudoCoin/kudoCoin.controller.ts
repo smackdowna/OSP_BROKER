@@ -29,6 +29,20 @@ const getAllKudoCoins = catchAsyncError(async (req: Request, res: Response) => {
     });
 });
 
+// get kudo coin by id
+const getKudoCoinById = catchAsyncError(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+
+    const kudoCoin = await kudoCoinServices.getKudoCoinById(id, res);
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Kudo coin retrieved successfully",
+        data: kudoCoin,
+    });
+});
+
 // update kudo coin
 const updateKudoCoin = catchAsyncError(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -79,6 +93,7 @@ const buyKudoCoin = catchAsyncError(async (req: Request, res: Response) => {
 export const kudoCoinController = {
     createKudoCoin,
     getAllKudoCoins,
+    getKudoCoinById,
     updateKudoCoin,
     deleteKudoCoin,
     buyKudoCoin

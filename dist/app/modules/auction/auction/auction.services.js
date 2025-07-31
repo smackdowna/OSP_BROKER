@@ -101,7 +101,10 @@ const getAllAuctions = () => __awaiter(void 0, void 0, void 0, function* () {
             media: true,
         },
     });
-    return { auctions };
+    return { auctions: {
+            pinnedAuctions: filterPinnedAuctions,
+            allAuctions: auctions,
+        } };
 });
 // Get auction by ID
 const getAuctionById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {

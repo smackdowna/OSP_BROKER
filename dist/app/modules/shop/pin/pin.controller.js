@@ -147,6 +147,20 @@ const pinAuctionBid = (0, catchAsyncError_1.default)((req, res) => __awaiter(voi
         data: pinnedAuctionBid,
     });
 }));
+// get userPin by userId
+const getUserPinsByUserId = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    if (!userId) {
+        throw new appError_1.default(400, "User ID is required.");
+    }
+    const userPins = yield pin_services_1.pinServices.getUserPin(userId, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "User pins retrieved successfully",
+        data: userPins,
+    });
+}));
 exports.pinController = {
     createPin,
     getAllPins,
@@ -157,5 +171,6 @@ exports.pinController = {
     pinTopic,
     pinComment,
     pinAuction,
-    pinAuctionBid
+    pinAuctionBid,
+    getUserPinsByUserId
 };

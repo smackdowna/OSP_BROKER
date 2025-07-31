@@ -127,7 +127,7 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     if (!user) {
-        throw new appError_1.default(401, "Invalid credentials");
+        throw new appError_1.default(401, "user not found");
     }
     if (user.isBanned) {
         throw new appError_1.default(401, "You are temporarily banned from this platform");

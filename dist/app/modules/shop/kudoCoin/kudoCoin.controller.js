@@ -37,6 +37,17 @@ const getAllKudoCoins = (0, catchAsyncError_1.default)((req, res) => __awaiter(v
         data: kudoCoins,
     });
 }));
+// get kudo coin by id
+const getKudoCoinById = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const kudoCoin = yield kudoCoin_services_1.kudoCoinServices.getKudoCoinById(id, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Kudo coin retrieved successfully",
+        data: kudoCoin,
+    });
+}));
 // update kudo coin
 const updateKudoCoin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -76,6 +87,7 @@ const buyKudoCoin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 
 exports.kudoCoinController = {
     createKudoCoin,
     getAllKudoCoins,
+    getKudoCoinById,
     updateKudoCoin,
     deleteKudoCoin,
     buyKudoCoin

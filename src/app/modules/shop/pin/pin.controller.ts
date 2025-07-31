@@ -172,6 +172,24 @@ const pinAuctionBid = catchAsyncError(async (req: Request, res: Response) => {
     });
 });
 
+// get userPin by userId
+const getUserPinsByUserId = catchAsyncError(async (req: Request, res: Response) => {
+    const userId = req.user.userId;
+
+    if (!userId) {
+        throw new AppError(400, "User ID is required.");
+    }
+
+    const userPins = await pinServices.getUserPin(userId, res);
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User pins retrieved successfully",
+        data: userPins,
+    });
+});
+
 export const pinController = {
     createPin,
     getAllPins,
@@ -182,5 +200,6 @@ export const pinController = {
     pinTopic,
     pinComment,
     pinAuction,
-    pinAuctionBid
+    pinAuctionBid,
+    getUserPinsByUserId
 };
