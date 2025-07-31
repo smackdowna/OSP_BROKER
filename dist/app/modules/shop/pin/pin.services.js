@@ -110,12 +110,23 @@ const buyPin = (userPIn, res) => __awaiter(void 0, void 0, void 0, function* () 
     if (!userId || !count || !totalCost || !pinId) {
         throw new appError_1.default(400, "All fields are required.");
     }
+    const existingPin = yield prismaDb_1.default.pin.findFirst({
+        where: { id: pinId },
+    });
+    if (!existingPin) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Pin not found",
+        });
+    }
     const userPin = yield prismaDb_1.default.userPin.create({
         data: {
             userId,
             count,
             totalCost,
             pinId,
+            expirationDate: new Date(Date.now() + existingPin.duration * 24 * 60 * 60 * 1000), // duration in days
         },
     });
     if (!userPin) {
@@ -154,6 +165,19 @@ const pinTopic = (pinnedTopic, res) => __awaiter(void 0, void 0, void 0, functio
             pinId,
         },
     });
+    if (!newPinnedTopic) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin topic",
+        });
+    }
+    yield prismaDb_1.default.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    });
     return { pinnedTopic: newPinnedTopic };
 });
 // pin comment
@@ -181,6 +205,19 @@ const pinComment = (pinnedComment, res) => __awaiter(void 0, void 0, void 0, fun
             userPinId,
             commentId,
             pinId,
+        },
+    });
+    if (!newPinnedComment) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin comment",
+        });
+    }
+    yield prismaDb_1.default.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
         },
     });
     return { pinnedComment: newPinnedComment };
@@ -212,6 +249,19 @@ const pinAuction = (pinnedAuction, res) => __awaiter(void 0, void 0, void 0, fun
             pinId,
         },
     });
+    if (!newPinnedAuction) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin auction",
+        });
+    }
+    yield prismaDb_1.default.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    });
     return { pinnedAuction: newPinnedAuction };
 });
 // pin auction bid
@@ -241,7 +291,35 @@ const pinAuctionBid = (pinnedAuctionBid, res) => __awaiter(void 0, void 0, void 
             pinId,
         },
     });
+    if (!newPinnedAuctionBid) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to pin auction bid",
+        });
+    }
+    // Decrement the count of userPin
+    yield prismaDb_1.default.userPin.update({
+        where: { id: userPinId },
+        data: {
+            count: { decrement: 1 },
+        },
+    });
     return { pinnedAuctionBid: newPinnedAuctionBid };
+});
+// get userPIn by userId
+const getUserPin = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userPin = yield prismaDb_1.default.userPin.findMany({
+        where: { userId: userId },
+    });
+    if (!userPin) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "User pin not found",
+        });
+    }
+    return { userPin };
 });
 exports.pinServices = {
     createPin,
@@ -253,5 +331,6 @@ exports.pinServices = {
     pinTopic,
     pinComment,
     pinAuction,
-    pinAuctionBid
+    pinAuctionBid,
+    getUserPin
 };

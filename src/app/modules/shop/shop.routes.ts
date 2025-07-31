@@ -27,10 +27,12 @@ router.post("/pin/topic/:pinId", verifyToken, pinController.pinTopic);
 router.post("/pin/comment/:pinId", verifyToken, pinController.pinComment);
 router.post("/pin/auction/:pinId", verifyToken, pinController.pinAuction);
 router.post("/pin/auctionBid/:pinId", verifyToken, pinController.pinAuctionBid);
+router.get("/userPins", verifyToken, pinController.getUserPinsByUserId);
 
 // kudoCoin routes
 router.post("/kudoCoin", verifyToken, authorizeRole("ADMIN"), kudoCoinController.createKudoCoin);
 router.get("/kudoCoin", verifyToken, kudoCoinController.getAllKudoCoins);
+router.get("/kudoCoin/:id", verifyToken, kudoCoinController.getKudoCoinById);
 router.put("/kudoCoin/:id", verifyToken, authorizeRole("ADMIN"), kudoCoinController.updateKudoCoin);
 router.delete("/kudoCoin/:id", verifyToken, authorizeRole("ADMIN"), kudoCoinController.deleteKudoCoin);
 router.post("/kudoCoin/buy/:id", verifyToken, kudoCoinController.buyKudoCoin);

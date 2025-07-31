@@ -50,6 +50,20 @@ const getAllKudoCoins = (res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     return { kudoCoins };
 });
+// get kudo coin by id
+const getKudoCoinById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const kudoCoin = yield prismaDb_1.default.kudoCoin.findFirst({
+        where: { id }
+    });
+    if (!kudoCoin) {
+        return res.status(404).json({
+            success: false,
+            message: "Kudo coin not found",
+            data: null,
+        });
+    }
+    return { kudoCoin };
+});
 // update kudo coin
 const updateKudoCoin = (id, kudoCoin, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { price, description } = kudoCoin;
@@ -108,6 +122,7 @@ const buyKudoCoin = (userId, kudoCoinId, quantity, res) => __awaiter(void 0, voi
 exports.kudoCoinServices = {
     createKudoCoin,
     getAllKudoCoins,
+    getKudoCoinById,
     updateKudoCoin,
     deleteKudoCoin,
     buyKudoCoin

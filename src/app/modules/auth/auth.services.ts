@@ -129,7 +129,7 @@ const loginUser = async (payload: TLoginAuth) => {
     });
 
     if (!user) {
-        throw new AppError(401, "Invalid credentials");
+        throw new AppError(401, "user not found");
     }
 
     if(user.isBanned) {

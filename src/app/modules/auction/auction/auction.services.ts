@@ -101,7 +101,10 @@ const getAllAuctions = async () => {
         },
     });
 
-    return { auctions };
+    return { auctions:{
+        pinnedAuctions: filterPinnedAuctions,
+        allAuctions: auctions,
+    } };
 };
 
 // Get auction by ID

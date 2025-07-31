@@ -47,6 +47,23 @@ const getAllKudoCoins = async (res: Response) => {
     return { kudoCoins };
 }
 
+// get kudo coin by id
+const getKudoCoinById = async (id: string, res: Response) => {
+    const kudoCoin = await prismadb.kudoCoin.findFirst({
+        where: { id }
+    });
+
+    if (!kudoCoin) {
+        return res.status(404).json({
+            success: false,
+            message: "Kudo coin not found",
+            data: null,
+        });
+    }
+
+    return { kudoCoin };
+}
+
 // update kudo coin
 const updateKudoCoin = async (id: string, kudoCoin: TKudoCoin, res: Response) => {
     const { price, description } = kudoCoin;
@@ -119,6 +136,7 @@ const buyKudoCoin = async (userId: string, kudoCoinId: string, quantity: number,
 export const kudoCoinServices = {
     createKudoCoin,
     getAllKudoCoins,
+    getKudoCoinById,
     updateKudoCoin,
     deleteKudoCoin,
     buyKudoCoin
