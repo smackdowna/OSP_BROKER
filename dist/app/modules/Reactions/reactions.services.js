@@ -15,11 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.reactionsService = void 0;
 const appError_1 = __importDefault(require("../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
+const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
 // create a reaction
 const createReaction = (reaction, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId, contentType, reactionType, topicId, commentId, postId } = reaction;
-    if (!userId || !contentType || !reactionType) {
-        throw new appError_1.default(400, "User ID, content type, and reaction type are required");
+    if (!userId) {
+        throw new appError_1.default(400, "User ID are required");
+    }
+    if (!contentType || !reactionType) {
+        throw new appError_1.default(400, " content type, and reaction type are required");
     }
     // Check if the user exists
     const user = yield prismaDb_1.default.user.findFirst({
@@ -123,6 +127,51 @@ const createReaction = (reaction, res) => __awaiter(void 0, void 0, void 0, func
         }
     }
 });
+// get all reactions for a topic
+const getReactionsForTopic = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const reactions = yield prismaDb_1.default.reactions.findMany({
+        where: { topicId },
+    });
+    if (!reactions || reactions.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No reactions found for this topic",
+            data: null,
+        });
+    }
+    return { reactions };
+});
+// get all reactions for a post
+const getReactionsForPost = (postId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const reactions = yield prismaDb_1.default.reactions.findMany({
+        where: { postId },
+    });
+    if (!reactions || reactions.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No reactions found for this post",
+            data: null,
+        });
+    }
+    return { reactions };
+});
+// get all reactions for a comment
+const getReactionsForComment = (commentId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const reactions = yield prismaDb_1.default.reactions.findMany({
+        where: { commentId },
+    });
+    if (!reactions || reactions.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No reactions found for this comment",
+            data: null,
+        });
+    }
+    return { reactions };
+});
 const deleteReaction = (userId, reactionId) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the reaction exists
     const reaction = yield prismaDb_1.default.reactions.findFirst({
@@ -143,4 +192,7 @@ const deleteReaction = (userId, reactionId) => __awaiter(void 0, void 0, void 0,
 exports.reactionsService = {
     createReaction,
     deleteReaction,
+    getReactionsForTopic,
+    getReactionsForPost,
+    getReactionsForComment
 };

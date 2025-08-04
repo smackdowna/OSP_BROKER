@@ -29,6 +29,39 @@ const createReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(vo
         data: reaction,
     });
 }));
+// get reactions for topic
+const getReactionsForTopic = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { topicId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForTopic(topicId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
+    });
+}));
+// get reactions for post
+const getReactionsForPost = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { postId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForPost(postId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
+    });
+}));
+// get reactions for comment
+const getReactionsForComment = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { commentId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForComment(commentId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
+    });
+}));
 // delete reaction
 const deleteReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -52,4 +85,7 @@ const deleteReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(vo
 exports.reactionsController = {
     createReaction,
     deleteReaction,
+    getReactionsForTopic,
+    getReactionsForPost,
+    getReactionsForComment
 };

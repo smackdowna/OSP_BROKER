@@ -16,6 +16,42 @@ const createReaction = catchAsyncError( async (req: Request, res: Response) => {
   });
 });
 
+// get reactions for topic
+const getReactionsForTopic = catchAsyncError( async (req: Request, res: Response) => {
+  const { topicId } = req.params;
+  const reactions = await reactionsService.getReactionsForTopic(topicId, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reactions fetched successfully",
+    data: reactions,
+  });
+});
+
+// get reactions for post
+const getReactionsForPost = catchAsyncError( async (req: Request, res: Response) => {
+  const { postId } = req.params;
+  const reactions = await reactionsService.getReactionsForPost(postId, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reactions fetched successfully",
+    data: reactions,
+  });
+});
+
+// get reactions for comment
+const getReactionsForComment = catchAsyncError( async (req: Request, res: Response) => {
+  const { commentId } = req.params;
+  const reactions = await reactionsService.getReactionsForComment(commentId, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reactions fetched successfully",
+    data: reactions,
+  });
+});
+
 
 // delete reaction
 const deleteReaction = catchAsyncError( async (req: Request, res: Response) =>{
@@ -43,4 +79,7 @@ const deleteReaction = catchAsyncError( async (req: Request, res: Response) =>{
 export const reactionsController = {
   createReaction,
   deleteReaction,
+  getReactionsForTopic,
+  getReactionsForPost,
+  getReactionsForComment
 };
