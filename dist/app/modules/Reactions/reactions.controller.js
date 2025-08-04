@@ -20,13 +20,46 @@ const catchAsyncError_1 = __importDefault(require("../../utils/catchAsyncError")
 const createReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const { contentType, reactionType, topicId, commentId } = req.body;
-    const reaction = yield reactions_services_1.reactionsService.createReaction({ userId, contentType, reactionType, topicId, commentId }, res);
+    const { contentType, reactionType, topicId, commentId, postId } = req.body;
+    const reaction = yield reactions_services_1.reactionsService.createReaction({ userId, contentType, reactionType, topicId, commentId, postId }, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
         message: "Reaction created successfully",
         data: reaction,
+    });
+}));
+// get reactions for topic
+const getReactionsForTopic = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { topicId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForTopic(topicId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
+    });
+}));
+// get reactions for post
+const getReactionsForPost = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { postId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForPost(postId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
+    });
+}));
+// get reactions for comment
+const getReactionsForComment = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { commentId } = req.params;
+    const reactions = yield reactions_services_1.reactionsService.getReactionsForComment(commentId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Reactions fetched successfully",
+        data: reactions,
     });
 }));
 // delete reaction
@@ -52,4 +85,7 @@ const deleteReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(vo
 exports.reactionsController = {
     createReaction,
     deleteReaction,
+    getReactionsForTopic,
+    getReactionsForPost,
+    getReactionsForComment
 };
