@@ -20,8 +20,8 @@ const catchAsyncError_1 = __importDefault(require("../../utils/catchAsyncError")
 const createReaction = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-    const { contentType, reactionType, topicId, commentId } = req.body;
-    const reaction = yield reactions_services_1.reactionsService.createReaction({ userId, contentType, reactionType, topicId, commentId }, res);
+    const { contentType, reactionType, topicId, commentId, postId } = req.body;
+    const reaction = yield reactions_services_1.reactionsService.createReaction({ userId, contentType, reactionType, topicId, commentId, postId }, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,

@@ -19,4 +19,5 @@ export type TReaction = {
   reactionType: ReactionType;
   topicId?: string;
   commentId?: string;
+  postId?: string;
 };

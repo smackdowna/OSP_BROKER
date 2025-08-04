@@ -6,8 +6,8 @@ import catchAsyncError from "../../utils/catchAsyncError";
 // create reaction
 const createReaction = catchAsyncError( async (req: Request, res: Response) => {
     const userId= req.user?.userId;
-  const {contentType , reactionType , topicId , commentId} = req.body;
-  const reaction = await reactionsService.createReaction({userId,contentType , reactionType , topicId , commentId}, res);
+  const {contentType , reactionType , topicId , commentId , postId} = req.body;
+  const reaction = await reactionsService.createReaction({userId,contentType , reactionType , topicId , commentId , postId}, res);
   sendResponse(res, {
     statusCode: 200,
     success: true,

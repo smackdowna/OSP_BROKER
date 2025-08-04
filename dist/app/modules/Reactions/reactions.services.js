@@ -17,7 +17,7 @@ const appError_1 = __importDefault(require("../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 // create a reaction
 const createReaction = (reaction, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId, contentType, reactionType, topicId, commentId } = reaction;
+    const { userId, contentType, reactionType, topicId, commentId, postId } = reaction;
     if (!userId || !contentType || !reactionType) {
         throw new appError_1.default(400, "User ID, content type, and reaction type are required");
     }
@@ -44,6 +44,37 @@ const createReaction = (reaction, res) => __awaiter(void 0, void 0, void 0, func
                     contentType: contentType,
                     reactionType: reactionType,
                     topicId: topicId,
+                },
+            });
+            return { reaction: newReaction };
+        }
+        else {
+            newReaction = yield prismaDb_1.default.reactions.update({
+                where: {
+                    id: existingReaction.id,
+                },
+                data: {
+                    reactionType: reactionType,
+                },
+            });
+            return { reaction: newReaction };
+        }
+    }
+    if (postId && userId) {
+        const existingReaction = yield prismaDb_1.default.reactions.findFirst({
+            where: {
+                userId: userId,
+                postId: postId,
+            },
+        });
+        let newReaction;
+        if (!existingReaction) {
+            newReaction = yield prismaDb_1.default.reactions.create({
+                data: {
+                    userId: userId,
+                    contentType: contentType,
+                    reactionType: reactionType,
+                    postId: postId,
                 },
             });
             return { reaction: newReaction };

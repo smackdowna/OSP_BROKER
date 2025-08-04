@@ -7,7 +7,7 @@ import sendResponse from "../../middlewares/sendResponse";
 
 // create a reaction
 const createReaction = async(reaction: TReaction, res: Response) => {
-  const { userId, contentType, reactionType, topicId, commentId } = reaction;
+  const { userId, contentType, reactionType, topicId, commentId , postId } = reaction;
     if(!userId || !contentType || !reactionType ) {
     throw new AppError(400, "User ID, content type, and reaction type are required");
     }
@@ -40,6 +40,39 @@ const createReaction = async(reaction: TReaction, res: Response) => {
         });
         return {reaction:newReaction};
     }else{
+        newReaction = await prismadb.reactions.update({
+            where: {
+                id: existingReaction.id,
+            },
+            data: {
+                reactionType: reactionType,
+            },
+        });
+        return {reaction:newReaction};
+    }
+  }
+
+  if(postId && userId){
+    const existingReaction= await prismadb.reactions.findFirst({
+        where: {
+            userId: userId,
+            postId: postId,
+        },
+    });
+
+    let newReaction;
+    if(!existingReaction){
+        newReaction = await prismadb.reactions.create({
+            data: {
+                userId: userId,
+                contentType: contentType,
+                reactionType: reactionType,
+                postId: postId,
+            },
+        });
+        return {reaction:newReaction};
+    }
+    else{
         newReaction = await prismadb.reactions.update({
             where: {
                 id: existingReaction.id,
