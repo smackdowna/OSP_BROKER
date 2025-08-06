@@ -39,6 +39,7 @@ router.post('/',verifyToken,verifyMembership, forumControllers.createForum);
 router.get('/', forumControllers.getAllForums);
 router.get('/:id',verifyToken,verifyMembership, forumControllers.getForumById); 
 router.put('/:id',verifyToken,authorizeRole("MODERATOR"), forumControllers.updateForum);
+router.post('/softDelete/:id', verifyToken, verifyMembership, forumControllers.softDeleteForum);
 router.delete('/:id',verifyToken,authorizeRole("MODERATOR"), forumControllers.deleteForum);
 router.delete('/',verifyToken,authorizeRole("MODERATOR"), forumControllers.deleteAllForums);
 

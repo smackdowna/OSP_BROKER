@@ -523,6 +523,37 @@ const updateRepresentativeRole = (userId, res) => __awaiter(void 0, void 0, void
         }
     });
 });
+// soft delete business
+const softDeleteBusinessPage = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Business ID is required"
+        });
+    }
+    const existingBusiness = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: id
+        }
+    });
+    if (!existingBusiness) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business not found with this id."
+        }));
+    }
+    const updatedBusiness = yield prismaDb_1.default.business.update({
+        where: {
+            id: id
+        },
+        data: {
+            isDeleted: true
+        }
+    });
+    return { business: updatedBusiness };
+});
 exports.businessServices = {
     createBusiness,
     getAllBusinesses,
@@ -530,6 +561,7 @@ exports.businessServices = {
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,
+    softDeleteBusinessPage,
     approveRepresentatives,
     createRepresentative,
     getAllRepresentatives,

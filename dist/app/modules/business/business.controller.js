@@ -106,6 +106,16 @@ const approveBusinessPage = (0, catchAsyncError_1.default)((req, res, next) => _
         data: business,
     });
 }));
+// soft delete business page
+const softDeleteBusinessPage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield business_services_1.businessServices.softDeleteBusinessPage(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business page deleted successfully",
+    });
+}));
 // approve representative
 const approveRepresentative = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId } = req.params;
@@ -214,6 +224,7 @@ exports.businessController = {
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,
+    softDeleteBusinessPage,
     approveRepresentative,
     createRepresentative,
     getAllRepresentatives,

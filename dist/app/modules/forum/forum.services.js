@@ -135,6 +135,30 @@ const updateForum = (forumId, res, forum) => __awaiter(void 0, void 0, void 0, f
     });
     return { forum: updatedForum };
 });
+// soft delete forum
+const softDeleteForum = (forumId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingForum = yield prismaDb_1.default.forum.findFirst({
+        where: {
+            id: forumId,
+        },
+    });
+    if (!existingForum) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Forum not found with this id",
+        }));
+    }
+    const deletedForum = yield prismaDb_1.default.forum.update({
+        where: {
+            id: forumId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { forum: deletedForum };
+});
 // delete forum
 const deleteForum = (forumId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingForum = yield prismaDb_1.default.forum.findFirst({
@@ -169,6 +193,7 @@ exports.forumServices = {
     getAllForums,
     getForumById,
     updateForum,
+    softDeleteForum,
     deleteForum,
     deleteAllForums
 };

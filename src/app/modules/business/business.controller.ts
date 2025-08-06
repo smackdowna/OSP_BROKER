@@ -124,6 +124,17 @@ const approveBusinessPage = catchAsyncError(async (req: Request, res: Response, 
     });
 });
 
+// soft delete business page
+const softDeleteBusinessPage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    await businessServices.softDeleteBusinessPage(id , res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business page deleted successfully",
+    });
+});
+
 // approve representative
 const approveRepresentative= catchAsyncError(async(req:Request , res: Response , next: NextFunction)=>{
     const {representativeId}= req.params;
@@ -245,6 +256,7 @@ export const businessController = {
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,
+    softDeleteBusinessPage,
     approveRepresentative,
     createRepresentative,
     getAllRepresentatives,
