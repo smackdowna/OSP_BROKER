@@ -82,6 +82,18 @@ const updateForum = catchAsyncError(async (req: Request, res: Response, next: Ne
     });
 })
 
+// soft delete forum
+const softDeleteForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const forum = await forumServices.softDeleteForum(id , res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Forum soft deleted successfully",
+        data: forum,
+    });
+});
+
 
 // delete forum
 const deleteForum = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
@@ -140,5 +152,6 @@ export const forumControllers = {
     getForumById,
     updateForum,
     deleteForum,
+    softDeleteForum,
     deleteAllForums
 };

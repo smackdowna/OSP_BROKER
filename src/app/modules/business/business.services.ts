@@ -668,6 +668,44 @@ const updateRepresentativeRole = async (userId: string,  res: Response) => {
     })
 }
 
+// soft delete business
+const softDeleteBusinessPage = async (id: string, res: Response) => {
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Business ID is required"
+        });
+    }
+
+    const existingBusiness = await prismadb.business.findFirst({
+        where: {
+            id: id
+        }
+    });
+
+    if (!existingBusiness) {
+        return (
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Business not found with this id."
+            })
+        )
+    }
+
+    const updatedBusiness = await prismadb.business.update({
+        where: {
+            id: id
+        },
+        data: {
+            isDeleted: true
+        }
+    });
+
+    return { business: updatedBusiness };
+}
+
 
 export const businessServices = {
     createBusiness,
@@ -676,6 +714,7 @@ export const businessServices = {
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,
+    softDeleteBusinessPage,
     approveRepresentatives,
     createRepresentative,
     getAllRepresentatives,

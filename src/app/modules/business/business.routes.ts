@@ -31,6 +31,7 @@ router.get('/:id',  businessController.getBusinessById);
 router.put('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.updateBusiness);
 router.delete('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.deleteBusiness);
 router.post('/:businessId', verifyToken, verifyMembership, authorizeRole("ADMIN"), businessController.approveBusinessPage);
+router.post('/softDelete/:id', verifyToken, verifyMembership, businessController.softDeleteBusinessPage);
 
 
 

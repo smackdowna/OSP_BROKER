@@ -127,6 +127,31 @@ const updateForum = async (forumId: string, res: Response, forum: Partial<TForum
     return {forum: updatedForum};
 }
 
+// soft delete forum
+const softDeleteForum = async (forumId: string, res: Response) => {
+    const existingForum = await prismadb.forum.findFirst({
+        where: {
+            id: forumId,
+        },
+    });
+    if (!existingForum) {
+        return(sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Forum not found with this id",
+        }));
+    }
+    const deletedForum = await prismadb.forum.update({
+        where: {
+            id: forumId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return {forum: deletedForum};
+}
+
 // delete forum
 const deleteForum = async (forumId: string , res:Response) => {
     const existingForum = await prismadb.forum.findFirst({
@@ -163,6 +188,7 @@ export const forumServices = {
     getAllForums,
     getForumById,
     updateForum,
+    softDeleteForum,
     deleteForum,
     deleteAllForums
 };

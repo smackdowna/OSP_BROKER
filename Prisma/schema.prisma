@@ -170,6 +170,7 @@ model business{
     saleDeckUrl String?
     websiteLinks String[]
     accountOwnerUsername String
+    isDeleted Boolean @default(false)
     
     businessAdminId String @db.ObjectId
     BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
@@ -189,6 +190,7 @@ model BusinessCategory{
     name String
     description String
     business business[] @relation("businessToBusinessCategory")
+    isDeleted Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -214,7 +216,7 @@ model Forum{
     user User @relation("userToForum",fields: [userId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     Categories Categories @relation("forumToCategory",fields: [categoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     topics Topic[] @relation("forumToTopic")
-
+    isDeleted Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -232,6 +234,7 @@ model Topic{
     flaggedContent FlaggedContent[] @relation("topicToFlaggedContent")
     reactions Reactions[] @relation("topicToReactions")
     pinnedTopic pinnedTopic[] @relation("pinToTopic")
+    isClosed Boolean @default(false) 
 
 
     createdAt DateTime @default(now())
@@ -247,6 +250,7 @@ model Comment{
     Topic Topic? @relation("topicToComment",fields: [topicId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     postId String? @db.ObjectId
     post Post? @relation("postToComment" , fields: [postId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    isDeleted Boolean @default(false)
 
     flaggedContent FlaggedContent[] @relation("commentToFlaggedContent")
     reactions Reactions[] @relation("commentToReactions")
@@ -426,6 +430,8 @@ model Message{
     recipientId String @db.ObjectId
     content String
     read Boolean @default(false)
+    isDeleted Boolean @default(false)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -452,6 +458,7 @@ model GroupMessage{
 
     user User @relation("userToGroupMessage", fields: [senderId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     userProfile UserProfile @relation("userProfileToGroupMessage", fields: [senderId], references: [userId], onDelete: Cascade , onUpdate: Cascade)
+    isDeleted Boolean @default(false)
 
     groupChatId String @db.ObjectId
     GroupChat GroupChat @relation("groupToGroupMessages", fields: [groupChatId], references: [id], onDelete: Cascade , onUpdate: Cascade)
@@ -516,6 +523,7 @@ model Post{
     comments Comment[] @relation("postToComment")
     reactions Reactions[] @relation("postToReactions")
     sharedPosts SharedPost[] @relation("postToSharedPost")
+    isDeleted Boolean @default(false)
     
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -530,6 +538,7 @@ model SharedPost{
     Post Post @relation("postToSharedPost", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     userId String @db.ObjectId
     user User @relation("userToSharedPost", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    isDeleted Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -544,6 +553,7 @@ model Media{
     url String
     thumbnailUrl String?
     fileType String?
+    isDeleted Boolean @default(false)
 
     postId String? @db.ObjectId
     Post Post? @relation("postToMedia", fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
@@ -566,6 +576,7 @@ model Auction{
     approved Boolean @default(false)
     userId String @db.ObjectId
     User User @relation("userToAuction", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    isDeleted Boolean @default(false)
 
     auctionBids AuctionBid[] @relation("auctionToAuctionBid")
     flaggedContent FlaggedContent[] @relation("auctionToFlaggedContent")
@@ -581,6 +592,7 @@ model AuctionCategory{
     name String @unique
     description String
     auctions Auction[] @relation("auctionCategoryToAuction")
+    isDeleted Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -595,6 +607,7 @@ model AuctionBid{
     User User @relation("userToAuctionBid", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     response String
     matched Boolean @default(false)
+    isDeleted Boolean @default(false)
 
     flaggedContent FlaggedContent[] @relation("auctionBidToFlaggedContent")
     pinnedAuctionBid pinnedAuctionBid[] @relation("pinToAuctionBid")
