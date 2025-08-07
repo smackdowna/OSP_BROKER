@@ -98,6 +98,30 @@ const updateAuctionCategoryById = async (id: string, category: TAuctionCategory 
   return { category: updatedCategory };
 }
 
+// soft delete auction category
+const softDeleteAuctionCategory = async (id: string, res: Response) => {
+  // Check if the category exists
+  const existingCategory = await prismadb.auctionCategory.findFirst({
+    where: { id },
+  });
+
+  if (!existingCategory) {
+    return(sendResponse(res ,{
+        statusCode: 404,
+        success: false,
+        message: "Auction category not found",
+    }))
+  }
+
+  // Soft delete the auction category
+  const deletedCategory = await prismadb.auctionCategory.update({
+    where: { id },
+    data: { isDeleted: true },
+  });
+
+  return { category: deletedCategory };
+};
+
 
 // dleete auction category by id
 const deleteAuctionCategoryById = async (id: string, res: Response) => {
@@ -132,5 +156,6 @@ export const categoryServices = {
   getAllAuctionCategories,
     getAuctionsByCategoryId,
   updateAuctionCategoryById,
+  softDeleteAuctionCategory,
   deleteAuctionCategoryById,
 };

@@ -93,6 +93,24 @@ const updateTopic = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         data: updatedTopic
     });
 }));
+// close topic
+const closeTopic = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic id is required",
+        });
+    }
+    const closedTopic = yield topic_services_1.topicServices.closeTopic(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Topic closed successfully",
+        data: closedTopic,
+    });
+}));
 // delete topic
 const deleteTopic = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -168,6 +186,7 @@ exports.topicController = {
     getAllTopics,
     getTopicById,
     updateTopic,
+    closeTopic,
     deleteTopic,
     deleteAllTopics,
 };

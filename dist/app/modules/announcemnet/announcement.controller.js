@@ -48,6 +48,16 @@ const getAnnouncementById = (0, catchAsyncError_1.default)((req, res, next) => _
         data: announcement,
     });
 }));
+// soft delete announcement
+const softDeleteAnnouncement = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield announcement_services_1.announcementServices.softDeleteAnnouncement(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Announcement soft deleted successfully",
+    });
+}));
 // delete announcement
 const deleteAnnouncement = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -74,6 +84,7 @@ exports.announcementController = {
     createAnnouncement,
     getAnnouncements,
     getAnnouncementById,
+    softDeleteAnnouncement,
     deleteAnnouncement,
     updateAnnouncement,
 };

@@ -70,6 +70,32 @@ const getAnnouncementById = async (announcementId: string , res:Response) => {
     return announcement;
 }
 
+// soft delete announcement
+const softDeleteAnnouncement = async (id: string, res: Response) => {
+    // Check if the announcement exists
+    const announcementExists = await prismadb.announcement.findFirst({
+        where: { id: id },
+    });
+    
+    if (!announcementExists) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Announcement not found",
+            })
+        )
+    }
+    
+    // Soft delete the announcement
+    const deletedAnnouncement = await prismadb.announcement.update({
+        where: { id: id },
+        data: { isDeleted: true },
+    });
+    
+    return { deletedAnnouncement };
+}
+
 
 // delete announcement by id
 const deleteAnnouncement = async (announcementId: string , res:Response) => {
@@ -127,6 +153,7 @@ export const announcementServices = {
     createAnnouncement,
     getAnnouncements,
     getAnnouncementById,
+    softDeleteAnnouncement,
     deleteAnnouncement,
     updateAnnouncement
 };

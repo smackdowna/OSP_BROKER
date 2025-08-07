@@ -105,6 +105,37 @@ const updateCategory = async (id: string, categoryData: Partial<Tcategory> , res
   return { category: updatedCategory };
 }
 
+// soft delete shop category
+const softDeleteCategory = async (id: string, res: Response) => {
+  if (!id) {
+    throw new AppError(400, "Please provide category ID");
+  }
+
+  const existingCategory = await prismadb.shopCategory.findUnique({
+    where: { id },
+  });
+
+  if (!existingCategory) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Category not found",
+    });
+  }
+
+  const deletedCategory = await prismadb.shopCategory.update({
+    where: { id },
+    data: { isDeleted: true },
+  });
+
+  return sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Category soft deleted successfully",
+    data: deletedCategory,
+  });
+};
+
 // Delete category
 const deleteCategory = async (id: string , res:Response) => {
   if (!id) {
@@ -136,5 +167,6 @@ export const categoryService = {
     getAllCategories,
     getCategoryById,
     updateCategory,
+    softDeleteCategory,
     deleteCategory
 };

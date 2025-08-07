@@ -179,6 +179,24 @@ if (req.files && req.files.length != 0) {
     });
 });
 
+// soft delete post
+const softDeletePost = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Post id is required",
+        });
+    }
+    await postServices.softDeletePost(id, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Post soft deleted successfully",
+    });
+});
+
 // delete post
 const deletePost = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -250,6 +268,7 @@ export const postController = {
     getPostsByBusinessId,
     getPostById,
     updatePost,
+    softDeletePost,
     deletePost,
     sharePost,
     unsharePost,

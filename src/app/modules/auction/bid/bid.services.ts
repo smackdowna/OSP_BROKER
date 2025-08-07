@@ -158,6 +158,22 @@ const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
     return { bid: updatedBid };
 }
 
+// soft delete auction bid
+const softDeleteAuctionBid = async (id: string) => {
+    if (!id) {
+        throw new AppError(400, "Bid ID is required");
+    }
+
+    const deletedBid = await prismadb.auctionBid.update({
+        where: { id: id },
+        data: {
+            isDeleted: true,
+        },
+    });
+
+    return { bid: deletedBid };
+}
+
 // delete a bid
 const deleteBid = async (id: string) => {
     if (!id) {
@@ -178,5 +194,6 @@ export const bidServices = {
     getBidsByAuctionId,
     getBidById,
     updateBid,
+    softDeleteAuctionBid,
     deleteBid,
 };

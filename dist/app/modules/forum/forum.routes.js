@@ -18,6 +18,7 @@ router.post('/topic', requireAuth_1.verifyToken, authorizeMembership_1.verifyMem
 router.get('/topics', topic_controller_1.topicController.getAllTopics);
 router.get('/topic/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, topic_controller_1.topicController.getTopicById);
 router.put('/topic/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), topic_controller_1.topicController.updateTopic);
+router.post('/topic/closeTopic/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, topic_controller_1.topicController.closeTopic);
 router.delete('/topic/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), topic_controller_1.topicController.deleteTopic);
 router.delete('/topics', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("MODERATOR"), topic_controller_1.topicController.deleteAllTopics);
 // Comment routes
@@ -25,8 +26,9 @@ router.post('/comment', requireAuth_1.verifyToken, authorizeMembership_1.verifyM
 router.get('/comments', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), comment_controller_1.commentController.getAllComments);
 router.get('/comments/:topicId', comment_controller_1.commentController.getCommentByTopicId);
 router.get('/comment/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getCommentById);
-router.get('/notifications/:senderId', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getAllNotifications);
+router.get('/notifications/:userId', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getAllNotifications);
 router.put('/comment/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.updateComment);
+router.post('/comment/softDelete/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.softDeleteComment);
 router.delete('/comment/:id', requireAuth_1.verifyToken, comment_controller_1.commentController.deleteComment);
 router.delete('/comments', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), comment_controller_1.commentController.deleteAllComments);
 // Category routes
@@ -34,6 +36,7 @@ router.post('/category', requireAuth_1.verifyToken, (0, authorizeRole_1.authoriz
 router.get('/categories', categories_controller_1.categoriesController.getAllCategories);
 router.get('/category/:id', requireAuth_1.verifyToken, categories_controller_1.categoriesController.getCategoryById);
 router.put('/category/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), categories_controller_1.categoriesController.updateCategory);
+router.post('/category/softDelete/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), categories_controller_1.categoriesController.softDeleteCategory);
 router.delete('/category/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), categories_controller_1.categoriesController.deleteCategory);
 // Forum routes
 router.post('/', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, forum_controller_1.forumControllers.createForum);

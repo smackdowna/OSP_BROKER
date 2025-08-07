@@ -39,6 +39,37 @@ const getUserById = async (userId: string, res: Response) => {
   return { user };
 };
 
+// soft delete user 
+const softDeleteUser= async (userId: string, res: Response) => {
+  if (!res || typeof res.status !== "function") {
+    throw new Error("Invalid Response object passed to softDeleteUser");
+  }
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  await prismadb.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isDeleted: true, // Assuming you have a field to mark soft deletion
+    },
+  });
+
+  return { user };
+};
+
 // delete user
 const deleteUser = async (userId: string, res: Response) => {
   if (!res || typeof res.status !== "function") {
@@ -70,5 +101,6 @@ const deleteUser = async (userId: string, res: Response) => {
 export const userService = {
   getAllUsers,
   getUserById,
+  softDeleteUser,
   deleteUser,
 };

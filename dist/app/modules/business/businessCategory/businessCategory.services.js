@@ -95,6 +95,26 @@ const updateBusinessCategory = (id, categoryData, res) => __awaiter(void 0, void
     });
     return { category: updatedCategory };
 });
+// soft delete business category
+const softDeleteBusinessCategory = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingCategory = yield prismaDb_1.default.businessCategory.findFirst({
+        where: { id },
+    });
+    if (!existingCategory) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business category not found",
+        });
+    }
+    const deletedBusinessCategory = yield prismaDb_1.default.businessCategory.update({
+        where: { id },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { businessCategory: deletedBusinessCategory };
+});
 // delete business category
 const deleteBusinessCategory = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the category exists
@@ -119,5 +139,6 @@ exports.businessCategoryServices = {
     getAllBusinessCategories,
     getBusinessCategoryById,
     updateBusinessCategory,
+    softDeleteBusinessCategory,
     deleteBusinessCategory,
 };

@@ -107,6 +107,24 @@ const updateComment = (0, catchAsyncError_1.default)((req, res, next) => __await
         data: updatedComment,
     });
 }));
+// soft delete comment
+const softDeleteComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        });
+    }
+    const deletedComment = yield comment_services_1.commentServices.softDeleteComment(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Comment soft deleted successfully",
+        data: deletedComment,
+    });
+}));
 // delete comment
 const deleteComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -214,6 +232,7 @@ const deleteComment = (0, catchAsyncError_1.default)((req, res, next) => __await
 }));
 exports.commentController = {
     createComment,
+    softDeleteComment,
     deleteAllComments,
     getAllComments,
     getCommentByTopicId,

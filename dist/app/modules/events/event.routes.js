@@ -10,5 +10,6 @@ router.post("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("
 router.get("/", event_controller_1.eventController.getEvents);
 router.get("/:id", event_controller_1.eventController.getEventById);
 router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), event_controller_1.eventController.updateEvent);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), event_controller_1.eventController.softDeleteEvent);
 router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), event_controller_1.eventController.deleteEvent);
 exports.eventRouter = router;

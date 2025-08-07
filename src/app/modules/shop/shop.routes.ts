@@ -13,6 +13,7 @@ router.post("/category", verifyToken, authorizeRole("ADMIN"), categoryController
 router.get("/category", verifyToken, authorizeRole("ADMIN"), categoryController.getAllCategories);
 router.get("/category/:id", verifyToken, authorizeRole("ADMIN"), categoryController.getCategoryById);
 router.put("/category/:id", verifyToken, authorizeRole("ADMIN"), categoryController.updateCategory);
+router.post("/category/softDelete/:id", verifyToken, authorizeRole("ADMIN"), categoryController.softDeleteShopCategory);
 router.delete("/category/:id", verifyToken, authorizeRole("ADMIN"), categoryController.deleteCategory);
 
 

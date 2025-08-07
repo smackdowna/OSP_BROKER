@@ -19,6 +19,7 @@ router.delete("/userProfile/:userId", verifyToken, userProfileController.deleteU
 // User routes
 router.get("/", verifyToken, authorizeRole("ADMIN"), userController.getAllUsers);
 router.get("/:id", verifyToken, authorizeRole("ADMIN"), userController.getUserById);
+router.post("/softDelete/:id", verifyToken, userController.softDeleteUser);
 router.delete("/:id", verifyToken, authorizeRole("ADMIN"), userController.deleteUser);
 
 

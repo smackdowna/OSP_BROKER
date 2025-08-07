@@ -90,6 +90,25 @@ const updateTopic = catchAsyncError(async (req: Request, res: Response, next: Ne
     });
 });
 
+// close topic
+const closeTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic id is required",
+        });
+    }
+    const closedTopic = await topicServices.closeTopic(id, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Topic closed successfully",
+        data: closedTopic,
+    });
+});
+
 // delete topic
 const deleteTopic = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -173,6 +192,7 @@ export const topicController = {
     getAllTopics,
     getTopicById,
     updateTopic,
+    closeTopic,
     deleteTopic,
     deleteAllTopics,
 };

@@ -118,6 +118,25 @@ const updateComment = catchAsyncError(
   }
 );
 
+// soft delete comment
+const softDeleteComment = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  if (!id) {
+    return sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: "Comment id is required",
+    });
+  }
+  const deletedComment = await commentServices.softDeleteComment(id, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Comment soft deleted successfully",
+    data: deletedComment,
+  });
+});
+
 // delete comment
 const deleteComment = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -246,6 +265,7 @@ const deleteComment = catchAsyncError(
 
 export const commentController = {
   createComment,
+  softDeleteComment,
   deleteAllComments,
   getAllComments,
   getCommentByTopicId,

@@ -70,6 +70,7 @@ const updateUserProfile = catchAsyncError(
   }
 );
 
+
 // delete user profile
 const deleteUserProfile = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {

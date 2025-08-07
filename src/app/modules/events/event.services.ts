@@ -94,6 +94,30 @@ const updateEvent = async (eventId: string, updatedData: Partial<TEvent> , res:R
     return event;
 }
 
+// soft delete event
+const softDeleteEvent = async (eventId: string, res: Response) => {
+    // Check if the event exists
+    const eventExists = await prismadb.event.findFirst({
+        where: { id: eventId },
+    });
+
+    if (!eventExists) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Event not found",
+        });
+    }
+
+    // Soft delete the event
+    const deletedEvent = await prismadb.event.update({
+        where: { id: eventId },
+        data: { isDeleted: true },
+    });
+
+    return { event:deletedEvent };
+};
+
 // delete event
 const deleteEvent = async (eventId: string, res:Response) => {
     // Check if the event exists
@@ -123,5 +147,6 @@ export const eventServices = {
     getEvents,
     getEventById,
     updateEvent,
+    softDeleteEvent,
     deleteEvent
 };

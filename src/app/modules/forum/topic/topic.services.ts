@@ -181,6 +181,33 @@ const deleteTopic = async (topicId: string , res: Response) => {
     return {deletedTopic};
 }
 
+// close topic
+const closeTopic = async (topicId: string, res: Response) => {
+    const existingTopic = await prismadb.topic.findFirst({
+        where: {
+            id: topicId,
+        },
+    });
+    if (!existingTopic) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Topic not found with this id",
+            })  
+        )
+    }
+    const closedTopic = await prismadb.topic.update({
+        where: {
+            id: topicId,
+        },
+        data: {
+            isClosed: true,
+        },
+    });
+    return {closedTopic};
+}
+
 // delete all topics
 const deleteAllTopics = async (res: Response) => {
     const deletedTopics = await prismadb.topic.deleteMany();
@@ -201,6 +228,7 @@ export const topicServices = {
     getAllTopics,
     getTopicById,
     updateTopic,
+    closeTopic,
     deleteTopic,
     deleteAllTopics,  
 };

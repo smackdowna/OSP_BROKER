@@ -74,6 +74,17 @@ const updateBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
         data: updatedBid,
     });
 }));
+// soft delete bid
+const softDeleteAuctionBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const deletedBid = yield bid_services_1.bidServices.softDeleteAuctionBid(id);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Bid soft deleted successfully",
+        data: deletedBid,
+    });
+}));
 // delete bid
 const deleteBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -91,5 +102,6 @@ exports.bidController = {
     getBidsByAuctionId,
     getBidById,
     updateBid,
+    softDeleteAuctionBid,
     deleteBid,
 };

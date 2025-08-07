@@ -87,14 +87,14 @@ const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, fu
             data: {
                 type: "COMMENT",
                 message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
-                recipient: post.businessId,
+                recipient: post.userId,
                 sender: commenterId
             },
         });
         (0, notifyUser_1.notifyUser)(post.businessId, {
             type: "COMMENT",
             message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
-            recipient: post.businessId,
+            recipient: post.userId,
             sender: commenterId
         });
         newComment = yield prismaDb_1.default.comment.create({
@@ -112,7 +112,7 @@ const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, fu
 const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const notifications = yield prismaDb_1.default.notification.findMany({
         where: {
-            sender: userId,
+            recipient: userId,
         },
     });
     if (!notifications) {
@@ -190,6 +190,33 @@ const getCommentByTopicId = (topicId, res) => __awaiter(void 0, void 0, void 0, 
     }
     return { comment };
 });
+// soft delete comment
+const softDeleteComment = (commentId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to softDeleteComment");
+    }
+    const existingComment = yield prismaDb_1.default.comment.findFirst({
+        where: {
+            id: commentId,
+        },
+    });
+    if (!existingComment) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Comment not found with this id",
+        }));
+    }
+    const deletedComment = yield prismaDb_1.default.comment.update({
+        where: {
+            id: commentId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { deletedComment };
+});
 // delete all comments
 const deleteAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
     const comments = yield prismaDb_1.default.comment.deleteMany({});
@@ -266,6 +293,7 @@ exports.commentServices = {
     createComment,
     getAllComments,
     getCommentByTopicId,
+    softDeleteComment,
     deleteAllComments,
     getCommentById,
     updateComment,

@@ -93,6 +93,26 @@ const updateAuctionCategoryById = (id, category, res) => __awaiter(void 0, void 
     });
     return { category: updatedCategory };
 });
+// soft delete auction category
+const softDeleteAuctionCategory = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the category exists
+    const existingCategory = yield prismaDb_1.default.auctionCategory.findFirst({
+        where: { id },
+    });
+    if (!existingCategory) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Auction category not found",
+        }));
+    }
+    // Soft delete the auction category
+    const deletedCategory = yield prismaDb_1.default.auctionCategory.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+    return { category: deletedCategory };
+});
 // dleete auction category by id
 const deleteAuctionCategoryById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the category exists
@@ -121,5 +141,6 @@ exports.categoryServices = {
     getAllAuctionCategories,
     getAuctionsByCategoryId,
     updateAuctionCategoryById,
+    softDeleteAuctionCategory,
     deleteAuctionCategoryById,
 };

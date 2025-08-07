@@ -10,6 +10,7 @@ const router = (0, express_1.Router)();
 router.post("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.createPoll);
 router.get("/", poll_controller_1.pollController.getPolls);
 router.get("/:id", poll_controller_1.pollController.getPollById);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.softDeletePoll);
 router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.deletePoll);
 router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), poll_controller_1.pollController.updatePoll);
 router.post("/vote/:pollId", poll_controller_1.pollController.createPollAnalytics);

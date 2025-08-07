@@ -173,6 +173,30 @@ const deleteTopic = (topicId, res) => __awaiter(void 0, void 0, void 0, function
     });
     return { deletedTopic };
 });
+// close topic
+const closeTopic = (topicId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingTopic = yield prismaDb_1.default.topic.findFirst({
+        where: {
+            id: topicId,
+        },
+    });
+    if (!existingTopic) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Topic not found with this id",
+        }));
+    }
+    const closedTopic = yield prismaDb_1.default.topic.update({
+        where: {
+            id: topicId,
+        },
+        data: {
+            isClosed: true,
+        },
+    });
+    return { closedTopic };
+});
 // delete all topics
 const deleteAllTopics = (res) => __awaiter(void 0, void 0, void 0, function* () {
     const deletedTopics = yield prismaDb_1.default.topic.deleteMany();
@@ -190,6 +214,7 @@ exports.topicServices = {
     getAllTopics,
     getTopicById,
     updateTopic,
+    closeTopic,
     deleteTopic,
     deleteAllTopics,
 };

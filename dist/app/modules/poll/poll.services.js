@@ -107,6 +107,26 @@ const updatePoll = (id, updatedData, res) => __awaiter(void 0, void 0, void 0, f
     });
     return { poll: updatedPoll };
 });
+// soft delete poll
+const softDeletePoll = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the poll exists
+    const pollExists = yield prismaDb_1.default.poll.findFirst({
+        where: { id: id },
+    });
+    if (!pollExists) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Poll not found",
+        });
+    }
+    // Soft delete the poll
+    const deletedPoll = yield prismaDb_1.default.poll.update({
+        where: { id: id },
+        data: { isDeleted: true },
+    });
+    return { poll: deletedPoll };
+});
 // create poll analytics
 const createPollAnalytics = (pollId, index, res) => __awaiter(void 0, void 0, void 0, function* () {
     const pollAnalyticsExist = yield prismaDb_1.default.pollAnalytics.findFirst({
@@ -193,6 +213,7 @@ exports.pollservices = {
     createPoll,
     getPolls,
     getPollById,
+    softDeletePoll,
     deletePoll,
     updatePoll,
     createPollAnalytics,

@@ -43,6 +43,18 @@ const getPollById = catchAsyncError( async (req: Request, res: Response, next: N
     });
 });
 
+// soft delete poll
+const softDeletePoll = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const {id} = req.params;
+    await pollservices.softDeletePoll(id, res);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Poll soft deleted successfully",
+    });
+});
+
 
 // delete poll
 const deletePoll = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
@@ -101,6 +113,7 @@ export const pollController = {
     createPoll,
     getPolls,
     getPollById,
+    softDeletePoll,
     deletePoll,
     updatePoll,
     createPollAnalytics,

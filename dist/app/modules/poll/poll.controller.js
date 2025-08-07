@@ -48,6 +48,16 @@ const getPollById = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         data: poll,
     });
 }));
+// soft delete poll
+const softDeletePoll = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield poll_services_1.pollservices.softDeletePoll(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Poll soft deleted successfully",
+    });
+}));
 // delete poll
 const deletePoll = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -99,6 +109,7 @@ exports.pollController = {
     createPoll,
     getPolls,
     getPollById,
+    softDeletePoll,
     deletePoll,
     updatePoll,
     createPollAnalytics,

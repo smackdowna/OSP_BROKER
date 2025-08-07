@@ -89,7 +89,7 @@ const createComment = async (commentBody: TComment , res:Response) => {
           data: {
             type: "COMMENT",
             message: `Someone commented on your post "${post?.title}"`,
-            recipient: post.businessId,
+            recipient: post.userId,
             sender: commenterId
           },
         })
@@ -97,7 +97,7 @@ const createComment = async (commentBody: TComment , res:Response) => {
         notifyUser(post.businessId, {
             type: "COMMENT",
             message: `Someone commented on your post "${post?.title}"`,
-            recipient: post.businessId,
+            recipient: post.userId,
             sender: commenterId
         });
 
@@ -119,7 +119,7 @@ const createComment = async (commentBody: TComment , res:Response) => {
 const getAllNotifications = async (userId: string) => {
     const notifications = await prismadb.notification.findMany({
         where: {
-            sender: userId,
+            recipient: userId,
         },
     });
     if (!notifications) {
@@ -127,7 +127,7 @@ const getAllNotifications = async (userId: string) => {
     }
     return {notifications};
 }
-
+  
 // get all comments
 const getAllComments = async () => {
     // fetch pinned comments
@@ -199,6 +199,38 @@ const getCommentByTopicId = async (topicId: string , res:Response) => {
         })
     }
     return {comment};
+}
+
+// soft delete comment
+const softDeleteComment = async (commentId: string , res: Response) => {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to softDeleteComment");
+    }
+    const existingComment = await prismadb.comment.findFirst({
+        where: {
+            id: commentId,
+        },
+    });
+
+    if (!existingComment) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Comment not found with this id",
+            })
+        );
+    }
+
+    const deletedComment = await prismadb.comment.update({
+        where: {
+            id: commentId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return {deletedComment};
 }
 
 // delete all comments
@@ -288,6 +320,7 @@ export const commentServices = {
     createComment,
     getAllComments,
     getCommentByTopicId,
+    softDeleteComment,
     deleteAllComments,
     getCommentById,
     updateComment,
