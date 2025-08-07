@@ -10,6 +10,7 @@ const router= Router();
 router.post("/", verifyToken, authorizeRole("ADMIN"), pollController.createPoll);
 router.get("/", pollController.getPolls);
 router.get("/:id",pollController.getPollById);
+router.post("/softDelete/:id", verifyToken, authorizeRole("ADMIN"), pollController.softDeletePoll);
 router.delete("/:id", verifyToken, authorizeRole("ADMIN"), pollController.deletePoll);
 router.put("/:id", verifyToken, authorizeRole("ADMIN"), pollController.updatePoll);
 

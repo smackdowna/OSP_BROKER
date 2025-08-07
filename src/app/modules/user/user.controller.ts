@@ -31,6 +31,18 @@ const getUserById = catchAsyncError(
   }
 );
 
+// soft delete user
+const softDeleteUser = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const user = await userService.softDeleteUser(id, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User soft deleted successfully",
+    data: user,
+  });
+});
+
 // delete user
 const deleteUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -48,5 +60,6 @@ const deleteUser = catchAsyncError(
 export const userController = {
   getAllUsers,
   getUserById,
+  softDeleteUser,
   deleteUser,
 };

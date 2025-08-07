@@ -46,6 +46,33 @@ const getUserById = (userId, res) => __awaiter(void 0, void 0, void 0, function*
     }
     return { user };
 });
+// soft delete user 
+const softDeleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to softDeleteUser");
+    }
+    const user = yield prismaDb_1.default.user.findFirst({
+        where: {
+            id: userId,
+        },
+    });
+    if (!user) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "User not found",
+        });
+    }
+    yield prismaDb_1.default.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            isDeleted: true, // Assuming you have a field to mark soft deletion
+        },
+    });
+    return { user };
+});
 // delete user
 const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!res || typeof res.status !== "function") {
@@ -73,5 +100,6 @@ const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.userService = {
     getAllUsers,
     getUserById,
+    softDeleteUser,
     deleteUser,
 };

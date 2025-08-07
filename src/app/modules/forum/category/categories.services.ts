@@ -132,6 +132,33 @@ const updateCategory = async (categoryId: string,res: Response, category: Partia
     return {updatedCategory};
 }
 
+// soft delete category
+const softDeleteCategory = async (categoryId: string, res: Response) => {
+    const existingCategory = await prismadb.categories.findFirst({
+        where: {
+            id: categoryId,
+        },
+    });
+    if (!existingCategory) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Category not found with this id",
+            })
+        )
+    }
+    const deletedCategory = await prismadb.categories.update({
+        where: {
+            id: categoryId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return {category:deletedCategory};
+}
+
 // delete category
 const deleteCategory = async (categoryId: string ,res: Response) => {
     const existingCategory = await prismadb.categories.findFirst({
@@ -162,5 +189,6 @@ export const categoriesServices = {
     getAllCategories,
     getCategoryById,
     updateCategory,
+    softDeleteCategory,
     deleteCategory,
 };

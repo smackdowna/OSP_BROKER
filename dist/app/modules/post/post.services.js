@@ -218,6 +218,33 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
         return { post: updatedPost };
     }
 });
+// soft delete post
+const softDeletePost = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Post id is required");
+    }
+    const existingPost = yield prismaDb_1.default.post.findFirst({
+        where: {
+            id: id,
+        },
+    });
+    if (!existingPost) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Post not found with this id",
+        });
+    }
+    const deletedPost = yield prismaDb_1.default.post.update({
+        where: {
+            id: id,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { post: deletedPost };
+});
 // delete post
 const deletePost = (id, res, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.cookies.user.role !== "ADMIN") {
@@ -330,6 +357,7 @@ exports.postServices = {
     getPostsByBusinessId,
     getPostById,
     updatePost,
+    softDeletePost,
     deletePost,
     sharePost,
     unsharePost,

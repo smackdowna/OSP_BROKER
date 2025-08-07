@@ -115,6 +115,30 @@ const updatePoll = async (id: string, updatedData: Partial<TPoll>, res: Response
     return {poll: updatedPoll}
 }
 
+// soft delete poll
+const softDeletePoll = async (id: string, res: Response) => {
+    // Check if the poll exists
+    const pollExists = await prismadb.poll.findFirst({
+        where: { id: id },
+    });
+    
+    if (!pollExists) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Poll not found",
+        });
+    }
+    
+    // Soft delete the poll
+    const deletedPoll = await prismadb.poll.update({
+        where: { id: id },
+        data: { isDeleted: true },
+    });
+    
+    return {poll: deletedPoll};
+}
+
 // create poll analytics
 const createPollAnalytics= async(pollId: string, index: number , res:Response)=>{
 
@@ -217,10 +241,12 @@ const getPollAnalytics= async (pollId: string, res: Response) => {
     return pollAnalytics;
 }
 
+
 export const pollservices={
     createPoll,
     getPolls,
     getPollById,
+    softDeletePoll,
     deletePoll,
     updatePoll,
     createPollAnalytics,

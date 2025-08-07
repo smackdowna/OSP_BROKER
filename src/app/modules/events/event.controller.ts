@@ -60,6 +60,19 @@ export const updateEvent = catchAsyncError(async (req: Request, res: Response) =
     });
 });
 
+// soft delete event
+const softDeleteEvent = catchAsyncError(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    await eventServices.softDeleteEvent(id, res);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Event soft deleted successfully",
+    });
+});
+
 // delete event
  const deleteEvent = catchAsyncError(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -79,5 +92,6 @@ export const eventController = {
     getEvents,
     getEventById,
     updateEvent,
+    softDeleteEvent,
     deleteEvent
 };

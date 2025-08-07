@@ -17,7 +17,7 @@ import { groupChatRouter } from "../modules/chat/groupChat/groupChat.routes";
 import { liveConventionRoutes } from "../modules/liveConvention/liveConvention.routes";
 import { bookingRouter } from "../modules/booking/booking.routes";
 import { postRoutes } from "../modules/post/post.routes";
-import { auctionRouter } from "../modules/auction/auction/auction.routes";
+import { auctionRouter } from "../modules/auction/auction.routes";
 import { shopRouter } from "../modules/shop/shop.routes";
 
 

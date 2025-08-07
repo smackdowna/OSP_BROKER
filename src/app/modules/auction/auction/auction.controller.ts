@@ -163,6 +163,26 @@ if (req.files && req.files.length != 0) {
     });
 });
 
+// Soft delete auction
+const softDeleteAuction = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    if (!id) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Auction ID is required",
+        });
+    }
+
+    const deletedAuction = await auctionServices.softDeleteAuction(id, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction soft deleted successfully",
+        data: deletedAuction,
+    });
+});
+
 // Delete auction by ID
 const deleteAuction = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -179,5 +199,6 @@ export const auctionController = {
     getAllAuctions,
     getAuctionById,
     updateAuction,
+    softDeleteAuction,
     deleteAuction,
 };

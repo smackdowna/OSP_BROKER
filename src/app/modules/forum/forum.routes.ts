@@ -14,6 +14,7 @@ router.post('/topic',verifyToken,verifyMembership, topicController.createTopic);
 router.get('/topics', topicController.getAllTopics);
 router.get('/topic/:id',verifyToken,verifyMembership, topicController.getTopicById);
 router.put('/topic/:id',verifyToken,authorizeRole("MODERATOR"), topicController.updateTopic);
+router.post('/topic/closeTopic/:id', verifyToken, verifyMembership, topicController.closeTopic);
 router.delete('/topic/:id',verifyToken,authorizeRole("MODERATOR"), topicController.deleteTopic);
 router.delete('/topics',verifyToken,authorizeRole("MODERATOR"), topicController.deleteAllTopics);
 
@@ -22,8 +23,9 @@ router.post('/comment',verifyToken,verifyMembership, commentController.createCom
 router.get('/comments',verifyToken,verifyMembership, authorizeRole("ADMIN"), commentController.getAllComments);
 router.get('/comments/:topicId' , commentController.getCommentByTopicId);
 router.get('/comment/:id',verifyToken,verifyMembership, commentController.getCommentById);
-router.get('/notifications/:senderId',verifyToken,verifyMembership, commentController.getAllNotifications);
+router.get('/notifications/:userId',verifyToken,verifyMembership, commentController.getAllNotifications);
 router.put('/comment/:id',verifyToken,verifyMembership, commentController.updateComment);
+router.post('/comment/softDelete/:id', verifyToken, verifyMembership, commentController.softDeleteComment);
 router.delete('/comment/:id',verifyToken, commentController.deleteComment);
 router.delete('/comments',verifyToken,authorizeRole("ADMIN"), commentController.deleteAllComments);
 
@@ -32,6 +34,7 @@ router.post('/category',verifyToken,authorizeRole("ADMIN"), categoriesController
 router.get('/categories', categoriesController.getAllCategories);
 router.get('/category/:id',verifyToken, categoriesController.getCategoryById);
 router.put('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.updateCategory);
+router.post('/category/softDelete/:id', verifyToken, authorizeRole("ADMIN"), categoriesController.softDeleteCategory);
 router.delete('/category/:id',verifyToken,authorizeRole("ADMIN"), categoriesController.deleteCategory);
 
 // Forum routes

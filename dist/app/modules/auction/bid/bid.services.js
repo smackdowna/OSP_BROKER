@@ -146,6 +146,19 @@ const updateBid = (id, updateData) => __awaiter(void 0, void 0, void 0, function
     }
     return { bid: updatedBid };
 });
+// soft delete auction bid
+const softDeleteAuctionBid = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Bid ID is required");
+    }
+    const deletedBid = yield prismaDb_1.default.auctionBid.update({
+        where: { id: id },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { bid: deletedBid };
+});
 // delete a bid
 const deleteBid = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!id) {
@@ -162,5 +175,6 @@ exports.bidServices = {
     getBidsByAuctionId,
     getBidById,
     updateBid,
+    softDeleteAuctionBid,
     deleteBid,
 };

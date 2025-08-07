@@ -60,6 +60,16 @@ const updateAuctionCategory = (0, catchAsyncError_1.default)((req, res, next) =>
         data: updatedCategory,
     });
 }));
+// soft delete auction category
+const softDeleteAuctionCategory = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield category_services_1.categoryServices.softDeleteAuctionCategory(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction category soft deleted successfully",
+    });
+}));
 // Delete auction category by ID
 const deleteAuctionCategory = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -75,5 +85,6 @@ exports.categoryController = {
     getAllAuctionCategories,
     getAuctionsByCategoryById,
     updateAuctionCategory,
+    softDeleteAuctionCategory,
     deleteAuctionCategory,
 };

@@ -133,6 +133,30 @@ const updateCategory = (categoryId, res, category) => __awaiter(void 0, void 0, 
     });
     return { updatedCategory };
 });
+// soft delete category
+const softDeleteCategory = (categoryId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingCategory = yield prismaDb_1.default.categories.findFirst({
+        where: {
+            id: categoryId,
+        },
+    });
+    if (!existingCategory) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Category not found with this id",
+        }));
+    }
+    const deletedCategory = yield prismaDb_1.default.categories.update({
+        where: {
+            id: categoryId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { category: deletedCategory };
+});
 // delete category
 const deleteCategory = (categoryId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingCategory = yield prismaDb_1.default.categories.findFirst({
@@ -159,5 +183,6 @@ exports.categoriesServices = {
     getAllCategories,
     getCategoryById,
     updateCategory,
+    softDeleteCategory,
     deleteCategory,
 };

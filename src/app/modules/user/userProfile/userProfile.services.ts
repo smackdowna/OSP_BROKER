@@ -252,6 +252,7 @@ const getAllUserProfiles = async (res: Response) => {
     return {userProfiles};
 };
 
+
 // delete user profile
 const deleteUserProfile = async (userId: string, res: Response) => {
     if (!res || typeof res.status !== "function") {

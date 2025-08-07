@@ -68,6 +68,26 @@ const getAnnouncementById = (announcementId, res) => __awaiter(void 0, void 0, v
     }
     return announcement;
 });
+// soft delete announcement
+const softDeleteAnnouncement = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the announcement exists
+    const announcementExists = yield prismaDb_1.default.announcement.findFirst({
+        where: { id: id },
+    });
+    if (!announcementExists) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Announcement not found",
+        }));
+    }
+    // Soft delete the announcement
+    const deletedAnnouncement = yield prismaDb_1.default.announcement.update({
+        where: { id: id },
+        data: { isDeleted: true },
+    });
+    return { deletedAnnouncement };
+});
 // delete announcement by id
 const deleteAnnouncement = (announcementId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the announcement exists
@@ -111,6 +131,7 @@ exports.announcementServices = {
     createAnnouncement,
     getAnnouncements,
     getAnnouncementById,
+    softDeleteAnnouncement,
     deleteAnnouncement,
     updateAnnouncement
 };

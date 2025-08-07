@@ -14,6 +14,7 @@ router.post("/category", requireAuth_1.verifyToken, (0, authorizeRole_1.authoriz
 router.get("/category", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.getAllCategories);
 router.get("/category/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.getCategoryById);
 router.put("/category/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.updateCategory);
+router.post("/category/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.softDeleteShopCategory);
 router.delete("/category/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), category_controller_1.categoryController.deleteCategory);
 // pin routes
 router.post("/pin", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), pin_controller_1.pinController.createPin);

@@ -143,6 +143,23 @@ const updatePost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
         data: updatedPost,
     });
 }));
+// soft delete post
+const softDeletePost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Post id is required",
+        });
+    }
+    yield post_services_1.postServices.softDeletePost(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Post soft deleted successfully",
+    });
+}));
 // delete post
 const deletePost = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -202,6 +219,7 @@ exports.postController = {
     getPostsByBusinessId,
     getPostById,
     updatePost,
+    softDeletePost,
     deletePost,
     sharePost,
     unsharePost,

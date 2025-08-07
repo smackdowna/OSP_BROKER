@@ -53,6 +53,18 @@ const updateCategory = catchAsyncError(async (req: Request, res: Response, next:
     });
 });
 
+// soft delete category
+const softDeleteCategory = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const deletedCategory = await categoriesServices.softDeleteCategory(id , res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Category soft deleted successfully",
+        data: deletedCategory,
+    });
+});
+
 // delete category
 const deleteCategory = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -71,4 +83,5 @@ export const categoriesController = {
     getCategoryById,
     updateCategory,
     deleteCategory,
+    softDeleteCategory,
 };

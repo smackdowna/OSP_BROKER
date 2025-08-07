@@ -44,6 +44,18 @@ const getAnnouncementById = catchAsyncError( async (req: Request, res: Response,
     });
 })
 
+// soft delete announcement
+const softDeleteAnnouncement = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const {id} = req.params;
+    await announcementServices.softDeleteAnnouncement(id , res);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Announcement soft deleted successfully",
+    });
+})
+
 // delete announcement
 const deleteAnnouncement = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
     const {id} = req.params;
@@ -75,6 +87,7 @@ export const announcementController = {
     createAnnouncement,
     getAnnouncements,
     getAnnouncementById,
+    softDeleteAnnouncement,
     deleteAnnouncement,
     updateAnnouncement,
 };

@@ -236,6 +236,39 @@ const updatePost = async (id: string, postData: Partial<TPost>, res: Response , 
     }
 }
 
+// soft delete post
+const softDeletePost= async (id: string, res: Response) => {
+
+    if(!id){
+        throw new AppError(400, "Post id is required");
+    }
+
+    const existingPost = await prismadb.post.findFirst({
+        where: {
+            id: id,
+        },
+    });
+
+    if (!existingPost) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Post not found with this id",
+        });
+    }
+
+    const deletedPost = await prismadb.post.update({
+        where: {
+            id: id,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+
+    return { post: deletedPost };
+}
+
 // delete post
 const deletePost = async (id: string, res: Response , req:Request) => {
     if(req.cookies.user.role!=="ADMIN"){
@@ -368,6 +401,7 @@ export const postServices = {
     getPostsByBusinessId,
     getPostById,
     updatePost,
+    softDeletePost,
     deletePost,
     sharePost,
     unsharePost,

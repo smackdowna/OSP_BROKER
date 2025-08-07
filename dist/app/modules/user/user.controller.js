@@ -37,6 +37,17 @@ const getUserById = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         data: user,
     });
 }));
+// soft delete user
+const softDeleteUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const user = yield user_services_1.userService.softDeleteUser(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "User soft deleted successfully",
+        data: user,
+    });
+}));
 // delete user
 const deleteUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -51,5 +62,6 @@ const deleteUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
 exports.userController = {
     getAllUsers,
     getUserById,
+    softDeleteUser,
     deleteUser,
 };

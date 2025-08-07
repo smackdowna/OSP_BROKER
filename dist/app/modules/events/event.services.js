@@ -90,6 +90,26 @@ const updateEvent = (eventId, updatedData, res) => __awaiter(void 0, void 0, voi
     });
     return event;
 });
+// soft delete event
+const softDeleteEvent = (eventId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // Check if the event exists
+    const eventExists = yield prismaDb_1.default.event.findFirst({
+        where: { id: eventId },
+    });
+    if (!eventExists) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Event not found",
+        });
+    }
+    // Soft delete the event
+    const deletedEvent = yield prismaDb_1.default.event.update({
+        where: { id: eventId },
+        data: { isDeleted: true },
+    });
+    return { event: deletedEvent };
+});
 // delete event
 const deleteEvent = (eventId, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if the event exists
@@ -114,5 +134,6 @@ exports.eventServices = {
     getEvents,
     getEventById,
     updateEvent,
+    softDeleteEvent,
     deleteEvent
 };

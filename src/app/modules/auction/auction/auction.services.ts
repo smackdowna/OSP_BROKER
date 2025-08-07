@@ -215,6 +215,30 @@ const updateAuctionById = async (id: string, auctionData: Partial<TAuction>, res
     }
 }
 
+// soft delete auction
+const softDeleteAuction = async (id: string, res: Response) => {
+    const existingAuction = await prismadb.auction.findFirst({
+        where: { id },
+    });
+
+    if (!existingAuction) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Auction not found",
+        });
+    }
+
+    const deletedAuction = await prismadb.auction.update({
+        where: { id },
+        data: {
+            isDeleted: true,
+        },
+    });
+
+    return { auction: deletedAuction };
+}
+
 // delete auction
 const deleteAuctionById = async (id: string, res: Response) => {
     const existingAuction = await prismadb.auction.findFirst({
@@ -242,5 +266,6 @@ export const auctionServices = {
     getAllAuctions,
     getAuctionById,
     updateAuctionById,
+    softDeleteAuction,
     deleteAuctionById,
 };

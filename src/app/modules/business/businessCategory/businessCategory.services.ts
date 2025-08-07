@@ -100,6 +100,30 @@ const updateBusinessCategory = async (id: string, categoryData: TBusinessCategor
   return {category:updatedCategory};
 };
 
+// soft delete business category
+const softDeleteBusinessCategory = async (id: string, res: Response) => {
+  const existingCategory = await prismadb.businessCategory.findFirst({
+    where: { id },
+  });
+
+  if (!existingCategory) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Business category not found",
+    });
+  }
+
+  const deletedBusinessCategory = await prismadb.businessCategory.update({
+    where: { id },
+    data: {
+      isDeleted: true,
+    },
+  });
+
+  return {businessCategory: deletedBusinessCategory};
+};
+
 // delete business category
 const deleteBusinessCategory = async (id: string , res:Response) => {
   // Check if the category exists
@@ -129,5 +153,6 @@ export const businessCategoryServices = {
   getAllBusinessCategories,
     getBusinessCategoryById,
     updateBusinessCategory,
+    softDeleteBusinessCategory,
     deleteBusinessCategory,
 };

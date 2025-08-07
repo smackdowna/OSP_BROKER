@@ -60,6 +60,16 @@ const updateCategory = (0, catchAsyncError_1.default)((req, res) => __awaiter(vo
         data: updatedCategory,
     });
 }));
+// soft delete shop category
+const softDeleteShopCategory = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    yield category_services_1.categoryService.softDeleteCategory(id, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Category soft deleted successfully",
+    });
+}));
 // Delete category
 const deleteCategory = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -75,5 +85,6 @@ exports.categoryController = {
     getAllCategories,
     getCategoryById,
     updateCategory,
+    softDeleteShopCategory,
     deleteCategory,
 };

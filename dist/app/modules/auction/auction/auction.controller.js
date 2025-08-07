@@ -131,6 +131,24 @@ const updateAuction = (0, catchAsyncError_1.default)((req, res, next) => __await
         data: updatedAuction,
     });
 }));
+// Soft delete auction
+const softDeleteAuction = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (!id) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Auction ID is required",
+        });
+    }
+    const deletedAuction = yield auction_services_1.auctionServices.softDeleteAuction(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Auction soft deleted successfully",
+        data: deletedAuction,
+    });
+}));
 // Delete auction by ID
 const deleteAuction = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -146,5 +164,6 @@ exports.auctionController = {
     getAllAuctions,
     getAuctionById,
     updateAuction,
+    softDeleteAuction,
     deleteAuction,
 };

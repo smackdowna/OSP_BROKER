@@ -201,6 +201,26 @@ const updateAuctionById = (id, auctionData, res) => __awaiter(void 0, void 0, vo
         return { auction: updatedAuction };
     }
 });
+// soft delete auction
+const softDeleteAuction = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingAuction = yield prismaDb_1.default.auction.findFirst({
+        where: { id },
+    });
+    if (!existingAuction) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Auction not found",
+        });
+    }
+    const deletedAuction = yield prismaDb_1.default.auction.update({
+        where: { id },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { auction: deletedAuction };
+});
 // delete auction
 const deleteAuctionById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingAuction = yield prismaDb_1.default.auction.findFirst({
@@ -223,5 +243,6 @@ exports.auctionServices = {
     getAllAuctions,
     getAuctionById,
     updateAuctionById,
+    softDeleteAuction,
     deleteAuctionById,
 };

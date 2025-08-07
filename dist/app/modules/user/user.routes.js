@@ -19,5 +19,6 @@ router.delete("/userProfile/:userId", requireAuth_1.verifyToken, userProfile_con
 // User routes
 router.get("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), user_controller_1.userController.getAllUsers);
 router.get("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), user_controller_1.userController.getUserById);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, user_controller_1.userController.softDeleteUser);
 router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), user_controller_1.userController.deleteUser);
 exports.userRoute = router;

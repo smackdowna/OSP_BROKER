@@ -10,6 +10,7 @@ const router = (0, express_1.Router)();
 router.post("/", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.createAnnouncement);
 router.get("/", announcement_controller_1.announcementController.getAnnouncements);
 router.get("/:id", announcement_controller_1.announcementController.getAnnouncementById);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.softDeleteAnnouncement);
 router.delete("/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.deleteAnnouncement);
 router.put("/:id", requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), announcement_controller_1.announcementController.updateAnnouncement);
 exports.announcementRouter = router;
