@@ -185,7 +185,32 @@ model business{
     representative Representative[] @relation("businessToRepresentative")
     businessPageFollower BusinessPageFollower[] @relation("business to businessPageFollowers")
     post Post[] @relation("businessToPost")
+    businessRateCard BusinessRateCard[] @relation("businessToBusinessRateCard")
 
+}
+
+model BusinessRateCard{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    businessId String @db.ObjectId
+    Business business @relation("businessToBusinessRateCard",fields: [businessId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    name String
+    logo String?
+    currency String
+
+    BusinessRateCardCategory BusinessRateCardCategory[] @relation("businessRateCardToBusinessRateCardCategory")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model BusinessRateCardCategory{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    businessRateCardId String @db.ObjectId
+    BusinessRateCard BusinessRateCard @relation("businessRateCardToBusinessRateCardCategory",fields: [businessRateCardId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+    orderIndex Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model BusinessCategory{
