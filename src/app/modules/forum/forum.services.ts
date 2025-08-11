@@ -141,6 +141,15 @@ const softDeleteForum = async (forumId: string, res: Response) => {
             message: "Forum not found with this id",
         }));
     }
+
+    if( existingForum.isDeleted === true) {
+        return(sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Forum is already soft deleted.",
+        }));
+    }
+
     const deletedForum = await prismadb.forum.update({
         where: {
             id: forumId,

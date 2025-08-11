@@ -86,6 +86,32 @@ const updateBadge = (id, badgeData, res) => __awaiter(void 0, void 0, void 0, fu
     });
     return { badge: updatedBadge };
 });
+// soft delete badge
+const softDeleteBadge = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Please provide badge id");
+    }
+    const existingBadge = yield prismaDb_1.default.badge.findFirst({
+        where: { id },
+    });
+    if (!existingBadge) {
+        return res.status(404).json({
+            success: false,
+            message: "Badge not found",
+        });
+    }
+    if (existingBadge.isDeleted) {
+        return res.status(400).json({
+            success: false,
+            message: "Badge is already soft deleted.",
+        });
+    }
+    const deletedBadge = yield prismaDb_1.default.badge.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+    return { badge: deletedBadge };
+});
 // delete badge
 const deleteBadge = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingBadge = yield prismaDb_1.default.badge.findFirst({
@@ -126,6 +152,7 @@ exports.badgeServices = {
     getAllBadges,
     getBadgeById,
     updateBadge,
+    softDeleteBadge,
     deleteBadge,
     buyBadge
 };

@@ -694,6 +694,16 @@ const softDeleteBusinessPage = async (id: string, res: Response) => {
         )
     }
 
+    if(existingBusiness.isDeleted=== true){
+        return (
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Business page is already soft deleted."
+            })
+        )
+    }
+
     const updatedBusiness = await prismadb.business.update({
         where: {
             id: id

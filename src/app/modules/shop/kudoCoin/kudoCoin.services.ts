@@ -83,6 +83,38 @@ const updateKudoCoin = async (id: string, kudoCoin: TKudoCoin, res: Response) =>
     return { kudoCoin: updatedKudoCoin };
 }
 
+// soft delete kudo coin
+const softDeleteKudoCoin = async (id: string, res: Response) => {
+    if (!id) {
+        throw new AppError(400, "Please provide a valid Kudo Coin ID.");
+    }
+
+    const existingKudoCoin = await prismadb.kudoCoin.findFirst({
+        where: { id },
+    });
+
+    if (!existingKudoCoin) {
+        return res.status(404).json({
+            success: false,
+            message: "Kudo coin not found",
+        });
+    }
+
+    if (existingKudoCoin.isDeleted) {
+        return res.status(400).json({
+            success: false,
+            message: "Kudo coin is already soft deleted.",
+        });
+    }
+
+    const deletedKudoCoin = await prismadb.kudoCoin.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+
+    return { kudoCoin: deletedKudoCoin };
+}
+
 // delete kudo coin
 const deleteKudoCoin = async (id: string, res: Response) => {
     const existingKudoCoin = await prismadb.kudoCoin.findFirst({
@@ -138,6 +170,7 @@ export const kudoCoinServices = {
     getAllKudoCoins,
     getKudoCoinById,
     updateKudoCoin,
+    softDeleteKudoCoin,
     deleteKudoCoin,
     buyKudoCoin
 }

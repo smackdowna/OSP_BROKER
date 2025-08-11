@@ -129,6 +129,14 @@ const softDeletePoll = async (id: string, res: Response) => {
             message: "Poll not found",
         });
     }
+
+    if( pollExists.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Poll is already soft deleted.",
+        });
+    }
     
     // Soft delete the poll
     const deletedPoll = await prismadb.poll.update({

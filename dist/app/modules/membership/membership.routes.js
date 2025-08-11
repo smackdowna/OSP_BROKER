@@ -19,5 +19,6 @@ router.post("/", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("
 router.get("/", membership_controller_1.membershipController.getAllMembershipPlans);
 router.get("/:id", membership_controller_1.membershipController.getMembershipPlanById);
 router.put("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.updateMembershipPlan);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.softDeleteMembershipPlan);
 router.delete("/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), membership_controller_1.membershipController.deleteMembershipPlan);
 exports.membershipRouter = router;

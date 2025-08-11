@@ -148,6 +148,15 @@ const softDeleteCategory = async (categoryId: string, res: Response) => {
             })
         )
     }
+
+    if( existingCategory.isDeleted === true) {
+        return(sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Category is already soft deleted.",
+        }));
+    }
+    
     const deletedCategory = await prismadb.categories.update({
         where: {
             id: categoryId,

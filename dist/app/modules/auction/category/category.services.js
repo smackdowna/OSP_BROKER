@@ -106,6 +106,13 @@ const softDeleteAuctionCategory = (id, res) => __awaiter(void 0, void 0, void 0,
             message: "Auction category not found",
         }));
     }
+    if (existingCategory.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Auction category is already soft deleted.",
+        });
+    }
     // Soft delete the auction category
     const deletedCategory = yield prismaDb_1.default.auctionCategory.update({
         where: { id },

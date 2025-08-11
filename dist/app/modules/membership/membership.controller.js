@@ -65,6 +65,17 @@ const updateMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => 
         data: updatedMembershipPlan,
     });
 }));
+// soft delete membership plan
+const softDeleteMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const deletedMembershipPlan = yield membership_services_1.membershipServices.softDeleteMembershipPlan(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Membership plan soft deleted successfully",
+        data: deletedMembershipPlan,
+    });
+}));
 // delete membership plan
 const deleteMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -140,6 +151,7 @@ exports.membershipController = {
     getAllMembershipPlans,
     getMembershipPlanById,
     updateMembershipPlan,
+    softDeleteMembershipPlan,
     deleteMembershipPlan,
     createUserMembership,
     getAllUserMemberships,

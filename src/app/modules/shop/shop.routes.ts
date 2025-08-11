@@ -22,6 +22,7 @@ router.post("/pin", verifyToken,authorizeRole("ADMIN"), pinController.createPin)
 router.get("/pin", verifyToken,  pinController.getAllPins);
 router.get("/pin/:id", verifyToken,  pinController.getPinById);
 router.put("/pin/:id", verifyToken,  pinController.updatePin);
+router.post("/pin/softDelete/:id", verifyToken,  pinController.softDeletePin);
 router.delete("/pin/:id", verifyToken,  pinController.deletePin);
 router.post("/pin/buy/:pinId", verifyToken, pinController.buyPin);
 router.post("/pin/topic/:pinId", verifyToken, pinController.pinTopic);
@@ -35,6 +36,7 @@ router.post("/kudoCoin", verifyToken, authorizeRole("ADMIN"), kudoCoinController
 router.get("/kudoCoin", verifyToken, kudoCoinController.getAllKudoCoins);
 router.get("/kudoCoin/:id", verifyToken, kudoCoinController.getKudoCoinById);
 router.put("/kudoCoin/:id", verifyToken, authorizeRole("ADMIN"), kudoCoinController.updateKudoCoin);
+router.post("/kudoCoin/softDelete/:id", verifyToken, authorizeRole("ADMIN"), kudoCoinController.softDeleteKudoCoin);
 router.delete("/kudoCoin/:id", verifyToken, authorizeRole("ADMIN"), kudoCoinController.deleteKudoCoin);
 router.post("/kudoCoin/buy/:id", verifyToken, kudoCoinController.buyKudoCoin);
 
@@ -44,6 +46,7 @@ router.post("/badge", verifyToken, authorizeRole("ADMIN"), badgeController.creat
 router.get("/badge", verifyToken, badgeController.getAllBadges);
 router.get("/badge/:id", verifyToken, badgeController.getBadgeById);
 router.put("/badge/:id", verifyToken, authorizeRole("ADMIN"), badgeController.updateBadge);
+router.post("/badge/softDelete/:id", verifyToken, authorizeRole("ADMIN"), badgeController.softDeleteBadge);
 router.delete("/badge/:id", verifyToken, authorizeRole("ADMIN"), badgeController.deleteBadge);
 router.post("/badge/buy/:badgeId", verifyToken, badgeController.buyBadge);
 

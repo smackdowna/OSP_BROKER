@@ -83,6 +83,34 @@ const updatePin = (id, pinData, res) => __awaiter(void 0, void 0, void 0, functi
     });
     return { pin: updatedPin };
 });
+// soft delete pin
+const softDeletePin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Pin ID is required");
+    }
+    const existingPin = yield prismaDb_1.default.pin.findFirst({
+        where: { id }
+    });
+    if (!existingPin) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Pin not found",
+        });
+    }
+    if (existingPin.isDeleted) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Pin is already soft deleted.",
+        });
+    }
+    const deletedPin = yield prismaDb_1.default.pin.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+    return { pin: deletedPin };
+});
 // delete pin
 const deletePin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingPin = yield prismaDb_1.default.pin.findFirst({
@@ -326,6 +354,7 @@ exports.pinServices = {
     getAllPins,
     getPinById,
     updatePin,
+    softDeletePin,
     deletePin,
     buyPin,
     pinTopic,

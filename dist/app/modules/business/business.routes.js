@@ -25,6 +25,7 @@ router.post('/category', requireAuth_1.verifyToken, (0, authorizeRole_1.authoriz
 router.get('/category', businessCategory_controller_1.businessCategoryController.getAllBusinessCategories);
 router.get('/category/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), businessCategory_controller_1.businessCategoryController.getBusinessCategoryById);
 router.put('/category/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), businessCategory_controller_1.businessCategoryController.updateBusinessCategory);
+router.post('/category/softDelete/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), businessCategory_controller_1.businessCategoryController.softDeleteBusinessCategory);
 router.delete('/category/:id', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), businessCategory_controller_1.businessCategoryController.deleteBusinessCategory);
 // Business routes
 router.post('/', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, business_controller_1.businessController.createBusiness);

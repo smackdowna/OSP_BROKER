@@ -74,10 +74,22 @@ const updateMessageReadStatus = (0, catchAsyncError_1.default)((req, res, next) 
         data: updatedMessage
     });
 }));
+// soft delete message
+const softDeleteMessage = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const deletedMessage = yield chat_services_1.chatServices.softDeleteMessage(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Message soft deleted successfully",
+        data: deletedMessage
+    });
+}));
 exports.chatController = {
     createMessage,
     getMessages,
     getUniqueReciepientsWithMessage,
     getUnreadMessages,
-    updateMessageReadStatus
+    updateMessageReadStatus,
+    softDeleteMessage
 };

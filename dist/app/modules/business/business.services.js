@@ -544,6 +544,13 @@ const softDeleteBusinessPage = (id, res) => __awaiter(void 0, void 0, void 0, fu
             message: "Business not found with this id."
         }));
     }
+    if (existingBusiness.isDeleted === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Business page is already soft deleted."
+        }));
+    }
     const updatedBusiness = yield prismaDb_1.default.business.update({
         where: {
             id: id

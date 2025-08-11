@@ -120,6 +120,47 @@ const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, functi
     }
     return { notifications };
 });
+// soft delete notification 
+const softDeleteNotification = (notificationId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to softDeleteNotification");
+    }
+    if (!notificationId) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Notification id is required",
+        }));
+    }
+    const existingNotification = yield prismaDb_1.default.notification.findFirst({
+        where: {
+            id: notificationId,
+        },
+    });
+    if (!existingNotification) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Notification not found with this id",
+        }));
+    }
+    if (existingNotification.isDeleted === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Notification is already soft deleted.",
+        }));
+    }
+    const deletedNotification = yield prismaDb_1.default.notification.update({
+        where: {
+            id: notificationId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { deletedNotification };
+});
 // get all comments
 const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
     // fetch pinned comments
@@ -195,6 +236,13 @@ const softDeleteComment = (commentId, res) => __awaiter(void 0, void 0, void 0, 
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to softDeleteComment");
     }
+    if (!commentId) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment id is required",
+        }));
+    }
     const existingComment = yield prismaDb_1.default.comment.findFirst({
         where: {
             id: commentId,
@@ -205,6 +253,13 @@ const softDeleteComment = (commentId, res) => __awaiter(void 0, void 0, void 0, 
             statusCode: 404,
             success: false,
             message: "Comment not found with this id",
+        }));
+    }
+    if (existingComment.isDeleted === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Comment is already soft deleted.",
         }));
     }
     const deletedComment = yield prismaDb_1.default.comment.update({
@@ -299,4 +354,5 @@ exports.commentServices = {
     updateComment,
     deleteComment,
     getAllNotifications,
+    softDeleteNotification
 };

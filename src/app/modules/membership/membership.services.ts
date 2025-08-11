@@ -111,6 +111,48 @@ const updateMembershipPlan = async(id: string,res:Response, membershipPlanInterf
     return {membershipPlan};
 };
 
+// soft delete membership plan
+const softDeleteMembershipPlan = async(id: string, res:Response) => {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to deleteTopic");
+    }
+
+    if(!id) {
+        throw new AppError(400, "please provide id");
+    }
+    const existingMembershipPlan = await prismadb.membershipPlan.findFirst({
+        where: {
+            id: id,
+        },
+    });
+
+    if (!existingMembershipPlan) {
+        sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "No membership plan found with this id",
+        });
+    }
+
+    if(existingMembershipPlan?.isDeleted === true) {
+        return(sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Membership plan is already soft deleted.",
+        }));
+    }
+    
+    const deletedMembershipPlan = await prismadb.membershipPlan.update({
+        where: {
+            id: id,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return {membershipPlan:deletedMembershipPlan};
+}
+
 // delete membership plan
 const deleteMembershipPlan = async(id: string , res:Response) => {
     if (!res || typeof res.status !== "function") {
@@ -263,6 +305,7 @@ export const membershipServices = {
     getAllMembershipPlans,
     getMembershipPlanById,
     updateMembershipPlan,
+    softDeleteMembershipPlan,
     deleteMembershipPlan,
     createUserMembership,
     getAllUserMemberships,

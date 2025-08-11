@@ -21,6 +21,7 @@ router.post("/pin", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole
 router.get("/pin", requireAuth_1.verifyToken, pin_controller_1.pinController.getAllPins);
 router.get("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.getPinById);
 router.put("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.updatePin);
+router.post("/pin/softDelete/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.softDeletePin);
 router.delete("/pin/:id", requireAuth_1.verifyToken, pin_controller_1.pinController.deletePin);
 router.post("/pin/buy/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.buyPin);
 router.post("/pin/topic/:pinId", requireAuth_1.verifyToken, pin_controller_1.pinController.pinTopic);
@@ -33,6 +34,7 @@ router.post("/kudoCoin", requireAuth_1.verifyToken, (0, authorizeRole_1.authoriz
 router.get("/kudoCoin", requireAuth_1.verifyToken, kudoCoin_controller_1.kudoCoinController.getAllKudoCoins);
 router.get("/kudoCoin/:id", requireAuth_1.verifyToken, kudoCoin_controller_1.kudoCoinController.getKudoCoinById);
 router.put("/kudoCoin/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), kudoCoin_controller_1.kudoCoinController.updateKudoCoin);
+router.post("/kudoCoin/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), kudoCoin_controller_1.kudoCoinController.softDeleteKudoCoin);
 router.delete("/kudoCoin/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), kudoCoin_controller_1.kudoCoinController.deleteKudoCoin);
 router.post("/kudoCoin/buy/:id", requireAuth_1.verifyToken, kudoCoin_controller_1.kudoCoinController.buyKudoCoin);
 // badge routes
@@ -40,6 +42,7 @@ router.post("/badge", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRo
 router.get("/badge", requireAuth_1.verifyToken, badge_controller_1.badgeController.getAllBadges);
 router.get("/badge/:id", requireAuth_1.verifyToken, badge_controller_1.badgeController.getBadgeById);
 router.put("/badge/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.updateBadge);
+router.post("/badge/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.softDeleteBadge);
 router.delete("/badge/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.deleteBadge);
 router.post("/badge/buy/:badgeId", requireAuth_1.verifyToken, badge_controller_1.badgeController.buyBadge);
 exports.shopRouter = router;

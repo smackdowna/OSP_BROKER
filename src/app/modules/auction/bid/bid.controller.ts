@@ -80,7 +80,7 @@ const updateBid = catchAsyncError(async (req: Request, res: Response, next: Next
 const softDeleteAuctionBid = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const deletedBid = await bidServices.softDeleteAuctionBid(id);
+    const deletedBid = await bidServices.softDeleteAuctionBid(id , res);
 
     return sendResponse(res, {
         statusCode: 200,

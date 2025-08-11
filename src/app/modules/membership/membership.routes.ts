@@ -18,6 +18,7 @@ router.post("/", verifyToken,authorizeRole("ADMIN"), membershipController.create
 router.get("/", membershipController.getAllMembershipPlans);
 router.get("/:id",  membershipController.getMembershipPlanById);
 router.put("/:id", verifyToken,authorizeRole("ADMIN"), membershipController.updateMembershipPlan);
+router.post("/softDelete/:id", verifyToken, authorizeRole("ADMIN"), membershipController.softDeleteMembershipPlan);
 router.delete("/:id", verifyToken,authorizeRole("ADMIN"), membershipController.deleteMembershipPlan);
 
 export const membershipRouter= router;

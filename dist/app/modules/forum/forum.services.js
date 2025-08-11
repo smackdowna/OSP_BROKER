@@ -149,6 +149,13 @@ const softDeleteForum = (forumId, res) => __awaiter(void 0, void 0, void 0, func
             message: "Forum not found with this id",
         }));
     }
+    if (existingForum.isDeleted === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Forum is already soft deleted.",
+        }));
+    }
     const deletedForum = yield prismaDb_1.default.forum.update({
         where: {
             id: forumId,

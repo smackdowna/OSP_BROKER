@@ -62,6 +62,40 @@ const getGroupChatByBusinessId = async (businessId: string ,res:Response) => {
   return { groupChat };
 };
 
+// soft delete group chat
+const softDeleteGroupChat = async (groupChatId: string, res: Response) => {
+    if (!groupChatId) {
+        throw new AppError(400, "Please provide group chat ID");
+    }
+
+    const groupChat = await prismadb.groupChat.findFirst({
+        where: { id: groupChatId },
+    });
+
+    if (!groupChat) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Group chat not found",
+        });
+    }
+
+    if (groupChat?.isDeleted) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Group chat is already soft deleted",
+        });
+    }
+
+    const deletedGroupChat = await prismadb.groupChat.update({
+        where: { id: groupChatId },
+        data: { isDeleted: true },
+    });
+
+    return { groupChat: deletedGroupChat };
+};
+
 // delete group chat
 const deleteGroupChat = async (groupChatId: string) => {
     if (!groupChatId) {
@@ -207,7 +241,7 @@ const sendGroupMessage = async (message: TGroupMessage) => {
         throw new AppError(403, "You are not a member of this group chat");
     }
 
-
+    
     const newMessage = await prismadb.groupMessage.create({
         data: {
             groupChatId,
@@ -215,11 +249,11 @@ const sendGroupMessage = async (message: TGroupMessage) => {
             content,
         },
     });
-
-
+    
     io.to(groupChatId).emit("newGroupMessage", {
         message: newMessage
     });
+
 
     return { message: newMessage };
 }
@@ -284,12 +318,64 @@ const getGroupMessages = async (groupChatId: string , req: Request , res:Respons
     return { messages };
 }
 
+// soft delete group message
+const softDeleteGroupMessage = async(groupchatId: string, messageId: string, res: Response) => {
+    if (!groupchatId || !messageId) {
+        throw new AppError(400, "Please provide group chat ID and message ID");
+    }
+
+    const groupChat = await prismadb.groupChat.findFirst({
+        where: { id: groupchatId },
+    });
+
+    if (!groupChat) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Group chat not found",
+        });
+    }
+
+    const message = await prismadb.groupMessage.findFirst({
+        where: { id: messageId, groupChatId: groupchatId },
+    });
+
+    if (!message) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Message not found in this group chat",
+        });
+    }
+
+    if (message.isDeleted) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Message is already soft deleted",
+        });
+    }
+
+    const deletedMessage = await prismadb.groupMessage.update({
+        where: { id: messageId },
+        data: { isDeleted: true },
+    });
+
+    io.to(groupchatId).emit("groupMessageDeleted", {
+        message: deletedMessage,
+    });
+
+    return { message: deletedMessage };
+}
+
 export const groupChatServices = {
     createGroupChat,
     getGroupChatByBusinessId,
+    softDeleteGroupChat,
     deleteGroupChat,
     joinGroupChat,
     leaveGroupChat,
     sendGroupMessage,
-    getGroupMessages
+    getGroupMessages,
+    softDeleteGroupMessage
 };

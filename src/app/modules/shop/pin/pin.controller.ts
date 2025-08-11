@@ -79,6 +79,21 @@ const updatePin = catchAsyncError(async (req: Request, res: Response) => {
     });
 });
 
+// soft delete pin
+const softDeletePin = catchAsyncError(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+
+    const deletedPin = await pinServices.softDeletePin(id, res);
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Pin soft deleted successfully",
+        data: deletedPin,
+    });
+});
+
 // delete pin
 const deletePin = catchAsyncError(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -195,6 +210,7 @@ export const pinController = {
     getAllPins,
     getPinById,
     updatePin,
+    softDeletePin,
     deletePin,
     buyPin,
     pinTopic,

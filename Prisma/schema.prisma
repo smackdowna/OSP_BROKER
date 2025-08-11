@@ -476,6 +476,7 @@ model GroupChat{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     businessId String @db.ObjectId @unique
+    isDeleted Boolean @default(false)
 
     Business business @relation("businessToGroupChat", fields: [businessId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     groupMessages GroupMessage[] @relation("groupToGroupMessages")
@@ -668,6 +669,7 @@ model pin{
     price Float
     bought Boolean? @default(false)
     duration Int //in days
+    isDeleted Boolean @default(false)
 
     userPin UserPin[] @relation("userToPin")
     pinnedTopic pinnedTopic[] @relation("pinToTopic")
@@ -764,6 +766,7 @@ model kudoCoin{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     price Float
     description String
+    isDeleted Boolean @default(false)
 
     userKudoCoin userKudoCoin[] @relation("kudoCoinToUserKudoCoin")
 
@@ -791,6 +794,7 @@ model Badge{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     description String
+    isDeleted Boolean @default(false)
     userBadge UserBadge[] @relation("badgeToUserBadge")
 
     createdAt DateTime @default(now())

@@ -10,5 +10,6 @@ router.get('/recipients', verifyToken, chatController.getUniqueReciepientsWithMe
 router.get('/:recipientId', verifyToken, chatController.getMessages); 
 router.get('/unreadMessages/:recipientId', verifyToken, chatController.getUnreadMessages);
 router.post('/updateReadStatus/:recipientId', verifyToken, chatController.updateMessageReadStatus);
+router.post('/softDelete/:id', verifyToken, chatController.softDeleteMessage);
 
 export const chatRouter = router;

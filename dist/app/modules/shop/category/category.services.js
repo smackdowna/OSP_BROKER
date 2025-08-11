@@ -109,6 +109,13 @@ const softDeleteCategory = (id, res) => __awaiter(void 0, void 0, void 0, functi
             message: "Category not found",
         });
     }
+    if (existingCategory.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Category is already soft deleted.",
+        });
+    }
     const deletedCategory = yield prismaDb_1.default.shopCategory.update({
         where: { id },
         data: { isDeleted: true },

@@ -127,6 +127,60 @@ const getAllNotifications = async (userId: string) => {
     }
     return {notifications};
 }
+
+
+// soft delete notification 
+const softDeleteNotification= async (notificationId: string, res: Response) => {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to softDeleteNotification");
+    }
+
+    if (!notificationId) {
+        return(
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Notification id is required",
+            })
+        );
+    }
+
+    const existingNotification = await prismadb.notification.findFirst({
+        where: {
+            id: notificationId,
+        },
+    });
+
+    if (!existingNotification) {
+        return(
+            sendResponse(res, {
+                statusCode: 404,
+                success: false,
+                message: "Notification not found with this id",
+            })
+        );
+    }
+
+    if(existingNotification.isDeleted === true) {
+        return(
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Notification is already soft deleted.",
+            })
+        );
+    }
+
+    const deletedNotification = await prismadb.notification.update({
+        where: {
+            id: notificationId,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return {deletedNotification};
+}
   
 // get all comments
 const getAllComments = async () => {
@@ -206,6 +260,17 @@ const softDeleteComment = async (commentId: string , res: Response) => {
     if (!res || typeof res.status !== "function") {
         throw new Error("Invalid Response object passed to softDeleteComment");
     }
+
+    if (!commentId) {
+        return(
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Comment id is required",
+            })
+        );
+    }
+
     const existingComment = await prismadb.comment.findFirst({
         where: {
             id: commentId,
@@ -218,6 +283,16 @@ const softDeleteComment = async (commentId: string , res: Response) => {
                 statusCode: 404,
                 success: false,
                 message: "Comment not found with this id",
+            })
+        );
+    }
+
+    if(existingComment.isDeleted === true) {
+        return(
+            sendResponse(res, {
+                statusCode: 400,
+                success: false,
+                message: "Comment is already soft deleted.",
             })
         );
     }
@@ -326,4 +401,5 @@ export const commentServices = {
     updateComment,
     deleteComment,
     getAllNotifications,
+    softDeleteNotification
 };

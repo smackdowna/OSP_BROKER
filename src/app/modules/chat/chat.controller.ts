@@ -69,10 +69,23 @@ const updateMessageReadStatus = catchAsyncError(async (req: Request, res: Respon
     });
 });
 
+// soft delete message
+const softDeleteMessage = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const deletedMessage = await chatServices.softDeleteMessage(id, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Message soft deleted successfully",
+        data: deletedMessage
+    });
+});
+
 export const chatController = {
     createMessage,
     getMessages,
     getUniqueReciepientsWithMessage,
     getUnreadMessages , 
-    updateMessageReadStatus
+    updateMessageReadStatus,
+    softDeleteMessage
 };

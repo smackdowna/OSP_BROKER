@@ -197,6 +197,14 @@ const closeTopic = async (topicId: string, res: Response) => {
             })  
         )
     }
+
+    if( existingTopic.isClosed === true) {
+        return(sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic is already closed.",
+        }));
+    }
     const closedTopic = await prismadb.topic.update({
         where: {
             id: topicId,

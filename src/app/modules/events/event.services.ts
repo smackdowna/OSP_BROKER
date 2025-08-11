@@ -109,6 +109,14 @@ const softDeleteEvent = async (eventId: string, res: Response) => {
         });
     }
 
+    if( eventExists.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Event is already soft deleted.",
+        });
+    }
+
     // Soft delete the event
     const deletedEvent = await prismadb.event.update({
         where: { id: eventId },

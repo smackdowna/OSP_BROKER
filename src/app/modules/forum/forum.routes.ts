@@ -23,7 +23,8 @@ router.post('/comment',verifyToken,verifyMembership, commentController.createCom
 router.get('/comments',verifyToken,verifyMembership, authorizeRole("ADMIN"), commentController.getAllComments);
 router.get('/comments/:topicId' , commentController.getCommentByTopicId);
 router.get('/comment/:id',verifyToken,verifyMembership, commentController.getCommentById);
-router.get('/notifications/:userId',verifyToken,verifyMembership, commentController.getAllNotifications);
+router.get('/notifications',verifyToken,verifyMembership, commentController.getAllNotifications);
+router.post('/notification/softDelete/:id', verifyToken, verifyMembership, commentController.softDeleteNotification);
 router.put('/comment/:id',verifyToken,verifyMembership, commentController.updateComment);
 router.post('/comment/softDelete/:id', verifyToken, verifyMembership, commentController.softDeleteComment);
 router.delete('/comment/:id',verifyToken, commentController.deleteComment);
