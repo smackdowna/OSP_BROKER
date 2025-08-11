@@ -120,6 +120,13 @@ const softDeletePoll = (id, res) => __awaiter(void 0, void 0, void 0, function* 
             message: "Poll not found",
         });
     }
+    if (pollExists.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Poll is already soft deleted.",
+        });
+    }
     // Soft delete the poll
     const deletedPoll = yield prismaDb_1.default.poll.update({
         where: { id: id },

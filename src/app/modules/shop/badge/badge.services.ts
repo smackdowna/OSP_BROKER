@@ -93,6 +93,38 @@ const updateBadge = async (id: string, badgeData: Partial<TBadge>, res: Response
 }
 
 
+// soft delete badge
+const softDeleteBadge = async (id: string, res: Response) => {
+    if(!id){
+        throw new AppError(400, "Please provide badge id");
+    }
+
+    const existingBadge = await prismadb.badge.findFirst({
+        where: { id },
+    });
+
+    if (!existingBadge) {
+        return res.status(404).json({
+            success: false,
+            message: "Badge not found",
+        });
+    }
+
+    if (existingBadge.isDeleted) {
+        return res.status(400).json({
+            success: false,
+            message: "Badge is already soft deleted.",
+        });
+    }
+
+    const deletedBadge = await prismadb.badge.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+
+    return { badge: deletedBadge };
+}
+
 // delete badge
 const deleteBadge = async (id: string, res: Response) => {
     const existingBadge = await prismadb.badge.findFirst({
@@ -141,6 +173,7 @@ export const badgeServices = {
     getAllBadges,
     getBadgeById,
     updateBadge,
+    softDeleteBadge,
     deleteBadge,
     buyBadge
 };

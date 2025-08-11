@@ -38,7 +38,7 @@ const createComment = (0, catchAsyncError_1.default)((req, res, next) => __await
 }));
 // get all notifications
 const getAllNotifications = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
+    const userId = req.user.userId;
     const notifications = yield comment_services_1.commentServices.getAllNotifications(userId);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -79,6 +79,17 @@ const getCommentById = (0, catchAsyncError_1.default)((req, res, next) => __awai
         data: comment,
     });
 }));
+// soft delete notification
+const softDeleteNotification = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const deletedNotification = yield comment_services_1.commentServices.softDeleteNotification(id, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Notification soft deleted successfully",
+        data: deletedNotification,
+    });
+}));
 // delete all comments
 const deleteAllComments = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const comments = yield comment_services_1.commentServices.deleteAllComments();
@@ -110,13 +121,6 @@ const updateComment = (0, catchAsyncError_1.default)((req, res, next) => __await
 // soft delete comment
 const softDeleteComment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    if (!id) {
-        return (0, sendResponse_1.default)(res, {
-            statusCode: 400,
-            success: false,
-            message: "Comment id is required",
-        });
-    }
     const deletedComment = yield comment_services_1.commentServices.softDeleteComment(id, res);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
@@ -240,4 +244,5 @@ exports.commentController = {
     updateComment,
     deleteComment,
     getAllNotifications,
+    softDeleteNotification
 };

@@ -62,6 +62,34 @@ const getGroupChatByBusinessId = (businessId, res) => __awaiter(void 0, void 0, 
     }
     return { groupChat };
 });
+// soft delete group chat
+const softDeleteGroupChat = (groupChatId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!groupChatId) {
+        throw new appError_1.default(400, "Please provide group chat ID");
+    }
+    const groupChat = yield prismaDb_1.default.groupChat.findFirst({
+        where: { id: groupChatId },
+    });
+    if (!groupChat) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Group chat not found",
+        });
+    }
+    if (groupChat === null || groupChat === void 0 ? void 0 : groupChat.isDeleted) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Group chat is already soft deleted",
+        });
+    }
+    const deletedGroupChat = yield prismaDb_1.default.groupChat.update({
+        where: { id: groupChatId },
+        data: { isDeleted: true },
+    });
+    return { groupChat: deletedGroupChat };
+});
 // delete group chat
 const deleteGroupChat = (groupChatId) => __awaiter(void 0, void 0, void 0, function* () {
     if (!groupChatId) {
@@ -236,12 +264,55 @@ const getGroupMessages = (groupChatId, req, res) => __awaiter(void 0, void 0, vo
     });
     return { messages };
 });
+// soft delete group message
+const softDeleteGroupMessage = (groupchatId, messageId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!groupchatId || !messageId) {
+        throw new appError_1.default(400, "Please provide group chat ID and message ID");
+    }
+    const groupChat = yield prismaDb_1.default.groupChat.findFirst({
+        where: { id: groupchatId },
+    });
+    if (!groupChat) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Group chat not found",
+        });
+    }
+    const message = yield prismaDb_1.default.groupMessage.findFirst({
+        where: { id: messageId, groupChatId: groupchatId },
+    });
+    if (!message) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Message not found in this group chat",
+        });
+    }
+    if (message.isDeleted) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Message is already soft deleted",
+        });
+    }
+    const deletedMessage = yield prismaDb_1.default.groupMessage.update({
+        where: { id: messageId },
+        data: { isDeleted: true },
+    });
+    mainSocket_1.io.to(groupchatId).emit("groupMessageDeleted", {
+        message: deletedMessage,
+    });
+    return { message: deletedMessage };
+});
 exports.groupChatServices = {
     createGroupChat,
     getGroupChatByBusinessId,
+    softDeleteGroupChat,
     deleteGroupChat,
     joinGroupChat,
     leaveGroupChat,
     sendGroupMessage,
-    getGroupMessages
+    getGroupMessages,
+    softDeleteGroupMessage
 };

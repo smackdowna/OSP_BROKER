@@ -213,6 +213,13 @@ const softDeleteAuction = (id, res) => __awaiter(void 0, void 0, void 0, functio
             message: "Auction not found",
         });
     }
+    if (existingAuction.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Auction is already soft deleted.",
+        });
+    }
     const deletedAuction = yield prismaDb_1.default.auction.update({
         where: { id },
         data: {

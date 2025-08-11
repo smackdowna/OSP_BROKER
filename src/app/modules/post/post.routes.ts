@@ -17,6 +17,7 @@ router.put("/:id", verifyToken,multipleUpload, postController.updatePost);
 router.delete("/:id", verifyToken, postController.deletePost);
 
 router.post("/share/:postId", verifyToken, postController.sharePost);
+router.post("/softDelete/:id", verifyToken, postController.softDeletePost);
 router.delete("/unshare/:postId", verifyToken, postController.unsharePost);
 
 export const postRoutes = router;

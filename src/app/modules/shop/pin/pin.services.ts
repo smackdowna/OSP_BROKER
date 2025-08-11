@@ -88,6 +88,40 @@ const updatePin = async (id: string, pinData: Partial<TPin>, res: Response) => {
     return { pin: updatedPin };
 }
 
+// soft delete pin
+const softDeletePin = async (id: string, res: Response) => {
+    if(!id) {
+        throw new AppError(400, "Pin ID is required");
+    }
+
+    const existingPin = await prismadb.pin.findFirst({
+        where: { id }
+    });
+
+    if (!existingPin) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Pin not found",
+        });
+    }
+
+    if (existingPin.isDeleted) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Pin is already soft deleted.",
+        });
+    }
+
+    const deletedPin = await prismadb.pin.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+
+    return { pin: deletedPin };
+};
+
 // delete pin
 const deletePin = async (id: string, res: Response) => {
     const existingPin = await prismadb.pin.findFirst({
@@ -380,6 +414,7 @@ export const pinServices = {
     getAllPins,
     getPinById,
     updatePin,
+    softDeletePin,
     deletePin,
     buyPin,
     pinTopic,

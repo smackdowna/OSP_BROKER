@@ -60,6 +60,20 @@ const updateBadge = catchAsyncError(async (req: Request, res: Response) => {
     });
 });
 
+// soft delete badge
+const softDeleteBadge = catchAsyncError(async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const deletedBadge = await badgeServices.softDeleteBadge(id, res);
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Badge soft deleted successfully",
+        data: deletedBadge,
+    });
+});
+
 // Delete badge
 const deleteBadge = catchAsyncError(async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -95,6 +109,7 @@ export const badgeController = {
     getAllBadges,
     getBadgeById,
     updateBadge,
+    softDeleteBadge,
     deleteBadge,
     buyBadge
 };

@@ -16,6 +16,7 @@ exports.bidServices = void 0;
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../../errors/appError"));
 const notifyUser_1 = require("../../../utils/notifyUser");
+const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create a new bid
 const createBid = (bid) => __awaiter(void 0, void 0, void 0, function* () {
     const { auctionId, userId, response } = bid;
@@ -147,9 +148,26 @@ const updateBid = (id, updateData) => __awaiter(void 0, void 0, void 0, function
     return { bid: updatedBid };
 });
 // soft delete auction bid
-const softDeleteAuctionBid = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const softDeleteAuctionBid = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!id) {
         throw new appError_1.default(400, "Bid ID is required");
+    }
+    const existingBid = yield prismaDb_1.default.auctionBid.findFirst({
+        where: { id: id },
+    });
+    if (!existingBid) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Bid not found with this id",
+        });
+    }
+    if (existingBid.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Bid is already soft deleted.",
+        });
     }
     const deletedBid = yield prismaDb_1.default.auctionBid.update({
         where: { id: id },

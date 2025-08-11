@@ -103,6 +103,13 @@ const softDeleteEvent = (eventId, res) => __awaiter(void 0, void 0, void 0, func
             message: "Event not found",
         });
     }
+    if (eventExists.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Event is already soft deleted.",
+        });
+    }
     // Soft delete the event
     const deletedEvent = yield prismaDb_1.default.event.update({
         where: { id: eventId },

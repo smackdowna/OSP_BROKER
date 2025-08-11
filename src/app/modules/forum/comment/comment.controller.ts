@@ -30,7 +30,7 @@ const createComment = catchAsyncError(
 // get all notifications
 const getAllNotifications = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.params;
+    const userId= req.user.userId;
     const notifications = await commentServices.getAllNotifications(userId);
     sendResponse(res, {
       statusCode: 200,
@@ -80,6 +80,18 @@ const getCommentById = catchAsyncError(
   }
 );
 
+// soft delete notification
+const softDeleteNotification= catchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params;
+  const deletedNotification = await commentServices.softDeleteNotification(id, res);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Notification soft deleted successfully",
+    data: deletedNotification,
+  });
+});
+
 // delete all comments
 const deleteAllComments = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -121,13 +133,6 @@ const updateComment = catchAsyncError(
 // soft delete comment
 const softDeleteComment = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  if (!id) {
-    return sendResponse(res, {
-      statusCode: 400,
-      success: false,
-      message: "Comment id is required",
-    });
-  }
   const deletedComment = await commentServices.softDeleteComment(id, res);
   sendResponse(res, {
     statusCode: 200,
@@ -273,4 +278,5 @@ export const commentController = {
   updateComment,
   deleteComment,
   getAllNotifications,
+  softDeleteNotification
 };

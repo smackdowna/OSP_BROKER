@@ -229,6 +229,14 @@ const softDeleteAuction = async (id: string, res: Response) => {
         });
     }
 
+    if( existingAuction.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Auction is already soft deleted.",
+        });
+    }
+
     const deletedAuction = await prismadb.auction.update({
         where: { id },
         data: {

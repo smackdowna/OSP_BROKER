@@ -79,6 +79,32 @@ const updateKudoCoin = (id, kudoCoin, res) => __awaiter(void 0, void 0, void 0, 
     });
     return { kudoCoin: updatedKudoCoin };
 });
+// soft delete kudo coin
+const softDeleteKudoCoin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Please provide a valid Kudo Coin ID.");
+    }
+    const existingKudoCoin = yield prismaDb_1.default.kudoCoin.findFirst({
+        where: { id },
+    });
+    if (!existingKudoCoin) {
+        return res.status(404).json({
+            success: false,
+            message: "Kudo coin not found",
+        });
+    }
+    if (existingKudoCoin.isDeleted) {
+        return res.status(400).json({
+            success: false,
+            message: "Kudo coin is already soft deleted.",
+        });
+    }
+    const deletedKudoCoin = yield prismaDb_1.default.kudoCoin.update({
+        where: { id },
+        data: { isDeleted: true },
+    });
+    return { kudoCoin: deletedKudoCoin };
+});
 // delete kudo coin
 const deleteKudoCoin = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingKudoCoin = yield prismaDb_1.default.kudoCoin.findFirst({
@@ -124,6 +150,7 @@ exports.kudoCoinServices = {
     getAllKudoCoins,
     getKudoCoinById,
     updateKudoCoin,
+    softDeleteKudoCoin,
     deleteKudoCoin,
     buyKudoCoin
 };

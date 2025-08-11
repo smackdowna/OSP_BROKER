@@ -187,6 +187,13 @@ const closeTopic = (topicId, res) => __awaiter(void 0, void 0, void 0, function*
             message: "Topic not found with this id",
         }));
     }
+    if (existingTopic.isClosed === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Topic is already closed.",
+        }));
+    }
     const closedTopic = yield prismaDb_1.default.topic.update({
         where: {
             id: topicId,

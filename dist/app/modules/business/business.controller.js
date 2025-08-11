@@ -113,7 +113,7 @@ const softDeleteBusinessPage = (0, catchAsyncError_1.default)((req, res, next) =
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
-        message: "Business page deleted successfully",
+        message: "soft deletion of business page successful",
     });
 }));
 // approve representative

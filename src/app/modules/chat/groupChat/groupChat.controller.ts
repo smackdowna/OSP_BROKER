@@ -40,6 +40,18 @@ const deleteGroupChat = catchAsyncError( async (req: Request, res: Response, nex
     });
 });
 
+// soft delete group chat
+const softDeleteGroupChat = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const { groupChatId } = req.params;
+    const deletedGroupChat = await groupChatServices.softDeleteGroupChat(groupChatId, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Group chat soft deleted successfully",
+        data: deletedGroupChat,
+    });
+});
+
 
 // join group chat
 const joinGroupChat= catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
@@ -99,12 +111,26 @@ const getGroupMessages = catchAsyncError( async (req: Request, res: Response, ne
     });
 });
 
+// soft delete group message
+const softDeleteGroupMessage = catchAsyncError( async (req: Request, res: Response, next: NextFunction) => {
+    const { messageId , groupchatId } = req.params;
+    const deletedMessage = await groupChatServices.softDeleteGroupMessage(groupchatId,messageId, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Group message soft deleted successfully",
+        data: deletedMessage,
+    });
+});
+
 export const groupChatController = {
     createGroupChat,
     getGroupChatByBusinessId,
+    softDeleteGroupChat,
     deleteGroupChat,
     joinGroupChat,
     leaveGroupChat,
     sendGroupMessage,
-    getGroupMessages
+    getGroupMessages,
+    softDeleteGroupMessage
 };

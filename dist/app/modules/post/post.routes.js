@@ -16,5 +16,6 @@ router.get("/:id", post_controller_1.postController.getPostById);
 router.put("/:id", requireAuth_1.verifyToken, multer_1.multipleUpload, post_controller_1.postController.updatePost);
 router.delete("/:id", requireAuth_1.verifyToken, post_controller_1.postController.deletePost);
 router.post("/share/:postId", requireAuth_1.verifyToken, post_controller_1.postController.sharePost);
+router.post("/softDelete/:id", requireAuth_1.verifyToken, post_controller_1.postController.softDeletePost);
 router.delete("/unshare/:postId", requireAuth_1.verifyToken, post_controller_1.postController.unsharePost);
 exports.postRoutes = router;

@@ -26,7 +26,8 @@ router.post('/comment', requireAuth_1.verifyToken, authorizeMembership_1.verifyM
 router.get('/comments', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, (0, authorizeRole_1.authorizeRole)("ADMIN"), comment_controller_1.commentController.getAllComments);
 router.get('/comments/:topicId', comment_controller_1.commentController.getCommentByTopicId);
 router.get('/comment/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getCommentById);
-router.get('/notifications/:userId', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getAllNotifications);
+router.get('/notifications', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.getAllNotifications);
+router.post('/notification/softDelete/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.softDeleteNotification);
 router.put('/comment/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.updateComment);
 router.post('/comment/softDelete/:id', requireAuth_1.verifyToken, authorizeMembership_1.verifyMembership, comment_controller_1.commentController.softDeleteComment);
 router.delete('/comment/:id', requireAuth_1.verifyToken, comment_controller_1.commentController.deleteComment);

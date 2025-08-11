@@ -2,6 +2,8 @@ import { TAuctionBid } from "./bid.interface";
 import prismadb from "../../../db/prismaDb";
 import AppError from "../../../errors/appError";
 import { notifyUser } from "../../../utils/notifyUser";
+import sendResponse from "../../../middlewares/sendResponse";
+import { Response } from "express";
 
 
 // create a new bid
@@ -159,9 +161,29 @@ const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
 }
 
 // soft delete auction bid
-const softDeleteAuctionBid = async (id: string) => {
+const softDeleteAuctionBid = async (id: string  ,res:Response) => {
     if (!id) {
         throw new AppError(400, "Bid ID is required");
+    }
+
+    const existingBid = await prismadb.auctionBid.findFirst({
+        where: { id: id },
+    });
+
+    if(!existingBid) {
+        return sendResponse(res , {
+            statusCode: 404,
+            success: false,
+            message: "Bid not found with this id",
+        })
+    }
+
+    if( existingBid.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Bid is already soft deleted.",
+        });
     }
 
     const deletedBid = await prismadb.auctionBid.update({

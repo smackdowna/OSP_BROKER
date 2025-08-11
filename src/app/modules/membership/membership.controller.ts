@@ -72,6 +72,19 @@ const updateMembershipPlan = catchAsyncError(
   }
 );
 
+// soft delete membership plan
+const softDeleteMembershipPlan= catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const deletedMembershipPlan = await membershipServices.softDeleteMembershipPlan(id, res);
+    
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Membership plan soft deleted successfully",
+        data: deletedMembershipPlan,
+    });
+});
+
 // delete membership plan
 const deleteMembershipPlan = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -173,6 +186,7 @@ export const membershipController = {
   getAllMembershipPlans,
   getMembershipPlanById,
   updateMembershipPlan,
+  softDeleteMembershipPlan,
   deleteMembershipPlan,
   createUserMembership,
   getAllUserMemberships,

@@ -22,6 +22,7 @@ router.post('/category', verifyToken,authorizeRole("ADMIN"), businessCategoryCon
 router.get('/category', businessCategoryController.getAllBusinessCategories);
 router.get('/category/:id', verifyToken,  authorizeRole("ADMIN"), businessCategoryController.getBusinessCategoryById);
 router.put('/category/:id', verifyToken,  authorizeRole("ADMIN"), businessCategoryController.updateBusinessCategory);
+router.post('/category/softDelete/:id', verifyToken, authorizeRole("ADMIN"), businessCategoryController.softDeleteBusinessCategory);
 router.delete('/category/:id', verifyToken, authorizeRole("ADMIN"), businessCategoryController.deleteBusinessCategory);
 
 // Business routes

@@ -134,6 +134,34 @@ const updateMessageReadStatus = async (receiverId: string , res:Response) => {
 };
 
 
+// soft delete message
+const softDeleteMessage= async (messageId: string, res: Response) => {
+    const existingMessage = await prismadb.message.findFirst({
+        where: { id: messageId },
+    });
+    if (!existingMessage) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Message not found with this id",
+        });
+    }
+
+    if (existingMessage.isDeleted) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Message is already soft deleted.",
+        });
+    }
+
+    const deletedMessage = await prismadb.message.update({
+        where: { id: messageId },
+        data: { isDeleted: true },
+    });
+
+    return { message: deletedMessage };
+}
 
 
 export const chatServices = {
@@ -141,5 +169,6 @@ export const chatServices = {
     getMessages,
     getUniqueReciepientsWithMessage,
     getUnreadMessages , 
-    updateMessageReadStatus
+    updateMessageReadStatus,
+    softDeleteMessage
 };

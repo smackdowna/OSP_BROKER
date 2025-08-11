@@ -129,10 +129,36 @@ const updateMessageReadStatus = (receiverId, res) => __awaiter(void 0, void 0, v
     }
     return { messages: updatedMessage };
 });
+// soft delete message
+const softDeleteMessage = (messageId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingMessage = yield prismaDb_1.default.message.findFirst({
+        where: { id: messageId },
+    });
+    if (!existingMessage) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Message not found with this id",
+        });
+    }
+    if (existingMessage.isDeleted) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Message is already soft deleted.",
+        });
+    }
+    const deletedMessage = yield prismaDb_1.default.message.update({
+        where: { id: messageId },
+        data: { isDeleted: true },
+    });
+    return { message: deletedMessage };
+});
 exports.chatServices = {
     createMessage,
     getMessages,
     getUniqueReciepientsWithMessage,
     getUnreadMessages,
-    updateMessageReadStatus
+    updateMessageReadStatus,
+    softDeleteMessage
 };

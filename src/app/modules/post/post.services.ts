@@ -257,6 +257,14 @@ const softDeletePost= async (id: string, res: Response) => {
         });
     }
 
+    if(existingPost.isDeleted === true) {
+        return sendResponse(res, {
+            statusCode: 400,
+            success: false,
+            message: "Post is already soft deleted.",
+        });
+    }
+
     const deletedPost = await prismadb.post.update({
         where: {
             id: id,

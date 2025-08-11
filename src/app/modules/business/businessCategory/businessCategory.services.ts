@@ -114,6 +114,14 @@ const softDeleteBusinessCategory = async (id: string, res: Response) => {
     });
   }
 
+  if(existingCategory.isDeleted === true) {
+    return sendResponse(res, {
+      statusCode: 400,
+      success: false,
+      message: "Business category is already soft deleted.",
+    });
+  }
+
   const deletedBusinessCategory = await prismadb.businessCategory.update({
     where: { id },
     data: {

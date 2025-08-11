@@ -63,7 +63,7 @@ const softDeleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, functi
             message: "User not found",
         });
     }
-    yield prismaDb_1.default.user.update({
+    const updatedUser = yield prismaDb_1.default.user.update({
         where: {
             id: userId,
         },
@@ -71,7 +71,7 @@ const softDeleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, functi
             isDeleted: true, // Assuming you have a field to mark soft deletion
         },
     });
-    return { user };
+    return { user: updatedUser };
 });
 // delete user
 const deleteUser = (userId, res) => __awaiter(void 0, void 0, void 0, function* () {

@@ -107,6 +107,13 @@ const softDeleteBusinessCategory = (id, res) => __awaiter(void 0, void 0, void 0
             message: "Business category not found",
         });
     }
+    if (existingCategory.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Business category is already soft deleted.",
+        });
+    }
     const deletedBusinessCategory = yield prismaDb_1.default.businessCategory.update({
         where: { id },
         data: {

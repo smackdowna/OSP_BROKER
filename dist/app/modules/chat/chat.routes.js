@@ -11,4 +11,5 @@ router.get('/recipients', requireAuth_1.verifyToken, chat_controller_1.chatContr
 router.get('/:recipientId', requireAuth_1.verifyToken, chat_controller_1.chatController.getMessages);
 router.get('/unreadMessages/:recipientId', requireAuth_1.verifyToken, chat_controller_1.chatController.getUnreadMessages);
 router.post('/updateReadStatus/:recipientId', requireAuth_1.verifyToken, chat_controller_1.chatController.updateMessageReadStatus);
+router.post('/softDelete/:id', requireAuth_1.verifyToken, chat_controller_1.chatController.softDeleteMessage);
 exports.chatRouter = router;

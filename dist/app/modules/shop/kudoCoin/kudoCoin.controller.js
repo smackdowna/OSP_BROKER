@@ -60,6 +60,17 @@ const updateKudoCoin = (0, catchAsyncError_1.default)((req, res) => __awaiter(vo
         data: updatedKudoCoin,
     });
 }));
+// soft delete kudo coin
+const softDeleteKudoCoin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const kudoCoin = yield kudoCoin_services_1.kudoCoinServices.softDeleteKudoCoin(id, res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Kudo coin soft deleted successfully",
+        data: kudoCoin,
+    });
+}));
 // delete kudo coin
 const deleteKudoCoin = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -89,6 +100,7 @@ exports.kudoCoinController = {
     getAllKudoCoins,
     getKudoCoinById,
     updateKudoCoin,
+    softDeleteKudoCoin,
     deleteKudoCoin,
     buyKudoCoin
 };

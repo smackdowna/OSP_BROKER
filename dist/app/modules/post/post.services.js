@@ -235,6 +235,13 @@ const softDeletePost = (id, res) => __awaiter(void 0, void 0, void 0, function* 
             message: "Post not found with this id",
         });
     }
+    if (existingPost.isDeleted === true) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Post is already soft deleted.",
+        });
+    }
     const deletedPost = yield prismaDb_1.default.post.update({
         where: {
             id: id,

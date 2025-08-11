@@ -58,7 +58,7 @@ const softDeleteUser= async (userId: string, res: Response) => {
     });
   }
 
-  await prismadb.user.update({
+  const updatedUser=await prismadb.user.update({
     where: {
       id: userId,
     },
@@ -67,7 +67,7 @@ const softDeleteUser= async (userId: string, res: Response) => {
     },
   });
 
-  return { user };
+  return { user: updatedUser };
 };
 
 // delete user

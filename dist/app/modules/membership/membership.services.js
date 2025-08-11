@@ -118,6 +118,43 @@ const updateMembershipPlan = (id, res, membershipPlanInterface) => __awaiter(voi
     });
     return { membershipPlan };
 });
+// soft delete membership plan
+const softDeleteMembershipPlan = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res || typeof res.status !== "function") {
+        throw new Error("Invalid Response object passed to deleteTopic");
+    }
+    if (!id) {
+        throw new appError_1.default(400, "please provide id");
+    }
+    const existingMembershipPlan = yield prismaDb_1.default.membershipPlan.findFirst({
+        where: {
+            id: id,
+        },
+    });
+    if (!existingMembershipPlan) {
+        (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No membership plan found with this id",
+        });
+    }
+    if ((existingMembershipPlan === null || existingMembershipPlan === void 0 ? void 0 : existingMembershipPlan.isDeleted) === true) {
+        return ((0, sendResponse_1.default)(res, {
+            statusCode: 400,
+            success: false,
+            message: "Membership plan is already soft deleted.",
+        }));
+    }
+    const deletedMembershipPlan = yield prismaDb_1.default.membershipPlan.update({
+        where: {
+            id: id,
+        },
+        data: {
+            isDeleted: true,
+        },
+    });
+    return { membershipPlan: deletedMembershipPlan };
+});
 // delete membership plan
 const deleteMembershipPlan = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!res || typeof res.status !== "function") {
@@ -260,6 +297,7 @@ exports.membershipServices = {
     getAllMembershipPlans,
     getMembershipPlanById,
     updateMembershipPlan,
+    softDeleteMembershipPlan,
     deleteMembershipPlan,
     createUserMembership,
     getAllUserMemberships,
