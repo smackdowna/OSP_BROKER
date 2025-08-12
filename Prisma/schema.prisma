@@ -194,10 +194,11 @@ model BusinessRateCard{
     businessId String @db.ObjectId
     Business business @relation("businessToBusinessRateCard",fields: [businessId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
     name String
-    logo String?
+    logo Media[] @relation("businessRateCardToMedia")
     currency String
 
-    BusinessRateCardCategory BusinessRateCardCategory[] @relation("businessRateCardToBusinessRateCardCategory")
+    businessRateCardItem BusinessRateCardItem[] @relation("businessRateCardToBusinessRateCardItem")
+
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -205,9 +206,32 @@ model BusinessRateCard{
 
 model BusinessRateCardCategory{
     id String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    orderIndex Int @default(0)
+
+    BusinessRateCardItem BusinessRateCardItem[] @relation("businessRateCardToBusinessRateCardCategory")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}   
+
+model BusinessRateCardItem{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    serviceType String
+    platform String
+    activity String
+    description String
+    unit  String
+    currency String
+    rate Float
+    isCustom Boolean @default(false)
+    orderIndex Int @default(0)
+
     businessRateCardId String @db.ObjectId
-    BusinessRateCard BusinessRateCard @relation("businessRateCardToBusinessRateCardCategory",fields: [businessRateCardId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
-    orderIndex Int
+    BusinessRateCard BusinessRateCard @relation("businessRateCardToBusinessRateCardItem",fields: [businessRateCardId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    businessRateCardCategoryId String @db.ObjectId
+    BusinessRateCardCategory BusinessRateCardCategory @relation("businessRateCardToBusinessRateCardCategory",fields: [businessRateCardCategoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -593,6 +617,9 @@ model Media{
 
     auctionId String? @db.ObjectId
     Auction Auction? @relation("auctionToMedia", fields: [auctionId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+
+    businessRateCardId String? @db.ObjectId
+    BusinessRateCard BusinessRateCard? @relation("businessRateCardToMedia", fields: [businessRateCardId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
 }
 
