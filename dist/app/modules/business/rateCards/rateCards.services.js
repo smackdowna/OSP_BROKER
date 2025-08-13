@@ -13,20 +13,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.businessRateCardServices = void 0;
+const appError_1 = __importDefault(require("../../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create business rate card
 const createBusinessRateCard = (businessRateCard, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessId, name, logo, currency } = businessRateCard;
     // check if business exists
-    const existingBusinessRateCard = yield prismaDb_1.default.business.findFirst({
+    const existingBusinessRateCard = yield prismaDb_1.default.businessRateCard.findFirst({
         where: { id: businessId }
     });
     if (existingBusinessRateCard) {
         return (0, sendResponse_1.default)(res, {
             statusCode: 400,
             success: false,
-            message: "Business already exists",
+            message: "Business rate card already exists",
         });
     }
     // create business rate card
@@ -76,8 +77,14 @@ const getBusinessRateCardByBusinessId = (businessId, res) => __awaiter(void 0, v
 });
 // get business rate card by id
 const getBusinessRateCardById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!id) {
+        throw new appError_1.default(400, "Business rate card id is required");
+    }
+    console.log("Fetching business rate card with id:", id);
     const businessRateCard = yield prismaDb_1.default.businessRateCard.findFirst({
-        where: { id }
+        where: {
+            id
+        }
     });
     if (!businessRateCard) {
         return (0, sendResponse_1.default)(res, {

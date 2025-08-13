@@ -64,6 +64,20 @@ const getAllBusinessRateCardItems = (res) => __awaiter(void 0, void 0, void 0, f
     }
     return businessRateCardItems;
 });
+// get businessRateCardItem by id
+const getBusinessRateCardItemById = (id, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const businessRateCardItem = yield prismaDb_1.default.businessRateCardItem.findUnique({
+        where: { id }
+    });
+    if (!businessRateCardItem) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business rate card item not found",
+        });
+    }
+    return businessRateCardItem;
+});
 // get businessRateCardItems for a businessRateCard
 const getBusinessRateCardItemsByRateCardId = (businessRateCardId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const businessRateCardItems = yield prismaDb_1.default.businessRateCardItem.findMany({
@@ -92,7 +106,7 @@ const getBussinessRateCardItemsForRateCardByRateCardCategory = (businessRateCard
         return (0, sendResponse_1.default)(res, {
             statusCode: 404,
             success: false,
-            message: "No business rate card items found for this rate card"
+            message: "No business rate card items found for this rate card category"
         });
     }
     return businessRateCardItems;
@@ -160,6 +174,7 @@ const deleteBusinessRateCardItem = (id, res) => __awaiter(void 0, void 0, void 0
 exports.businessRateCardItemServices = {
     createBusinessRateCardItem,
     getAllBusinessRateCardItems,
+    getBusinessRateCardItemById,
     getBusinessRateCardItemsByRateCardId,
     getBussinessRateCardItemsForRateCardByRateCardCategory,
     updateBusinessRateCardItem,

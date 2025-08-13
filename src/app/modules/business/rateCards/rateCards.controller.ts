@@ -113,11 +113,9 @@ const getBusinessRateCardByBusinessId = catchAsyncError(
 );
 
 // get business rate card by id
-const getBusinessRateCardById = catchAsyncError(
-  async (req: Request, res: Response) => {
+const getBusinessRateCardById = catchAsyncError(async (req: Request, res: Response) => {
     const { id } = req.params;
-    const businessRateCard =
-      await businessRateCardServices.getBusinessRateCardById(id, res);
+    const businessRateCard =await businessRateCardServices.getBusinessRateCardById(id, res);
     return sendResponse(res, {
       statusCode: 200,
       success: true,

@@ -10,7 +10,7 @@ const createBusinessRateCard= async(businessRateCard: TBusinessRateCard, res: Re
     const { businessId, name, logo, currency } = businessRateCard;
 
     // check if business exists
-    const existingBusinessRateCard = await prismadb.business.findFirst({
+    const existingBusinessRateCard = await prismadb.businessRateCard.findFirst({
         where: { id: businessId }
     });
 
@@ -18,7 +18,7 @@ const createBusinessRateCard= async(businessRateCard: TBusinessRateCard, res: Re
         return sendResponse(res , {
             statusCode: 400,
             success: false,
-            message: "Business already exists",
+            message: "Business rate card already exists",
         })
     }
 
@@ -79,8 +79,17 @@ const getBusinessRateCardByBusinessId = async (businessId: string, res: Response
 
 // get business rate card by id
 const getBusinessRateCardById = async (id: string, res: Response) => {
+
+    if(!id){
+        throw new AppError(400, "Business rate card id is required");
+    }
+
+    console.log("Fetching business rate card with id:", id);
+
     const businessRateCard = await prismadb.businessRateCard.findFirst({
-        where: { id }
+        where:{
+            id
+        }
     });
 
     if (!businessRateCard) {

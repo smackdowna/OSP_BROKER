@@ -53,8 +53,30 @@ const updateBusinessAdminRole = (0, catchAsyncError_1.default)((req, res, next) 
         data: user,
     });
 }));
+// get all individual chats
+const getALLIndividualChats = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const chats = yield admin_services_1.adminServices.getALLIndividualChats(res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All individual chats retrieved successfully",
+        data: chats,
+    });
+}));
+// get all group chats
+const getALLGroupChats = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const chats = yield admin_services_1.adminServices.getALLGroupChats(res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All group chats retrieved successfully",
+        data: chats,
+    });
+}));
 exports.adminController = {
     assignModerator,
     removeModerator,
-    updateBusinessAdminRole
+    updateBusinessAdminRole,
+    getALLIndividualChats,
+    getALLGroupChats
 };

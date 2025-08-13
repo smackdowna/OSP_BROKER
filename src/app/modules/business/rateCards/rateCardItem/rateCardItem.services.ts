@@ -62,6 +62,23 @@ const getAllBusinessRateCardItems = async (res: Response) => {
     return businessRateCardItems;
 }
 
+// get businessRateCardItem by id
+const getBusinessRateCardItemById = async (id: string, res: Response) => {
+    const businessRateCardItem = await prismadb.businessRateCardItem.findUnique({
+        where: { id }
+    });
+
+    if (!businessRateCardItem) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business rate card item not found",
+        });
+    }
+
+    return businessRateCardItem;
+}
+
 // get businessRateCardItems for a businessRateCard
 const getBusinessRateCardItemsByRateCardId= async (businessRateCardId:string,res:Response)=>{
     const businessRateCardItems= await prismadb.businessRateCardItem.findMany({
@@ -95,7 +112,7 @@ const getBussinessRateCardItemsForRateCardByRateCardCategory= async(businessRate
         return sendResponse(res, {
             statusCode: 404 ,
             success:false,
-            message: "No business rate card items found for this rate card"
+            message: "No business rate card items found for this rate card category"
         })
     }
 
@@ -180,6 +197,7 @@ const deleteBusinessRateCardItem= async(id:string , res:Response)=>{
 export const businessRateCardItemServices= {
     createBusinessRateCardItem , 
     getAllBusinessRateCardItems,
+    getBusinessRateCardItemById,
     getBusinessRateCardItemsByRateCardId,
     getBussinessRateCardItemsForRateCardByRateCardCategory,
     updateBusinessRateCardItem,
