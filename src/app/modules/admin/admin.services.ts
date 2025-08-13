@@ -177,9 +177,52 @@ const approveAuction= async( auctionId: string, res: Response) => {
   return {auction: updatedAuction};
 }
 
+
+// get all individual chats
+const getALLIndividualChats = async (res: Response) => {
+  const chats= await prismadb.message.findMany()
+
+  if(!chats || chats.length === 0) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "No chats found",
+    });
+  }
+
+  return chats;
+}
+
+// get all group chats
+const getALLGroupChats = async (res: Response) => {
+  const groupChats = await prismadb.groupChat.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      groupMembers:true,
+      groupMessages:true,
+    },
+  });
+
+  if (!groupChats || groupChats.length === 0) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "No group chats found",
+    });
+  }
+
+  return groupChats;
+}
+
+
+
 export const adminServices = {
   assignModerator,
   removeModerator,
   updateBusinessAdminRole,
-  approveAuction
+  approveAuction,
+  getALLIndividualChats,
+  getALLGroupChats
 };

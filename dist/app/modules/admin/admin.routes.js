@@ -13,4 +13,6 @@ const router = express_1.default.Router();
 router.post('/assignModerator/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.assignModerator);
 router.delete('/removeModerator/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.removeModerator);
 router.post('/updateBusinessAdminRole/:userId', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.updateBusinessAdminRole);
+router.get('/getALLIndividualChats', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.getALLIndividualChats);
+router.get('/getALLGroupChats', requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), admin_controller_1.adminController.getALLGroupChats);
 exports.adminRouter = router;

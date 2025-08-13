@@ -165,9 +165,43 @@ const approveAuction = (auctionId, res) => __awaiter(void 0, void 0, void 0, fun
     });
     return { auction: updatedAuction };
 });
+// get all individual chats
+const getALLIndividualChats = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const chats = yield prismaDb_1.default.message.findMany();
+    if (!chats || chats.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No chats found",
+        });
+    }
+    return chats;
+});
+// get all group chats
+const getALLGroupChats = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupChats = yield prismaDb_1.default.groupChat.findMany({
+        where: {
+            isDeleted: false,
+        },
+        include: {
+            groupMembers: true,
+            groupMessages: true,
+        },
+    });
+    if (!groupChats || groupChats.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No group chats found",
+        });
+    }
+    return groupChats;
+});
 exports.adminServices = {
     assignModerator,
     removeModerator,
     updateBusinessAdminRole,
-    approveAuction
+    approveAuction,
+    getALLIndividualChats,
+    getALLGroupChats
 };

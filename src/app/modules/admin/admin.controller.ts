@@ -45,8 +45,32 @@ const updateBusinessAdminRole= catchAsyncError(async (req: Request, res: Respons
     });
 });
 
+// get all individual chats
+const getALLIndividualChats= catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const chats= await adminServices.getALLIndividualChats(res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All individual chats retrieved successfully",
+        data: chats,
+    });
+});
+
+// get all group chats
+const getALLGroupChats= catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const chats= await adminServices.getALLGroupChats(res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All group chats retrieved successfully",
+        data: chats,
+    });
+});
+
 export const adminController = {
     assignModerator,
     removeModerator,
-    updateBusinessAdminRole
+    updateBusinessAdminRole,
+    getALLIndividualChats,
+    getALLGroupChats
 };

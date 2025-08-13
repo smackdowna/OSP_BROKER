@@ -42,6 +42,18 @@ const getAllBusinessRateCardItems = catchAsyncError(async (req: Request, res: Re
     });
 });
 
+// get businessRateCardItem by id
+const getBusinessRateCardItemById = catchAsyncError(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const businessRateCardItem = await businessRateCardItemServices.getBusinessRateCardItemById(id, res);
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business rate card item fetched successfully",
+        data: businessRateCardItem,
+    });
+});
+
 // get businessRateCardItemByRateCardId
 const getBusinessRateCardItemByRateCardId= catchAsyncError(async (req: Request, res: Response) => {
     const { businessRateCardId } = req.params;
@@ -106,6 +118,7 @@ const deleteBusinessRateCardItem = catchAsyncError(async (req: Request, res: Res
 export const businessRateCardItemController = {
     createBusinessRateCardItem,
     getAllBusinessRateCardItems,
+    getBusinessRateCardItemById,
     getBusinessRateCardItemByRateCardId,
     getBussinessRateCardItemsForRateCardByRateCardCategory,
     updateBusinessRateCardItem,

@@ -19,7 +19,7 @@ import { bookingRouter } from "../modules/booking/booking.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { auctionRouter } from "../modules/auction/auction.routes";
 import { shopRouter } from "../modules/shop/shop.routes";
-
+import { businessRateCardRouter } from "../modules/business/rateCards/rateCards.routes";
 
 const router = Router();
 
@@ -105,6 +105,10 @@ const moduleRoutes=[
     {
         path: "/shop",
         route: shopRouter
+    }, 
+    {
+        path:"/rateCard",
+        route: businessRateCardRouter
     }
 ]
 

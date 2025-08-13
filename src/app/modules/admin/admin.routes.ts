@@ -9,5 +9,7 @@ const router = express.Router();
 router.post('/assignModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.assignModerator);
 router.delete('/removeModerator/:userId', verifyToken,authorizeRole("ADMIN"), adminController.removeModerator);
 router.post('/updateBusinessAdminRole/:userId', verifyToken, authorizeRole("ADMIN"), adminController.updateBusinessAdminRole);
+router.get('/getALLIndividualChats', verifyToken, authorizeRole("ADMIN"), adminController.getALLIndividualChats);
+router.get('/getALLGroupChats', verifyToken, authorizeRole("ADMIN"), adminController.getALLGroupChats);
 
 export const adminRouter = router;
