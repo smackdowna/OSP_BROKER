@@ -27,19 +27,7 @@ const createComment = catchAsyncError(
   }
 );
 
-// get all notifications
-const getAllNotifications = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const userId= req.user.userId;
-    const notifications = await commentServices.getAllNotifications(userId);
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: "All notifications fetched successfully",
-      data: notifications,
-    });
-  }
-);
+
 
 // get all comments
 const getAllComments = catchAsyncError(
@@ -80,17 +68,7 @@ const getCommentById = catchAsyncError(
   }
 );
 
-// soft delete notification
-const softDeleteNotification= catchAsyncError(async(req: Request, res: Response, next: NextFunction) => {
-  const { id } = req.params;
-  const deletedNotification = await commentServices.softDeleteNotification(id, res);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Notification soft deleted successfully",
-    data: deletedNotification,
-  });
-});
+
 
 // delete all comments
 const deleteAllComments = catchAsyncError(
@@ -276,7 +254,5 @@ export const commentController = {
   getCommentByTopicId,
   getCommentById,
   updateComment,
-  deleteComment,
-  getAllNotifications,
-  softDeleteNotification
+  deleteComment
 };

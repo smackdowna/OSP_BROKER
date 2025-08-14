@@ -176,7 +176,7 @@ model business{
     isDeleted Boolean @default(false)
     
     businessAdminId String @db.ObjectId
-    BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [id])
+    BusinessAdmin BusinessAdmin @relation("userToBusinessAdmin",fields: [businessAdminId], references: [userId])
 
     businessCategoryId String @db.ObjectId
     BusinessCategory BusinessCategory @relation("businessToBusinessCategory",fields: [businessCategoryId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
@@ -727,6 +727,7 @@ model UserPin{
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 } 
+
 
 model pinnedTopic{
     id String @id @default(auto()) @map("_id") @db.ObjectId

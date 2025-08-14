@@ -52,6 +52,19 @@ const createSignature = catchAsyncError(async (req: Request, res: Response, next
     });
 });
 
+// notify live convention to business page followers
+const notifyLiveConvention = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+    const { businessId } = req.params;
+
+    await liveConventionServices.notifyLiveConvention(businessId, res);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Live convention notification sent successfully",
+    });
+});
+
 export const liveConventionController = {
     createSignature,
+    notifyLiveConvention
 };
