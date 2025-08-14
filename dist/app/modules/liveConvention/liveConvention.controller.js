@@ -47,6 +47,17 @@ const createSignature = (0, catchAsyncError_1.default)((req, res, next) => __awa
         data: signature,
     });
 }));
+// notify live convention to business page followers
+const notifyLiveConvention = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { businessId } = req.params;
+    yield liveConvention_services_1.liveConventionServices.notifyLiveConvention(businessId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Live convention notification sent successfully",
+    });
+}));
 exports.liveConventionController = {
     createSignature,
+    notifyLiveConvention
 };

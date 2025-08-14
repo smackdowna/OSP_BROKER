@@ -16,10 +16,12 @@ exports.postServices = void 0;
 const appError_1 = __importDefault(require("../../errors/appError"));
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
+const notifyUser_1 = require("../../utils/notifyUser");
 // create post
 const createPost = (post, res, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.cookies.user.role !== "ADMIN") {
-        if (req.cookies.user.role !== "BUSINESS_ADMIN" || req.cookies.user.role !== "REPRESENTATIVE") {
+        if (req.cookies.user.role !== "BUSINESS_ADMIN" ||
+            req.cookies.user.role !== "REPRESENTATIVE") {
             return (0, sendResponse_1.default)(res, {
                 statusCode: 403,
                 success: false,
@@ -32,6 +34,11 @@ const createPost = (post, res, req) => __awaiter(void 0, void 0, void 0, functio
     if (!title || !description || !businessId || !userId) {
         throw new appError_1.default(400, "Title, description and media are required");
     }
+    const business = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: businessId,
+        },
+    });
     if (media) {
         const newPost = yield prismaDb_1.default.post.create({
             data: {
@@ -45,14 +52,46 @@ const createPost = (post, res, req) => __awaiter(void 0, void 0, void 0, functio
                         name: item.name,
                         url: item.url,
                         thumbnailUrl: item.thumbnailUrl,
-                        fileType: item.fileType
-                    }))
-                }
+                        fileType: item.fileType,
+                    })),
+                },
             },
             include: {
-                media: true
-            }
+                media: true,
+                User: true,
+            },
         });
+        if (!newPost) {
+            return (0, sendResponse_1.default)(res, {
+                statusCode: 500,
+                success: false,
+                message: "Failed to create post",
+            });
+        }
+        const businessFollowers = yield prismaDb_1.default.businessPageFollower.findMany({
+            where: {
+                businessId: businessId,
+            },
+            include: {
+                user: true,
+            },
+        });
+        yield Promise.all(businessFollowers.map((follower) => __awaiter(void 0, void 0, void 0, function* () {
+            (0, notifyUser_1.notifyUser)(follower.user.id, {
+                type: "POST",
+                message: `${business === null || business === void 0 ? void 0 : business.businessName} created a new post ${newPost.title}`,
+                recipient: follower.user.id,
+                sender: userId,
+            });
+            yield prismaDb_1.default.notification.create({
+                data: {
+                    type: "POST",
+                    message: `${business === null || business === void 0 ? void 0 : business.businessName} created a new post ${newPost.title}`,
+                    recipient: follower.user.id,
+                    sender: userId,
+                },
+            });
+        })));
         return { post: newPost };
     }
     else {
@@ -62,7 +101,7 @@ const createPost = (post, res, req) => __awaiter(void 0, void 0, void 0, functio
                 description,
                 businessId,
                 userId,
-            }
+            },
         });
         return { post: newPost };
     }
@@ -94,11 +133,11 @@ const getPostsByBusinessId = (businessId, res) => __awaiter(void 0, void 0, void
         },
     });
     if (!posts || posts.length === 0) {
-        return ((0, sendResponse_1.default)(res, {
+        return (0, sendResponse_1.default)(res, {
             statusCode: 404,
             success: false,
             message: "No posts found for this business",
-        }));
+        });
     }
     return { posts };
 });
@@ -124,7 +163,8 @@ const getPostById = (id, res) => __awaiter(void 0, void 0, void 0, function* () 
 // update post
 const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.cookies.user.role !== "ADMIN") {
-        if (req.cookies.user.role !== "BUSINESS_ADMIN" || req.cookies.user.role !== "REPRESENTATIVE") {
+        if (req.cookies.user.role !== "BUSINESS_ADMIN" ||
+            req.cookies.user.role !== "REPRESENTATIVE") {
             return (0, sendResponse_1.default)(res, {
                 statusCode: 403,
                 success: false,
@@ -149,7 +189,7 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
         },
         include: {
             media: true,
-        }
+        },
     });
     if (!existingPost) {
         return (0, sendResponse_1.default)(res, {
@@ -163,7 +203,7 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
         yield prismaDb_1.default.media.deleteMany({
             where: {
                 postId: id,
-            }
+            },
         });
         updatedPost = yield prismaDb_1.default.post.update({
             where: {
@@ -178,13 +218,13 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
                         name: item.name,
                         url: item.url,
                         thumbnailUrl: item.thumbnailUrl,
-                        fileType: item.fileType
-                    }))
-                }
+                        fileType: item.fileType,
+                    })),
+                },
             },
             include: {
                 media: true,
-            }
+            },
         });
         return { post: updatedPost };
     }
@@ -192,7 +232,7 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
         yield prismaDb_1.default.media.deleteMany({
             where: {
                 postId: id,
-            }
+            },
         });
         updatedPost = yield prismaDb_1.default.post.update({
             where: {
@@ -207,13 +247,13 @@ const updatePost = (id, postData, res, req) => __awaiter(void 0, void 0, void 0,
                         name: item.name,
                         url: item.url,
                         thumbnailUrl: item.thumbnailUrl,
-                        fileType: item.fileType
-                    }))
-                }
+                        fileType: item.fileType,
+                    })),
+                },
             },
             include: {
                 media: true,
-            }
+            },
         });
         return { post: updatedPost };
     }
@@ -255,7 +295,8 @@ const softDeletePost = (id, res) => __awaiter(void 0, void 0, void 0, function* 
 // delete post
 const deletePost = (id, res, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.cookies.user.role !== "ADMIN") {
-        if (req.cookies.user.role !== "BUSINESS_ADMIN" || req.cookies.user.role !== "REPRESENTATIVE") {
+        if (req.cookies.user.role !== "BUSINESS_ADMIN" ||
+            req.cookies.user.role !== "REPRESENTATIVE") {
             return (0, sendResponse_1.default)(res, {
                 statusCode: 403,
                 success: false,
@@ -368,5 +409,5 @@ exports.postServices = {
     deletePost,
     sharePost,
     unsharePost,
-    getSharedPostsByUserId
+    getSharedPostsByUserId,
 };

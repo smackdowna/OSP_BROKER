@@ -3,9 +3,25 @@ import prismadb from "../../db/prismaDb";
 import sendResponse from "../../middlewares/sendResponse";
 import { Response } from "express";
 
+import { notifyUser } from "../../utils/notifyUser";
+
 // create business page follower(click follow)
 const createBusinessPageFollower = async (follower: TBusinessPageFollower , res:Response) => {
   const { businessId, userId } = follower;
+
+  const business= await prismadb.business.findFirst({
+    where: {
+      id: businessId,
+    }
+  });
+
+  if(!business) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Business page not found",
+    });
+  }
 
   // Check if the follower already exists
   const existingFollower = await prismadb.businessPageFollower.findFirst({
@@ -29,13 +45,58 @@ const createBusinessPageFollower = async (follower: TBusinessPageFollower , res:
       businessId,
       userId,
     },
+    include:{
+      user:true
+    }
   });
+
+  if(!newFollower) {
+    return sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: "Failed to follow business page",
+    });
+  }
+  
+    notifyUser(business?.businessAdminId,{
+      type:"FOLLOW",
+      message:`${newFollower?.user?.fullName} started following your business page ${business?.businessName}`,
+      recipient: business?.businessAdminId,
+      sender: newFollower.userId,
+    })
+
+  await prismadb.notification.create({
+    data:{
+      type:"FOLLOW",
+      message:`${newFollower?.user?.fullName} started following your business page ${business?.businessName}`,
+      recipient:  business?.businessAdminId,
+      sender: newFollower.userId,
+    }
+  })
 
   return newFollower;
 }
 
 //unfollow business page
 const unfollowBusinessPage= async(businessId: string, userId: string, res: Response) => {
+
+    const business= await prismadb.business.findFirst({
+    where: {
+      id: businessId,
+    },
+    include:{
+      BusinessAdmin: true
+    }
+  });
+
+  if(!business) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Business page not found",
+    });
+  }
+
   const businessPageFollower = await prismadb.businessPageFollower.findFirst({
     where: {
       businessId,
@@ -55,7 +116,34 @@ const unfollowBusinessPage= async(businessId: string, userId: string, res: Respo
     where: {
       id: businessPageFollower.id,
     },
+    include:{
+      user: true,
+    }
   });
+
+  if(!unfollow) {
+    return sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: "Failed to unfollow business page",
+    });
+  }
+  notifyUser(business?.businessAdminId,{
+    type:"UNFOLLOW",
+    message:`${unfollow?.user?.fullName} unfollowed your business page ${business?.businessName}`,
+    recipient: business?.businessAdminId,
+    sender: userId,
+  })
+  
+  await prismadb.notification.create({
+    data:{
+      type:"UNFOLLOW",
+      message:`${unfollow?.user?.fullName} unfollowed your business page ${business?.businessName}`,
+      recipient:  business?.businessAdminId,
+      sender: userId,
+    }
+  })
+
   
   return unfollow;
 };
@@ -93,6 +181,24 @@ const getAllBusinessPageFollowers = async (businessId: string) => {
 // create representative page follower(click follow)
 const createRepresentativePageFollower = async (follower: TRepresentativePageFollower , res:Response) => {
     const { representativeId, userId } = follower;
+
+
+    const representative= await prismadb.representative.findFirst({
+        where: {
+            id: representativeId,
+        },
+        include:{
+          user: true
+        }
+    })
+
+    if(!representative) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representative not found",
+        });
+    }
     
     // Check if the follower already exists
     const existingFollower = await prismadb.representativePageFollower.findFirst({
@@ -116,13 +222,55 @@ const createRepresentativePageFollower = async (follower: TRepresentativePageFol
         representativeId,
         userId,
         },
+        include:{
+            user: true
+        }
     });
+
+    if(!newFollower) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to follow representative page",
+        });
+    }
+    
+    notifyUser(representative?.userId,{
+        type:"FOLLOW",
+        message:`${newFollower.user.fullName} started following you`,
+        recipient: representative?.userId,
+        sender: newFollower.userId,
+    })
+    await prismadb.notification.create({
+        data:{
+            type:"FOLLOW",
+            message:`${newFollower.user.fullName} started following you`,
+            recipient:  representative?.userId,
+            sender: newFollower.userId,
+        }
+    })
+
     
     return newFollower;
 }
 
 // unfollow representative page
 const unfollowRepresentativePage = async (representativeId: string, userId: string, res: Response) => {
+
+    const representative= await prismadb.representative.findFirst({
+        where: {
+            id: representativeId,
+        }
+    });
+
+    if(!representative) {
+        return sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representative not found",
+        });
+    }
+
     const representativePageFollower = await prismadb.representativePageFollower.findFirst({
         where: {
             representativeId,
@@ -142,7 +290,34 @@ const unfollowRepresentativePage = async (representativeId: string, userId: stri
         where: {
             id: representativePageFollower.id,
         },
+        include: {
+            user: true,
+        }
     });
+
+    if(!unfollow) {
+        return sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to unfollow representative page",
+        });
+    }
+
+    notifyUser(representative?.userId,{
+        type:"UNFOLLOW",
+        message:`${unfollow?.user?.fullName} unfollowed you`,
+        recipient:  representative?.userId,
+        sender: userId,
+    })
+
+    await prismadb.notification.create({
+        data:{
+            type:"UNFOLLOW",
+            message:`${unfollow?.user?.fullName} unfollowed you`,
+            recipient:  representative?.userId,
+            sender: userId,
+        }
+    })
 
     return unfollow;
 }

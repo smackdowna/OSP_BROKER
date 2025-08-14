@@ -18,27 +18,75 @@ const appError_1 = __importDefault(require("../../../errors/appError"));
 const notifyUser_1 = require("../../../utils/notifyUser");
 const sendResponse_1 = __importDefault(require("../../../middlewares/sendResponse"));
 // create a new bid
-const createBid = (bid) => __awaiter(void 0, void 0, void 0, function* () {
+const createBid = (bid, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { auctionId, userId, response } = bid;
     if (!auctionId || !userId || !response) {
         throw new appError_1.default(400, "All fields are required");
     }
-    const existingBid = yield prismaDb_1.default.auctionBid.findFirst({
-        where: {
-            auctionId,
-            userId,
+    const auction = yield prismaDb_1.default.auction.findFirst({
+        where: { id: auctionId },
+        include: {
+            User: true,
+            auctionBids: true
         },
     });
-    if (existingBid) {
-        throw new appError_1.default(400, "You have already placed a bid on this auction");
+    if (!auction) {
+        throw new appError_1.default(404, "Auction not found");
     }
+    // get all the previous bidders for the auction
+    const auctionBidders = auction.auctionBids.map((bid) => bid.userId);
     const newBid = yield prismaDb_1.default.auctionBid.create({
         data: {
             auctionId,
             userId,
             response,
         },
+        include: {
+            User: true,
+            Auction: true,
+        }
     });
+    if (!newBid) {
+        throw new appError_1.default(500, "Failed to create bid");
+    }
+    // notify auction creator
+    (0, notifyUser_1.notifyUser)(newBid.Auction.userId, {
+        type: "BID",
+        message: `New bid placed for auction ${newBid.Auction.title}`,
+        recipient: newBid.Auction.userId,
+        sender: newBid.userId,
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            type: "BID",
+            message: `New bid placed for auction ${(_a = newBid === null || newBid === void 0 ? void 0 : newBid.Auction) === null || _a === void 0 ? void 0 : _a.title}`,
+            recipient: newBid.Auction.userId,
+            sender: newBid.userId,
+        }
+    });
+    // notify all the previous bidders
+    if (auctionBidders.length > 0) {
+        yield Promise.all(auctionBidders.map((bidderId) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            if (bidderId !== userId) {
+                (0, notifyUser_1.notifyUser)(bidderId, {
+                    type: "BID",
+                    message: `New bid placed for auction ${newBid.Auction.title} by ${newBid.User.fullName}`,
+                    recipient: bidderId,
+                    sender: newBid.userId,
+                });
+                yield prismaDb_1.default.notification.create({
+                    data: {
+                        type: "BID",
+                        message: `New bid placed for auction ${(_a = newBid === null || newBid === void 0 ? void 0 : newBid.Auction) === null || _a === void 0 ? void 0 : _a.title} by ${newBid.User.fullName}`,
+                        recipient: bidderId,
+                        sender: newBid.userId,
+                    }
+                });
+            }
+        })));
+    }
     return { bid: newBid };
 });
 // get all bids
@@ -112,6 +160,7 @@ const getBidById = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 // update a bid
 const updateBid = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     const { response, matched } = updateData;
     if (!id || !response) {
         throw new appError_1.default(400, "Bid ID and update data are required");
@@ -122,6 +171,10 @@ const updateBid = (id, updateData) => __awaiter(void 0, void 0, void 0, function
             response,
             matched: matched !== undefined ? matched : false,
         },
+        include: {
+            User: true,
+            Auction: true,
+        }
     });
     const { auctionId } = updatedBid;
     const auction = yield prismaDb_1.default.auction.findFirst({
@@ -137,13 +190,35 @@ const updateBid = (id, updateData) => __awaiter(void 0, void 0, void 0, function
         });
         if (admin) {
             (0, notifyUser_1.notifyUser)(admin.id, {
-                message: `Bid matched for auction ${auction === null || auction === void 0 ? void 0 : auction.title}`,
+                message: `Bid matched for auction ${auction === null || auction === void 0 ? void 0 : auction.title} by ${updatedBid.User.fullName}`,
                 bidId: updatedBid.id,
                 auctionId: updatedBid.auctionId,
                 auctionCreaterId: auction === null || auction === void 0 ? void 0 : auction.User.id,
                 bidCreaterId: updatedBid.userId,
             });
+            yield prismaDb_1.default.notification.create({
+                data: {
+                    type: "BID_MATCHED",
+                    message: `Bid matched for auction ${auction === null || auction === void 0 ? void 0 : auction.title} by ${updatedBid.User.fullName}`,
+                    recipient: admin.id,
+                    sender: (_a = updatedBid === null || updatedBid === void 0 ? void 0 : updatedBid.Auction) === null || _a === void 0 ? void 0 : _a.userId,
+                }
+            });
         }
+        (0, notifyUser_1.notifyUser)(updatedBid.Auction.userId, {
+            type: "BID_MATCHED",
+            message: `Your bid for auction ${auction === null || auction === void 0 ? void 0 : auction.title} has been matched by ${updatedBid.User.fullName}`,
+            recipient: updatedBid.Auction.userId,
+            sender: updatedBid.userId,
+        });
+        yield prismaDb_1.default.notification.create({
+            data: {
+                type: "BID_MATCHED",
+                message: `Your bid for auction ${auction === null || auction === void 0 ? void 0 : auction.title} has been matched by ${updatedBid.User.fullName}`,
+                recipient: (_b = updatedBid === null || updatedBid === void 0 ? void 0 : updatedBid.Auction) === null || _b === void 0 ? void 0 : _b.userId,
+                sender: updatedBid === null || updatedBid === void 0 ? void 0 : updatedBid.userId,
+            }
+        });
     }
     return { bid: updatedBid };
 });

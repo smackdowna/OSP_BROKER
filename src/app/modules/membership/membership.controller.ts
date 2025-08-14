@@ -99,9 +99,9 @@ const deleteMembershipPlan = catchAsyncError(
 );
 
 // create user membership
-const createUserMembership = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { membershipPlanId, startDate, endDate, status, userId } = req.body;
+const createUserMembership = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user.userId;  
+  const { membershipPlanId, startDate, endDate, status } = req.body;
     const {userMembership } = await membershipServices.createUserMembership({
       userId,
       membershipPlanId,

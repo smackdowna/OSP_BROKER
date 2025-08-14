@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.liveConventionServices = void 0;
 const jsrsasign_1 = require("jsrsasign");
 const config_1 = __importDefault(require("../../config"));
+const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
+const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
+const notifyUser_1 = require("../../utils/notifyUser");
 // create signature
 const createSignature = (liveConvention) => __awaiter(void 0, void 0, void 0, function* () {
     const { meetingNumber, role, expirationSeconds, videoWebRtcMode } = liveConvention;
@@ -36,6 +39,44 @@ const createSignature = (liveConvention) => __awaiter(void 0, void 0, void 0, fu
     const sdkJWT = jsrsasign_1.KJUR.jws.JWS.sign('HS256', sHeader, sPayload, config_1.default.zoom_meeting_sdk_secret);
     return { signature: sdkJWT, sdkKey: config_1.default.zoom_meeting_sdk_key };
 });
+// create live convention notification to business page followers
+const notifyLiveConvention = (businessId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!businessId) {
+        throw new Error("Business ID is required");
+    }
+    const followers = yield prismaDb_1.default.businessPageFollower.findMany({
+        where: {
+            businessId,
+        },
+        include: {
+            user: true,
+        },
+    });
+    if (!followers || followers.length === 0) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No followers found for this business page",
+        });
+    }
+    yield Promise.all(followers.map((follower) => __awaiter(void 0, void 0, void 0, function* () {
+        yield prismaDb_1.default.notification.create({
+            data: {
+                type: "LIVE_CONVENTION",
+                message: `A new live convention is scheduled for your followed business page.`,
+                recipient: follower.userId,
+                sender: follower.businessId,
+            }
+        });
+        (0, notifyUser_1.notifyUser)(follower.userId, {
+            type: "LIVE_CONVENTION",
+            message: `A new live convention is scheduled for your followed business page.`,
+            recipient: follower.userId,
+            sender: follower.businessId,
+        });
+    })));
+});
 exports.liveConventionServices = {
     createSignature,
+    notifyLiveConvention,
 };

@@ -10,7 +10,7 @@ const createBid = catchAsyncError(async (req: Request , res: Response , next: Ne
     const {auctionId}= req.params;
     const userId = req.user.userId;
 
-    const bid= await bidServices.createBid({auctionId , userId, response});
+    const bid= await bidServices.createBid({auctionId , userId, response} , res);
 
     return sendResponse(res,{
         statusCode: 201,

@@ -39,24 +39,24 @@ const createComment = async (commentBody: TComment , res:Response) => {
             );
         }
     
-        await prismadb.notification.create({
-          data: {
-            type: "COMMENT",
-            message: `Someone commented on your topic "${topic?.title}"`,
-            recipient: forum.userId,
-            sender: commenterId
-          },
-            })
-    
         // send real time notification to the user
         if(forum){
             notifyUser(forum?.userId, {
                 type: "COMMENT",
-                message: `Someone commented on your topic "${topic?.title}"`,
+                message: `Someone commented on your topic ${topic?.title}`,
                 recipient: forum.userId,
                 sender: commenterId
             });
         }
+    
+        await prismadb.notification.create({
+          data: {
+            type: "COMMENT",
+            message: `Someone commented on your topic ${topic?.title}`,
+            recipient: forum.userId,
+            sender: commenterId
+          },
+            })
     
          newComment = await prismadb.comment.create({
             data: {
@@ -84,22 +84,22 @@ const createComment = async (commentBody: TComment , res:Response) => {
                 })
             );
         }
-
+        
+        notifyUser(post.businessId, {
+            type: "COMMENT",
+            message: `Someone commented on your post ${post?.title}`,
+            recipient: post.userId,
+            sender: commenterId
+        });
         await prismadb.notification.create({
           data: {
             type: "COMMENT",
-            message: `Someone commented on your post "${post?.title}"`,
+            message: `Someone commented on your post ${post?.title}`,
             recipient: post.userId,
             sender: commenterId
           },
         })
 
-        notifyUser(post.businessId, {
-            type: "COMMENT",
-            message: `Someone commented on your post "${post?.title}"`,
-            recipient: post.userId,
-            sender: commenterId
-        });
 
         newComment = await prismadb.comment.create({
             data: {
@@ -115,73 +115,7 @@ const createComment = async (commentBody: TComment , res:Response) => {
     
 }
 
-// get all notifications
-const getAllNotifications = async (userId: string) => {
-    const notifications = await prismadb.notification.findMany({
-        where: {
-            recipient: userId,
-        },
-    });
-    if (!notifications) {
-        throw new AppError(404, "No notifications found");
-    }
-    return {notifications};
-}
 
-
-// soft delete notification 
-const softDeleteNotification= async (notificationId: string, res: Response) => {
-    if (!res || typeof res.status !== "function") {
-        throw new Error("Invalid Response object passed to softDeleteNotification");
-    }
-
-    if (!notificationId) {
-        return(
-            sendResponse(res, {
-                statusCode: 400,
-                success: false,
-                message: "Notification id is required",
-            })
-        );
-    }
-
-    const existingNotification = await prismadb.notification.findFirst({
-        where: {
-            id: notificationId,
-        },
-    });
-
-    if (!existingNotification) {
-        return(
-            sendResponse(res, {
-                statusCode: 404,
-                success: false,
-                message: "Notification not found with this id",
-            })
-        );
-    }
-
-    if(existingNotification.isDeleted === true) {
-        return(
-            sendResponse(res, {
-                statusCode: 400,
-                success: false,
-                message: "Notification is already soft deleted.",
-            })
-        );
-    }
-
-    const deletedNotification = await prismadb.notification.update({
-        where: {
-            id: notificationId,
-        },
-        data: {
-            isDeleted: true,
-        },
-    });
-    return {deletedNotification};
-}
-  
 // get all comments
 const getAllComments = async () => {
     // fetch pinned comments
@@ -399,7 +333,5 @@ export const commentServices = {
     deleteAllComments,
     getCommentById,
     updateComment,
-    deleteComment,
-    getAllNotifications,
-    softDeleteNotification
+    deleteComment
 };

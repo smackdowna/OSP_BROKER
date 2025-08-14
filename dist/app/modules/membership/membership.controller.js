@@ -88,7 +88,8 @@ const deleteMembershipPlan = (0, catchAsyncError_1.default)((req, res, next) => 
 }));
 // create user membership
 const createUserMembership = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { membershipPlanId, startDate, endDate, status, userId } = req.body;
+    const userId = req.user.userId;
+    const { membershipPlanId, startDate, endDate, status } = req.body;
     const { userMembership } = yield membership_services_1.membershipServices.createUserMembership({
         userId,
         membershipPlanId,

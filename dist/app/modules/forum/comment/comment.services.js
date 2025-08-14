@@ -43,23 +43,23 @@ const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, fu
                 message: "Forum not found",
             }));
         }
-        yield prismaDb_1.default.notification.create({
-            data: {
-                type: "COMMENT",
-                message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
-                recipient: forum.userId,
-                sender: commenterId
-            },
-        });
         // send real time notification to the user
         if (forum) {
             (0, notifyUser_1.notifyUser)(forum === null || forum === void 0 ? void 0 : forum.userId, {
                 type: "COMMENT",
-                message: `Someone commented on your topic "${topic === null || topic === void 0 ? void 0 : topic.title}"`,
+                message: `Someone commented on your topic ${topic === null || topic === void 0 ? void 0 : topic.title}`,
                 recipient: forum.userId,
                 sender: commenterId
             });
         }
+        yield prismaDb_1.default.notification.create({
+            data: {
+                type: "COMMENT",
+                message: `Someone commented on your topic ${topic === null || topic === void 0 ? void 0 : topic.title}`,
+                recipient: forum.userId,
+                sender: commenterId
+            },
+        });
         newComment = yield prismaDb_1.default.comment.create({
             data: {
                 comment,
@@ -83,19 +83,19 @@ const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, fu
                 message: "Post not found",
             }));
         }
+        (0, notifyUser_1.notifyUser)(post.businessId, {
+            type: "COMMENT",
+            message: `Someone commented on your post ${post === null || post === void 0 ? void 0 : post.title}`,
+            recipient: post.userId,
+            sender: commenterId
+        });
         yield prismaDb_1.default.notification.create({
             data: {
                 type: "COMMENT",
-                message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
+                message: `Someone commented on your post ${post === null || post === void 0 ? void 0 : post.title}`,
                 recipient: post.userId,
                 sender: commenterId
             },
-        });
-        (0, notifyUser_1.notifyUser)(post.businessId, {
-            type: "COMMENT",
-            message: `Someone commented on your post "${post === null || post === void 0 ? void 0 : post.title}"`,
-            recipient: post.userId,
-            sender: commenterId
         });
         newComment = yield prismaDb_1.default.comment.create({
             data: {
@@ -107,59 +107,6 @@ const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, fu
         });
         return { comment: newComment };
     }
-});
-// get all notifications
-const getAllNotifications = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const notifications = yield prismaDb_1.default.notification.findMany({
-        where: {
-            recipient: userId,
-        },
-    });
-    if (!notifications) {
-        throw new appError_1.default(404, "No notifications found");
-    }
-    return { notifications };
-});
-// soft delete notification 
-const softDeleteNotification = (notificationId, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!res || typeof res.status !== "function") {
-        throw new Error("Invalid Response object passed to softDeleteNotification");
-    }
-    if (!notificationId) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 400,
-            success: false,
-            message: "Notification id is required",
-        }));
-    }
-    const existingNotification = yield prismaDb_1.default.notification.findFirst({
-        where: {
-            id: notificationId,
-        },
-    });
-    if (!existingNotification) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 404,
-            success: false,
-            message: "Notification not found with this id",
-        }));
-    }
-    if (existingNotification.isDeleted === true) {
-        return ((0, sendResponse_1.default)(res, {
-            statusCode: 400,
-            success: false,
-            message: "Notification is already soft deleted.",
-        }));
-    }
-    const deletedNotification = yield prismaDb_1.default.notification.update({
-        where: {
-            id: notificationId,
-        },
-        data: {
-            isDeleted: true,
-        },
-    });
-    return { deletedNotification };
 });
 // get all comments
 const getAllComments = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -352,7 +299,5 @@ exports.commentServices = {
     deleteAllComments,
     getCommentById,
     updateComment,
-    deleteComment,
-    getAllNotifications,
-    softDeleteNotification
+    deleteComment
 };

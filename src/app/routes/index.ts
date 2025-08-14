@@ -20,6 +20,8 @@ import { postRoutes } from "../modules/post/post.routes";
 import { auctionRouter } from "../modules/auction/auction.routes";
 import { shopRouter } from "../modules/shop/shop.routes";
 import { businessRateCardRouter } from "../modules/business/rateCards/rateCards.routes";
+import { notificationRoutes } from "../modules/notification/notification.routes";
+
 
 const router = Router();
 
@@ -109,6 +111,10 @@ const moduleRoutes=[
     {
         path:"/rateCard",
         route: businessRateCardRouter
+    },
+    {
+        path: "/notification",
+        route: notificationRoutes
     }
 ]
 

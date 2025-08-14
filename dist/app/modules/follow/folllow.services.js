@@ -15,9 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.followServices = void 0;
 const prismaDb_1 = __importDefault(require("../../db/prismaDb"));
 const sendResponse_1 = __importDefault(require("../../middlewares/sendResponse"));
+const notifyUser_1 = require("../../utils/notifyUser");
 // create business page follower(click follow)
 const createBusinessPageFollower = (follower, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     const { businessId, userId } = follower;
+    const business = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: businessId,
+        }
+    });
+    if (!business) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business page not found",
+        });
+    }
     // Check if the follower already exists
     const existingFollower = yield prismaDb_1.default.businessPageFollower.findFirst({
         where: {
@@ -38,11 +52,51 @@ const createBusinessPageFollower = (follower, res) => __awaiter(void 0, void 0, 
             businessId,
             userId,
         },
+        include: {
+            user: true
+        }
+    });
+    if (!newFollower) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to follow business page",
+        });
+    }
+    (0, notifyUser_1.notifyUser)(business === null || business === void 0 ? void 0 : business.businessAdminId, {
+        type: "FOLLOW",
+        message: `${(_a = newFollower === null || newFollower === void 0 ? void 0 : newFollower.user) === null || _a === void 0 ? void 0 : _a.fullName} started following your business page ${business === null || business === void 0 ? void 0 : business.businessName}`,
+        recipient: business === null || business === void 0 ? void 0 : business.businessAdminId,
+        sender: newFollower.userId,
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            type: "FOLLOW",
+            message: `${(_b = newFollower === null || newFollower === void 0 ? void 0 : newFollower.user) === null || _b === void 0 ? void 0 : _b.fullName} started following your business page ${business === null || business === void 0 ? void 0 : business.businessName}`,
+            recipient: business === null || business === void 0 ? void 0 : business.businessAdminId,
+            sender: newFollower.userId,
+        }
     });
     return newFollower;
 });
 //unfollow business page
 const unfollowBusinessPage = (businessId, userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const business = yield prismaDb_1.default.business.findFirst({
+        where: {
+            id: businessId,
+        },
+        include: {
+            BusinessAdmin: true
+        }
+    });
+    if (!business) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Business page not found",
+        });
+    }
     const businessPageFollower = yield prismaDb_1.default.businessPageFollower.findFirst({
         where: {
             businessId,
@@ -60,6 +114,30 @@ const unfollowBusinessPage = (businessId, userId, res) => __awaiter(void 0, void
         where: {
             id: businessPageFollower.id,
         },
+        include: {
+            user: true,
+        }
+    });
+    if (!unfollow) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to unfollow business page",
+        });
+    }
+    (0, notifyUser_1.notifyUser)(business === null || business === void 0 ? void 0 : business.businessAdminId, {
+        type: "UNFOLLOW",
+        message: `${(_a = unfollow === null || unfollow === void 0 ? void 0 : unfollow.user) === null || _a === void 0 ? void 0 : _a.fullName} unfollowed your business page ${business === null || business === void 0 ? void 0 : business.businessName}`,
+        recipient: business === null || business === void 0 ? void 0 : business.businessAdminId,
+        sender: userId,
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            type: "UNFOLLOW",
+            message: `${(_b = unfollow === null || unfollow === void 0 ? void 0 : unfollow.user) === null || _b === void 0 ? void 0 : _b.fullName} unfollowed your business page ${business === null || business === void 0 ? void 0 : business.businessName}`,
+            recipient: business === null || business === void 0 ? void 0 : business.businessAdminId,
+            sender: userId,
+        }
     });
     return unfollow;
 });
@@ -91,6 +169,21 @@ const getAllBusinessPageFollowers = (businessId) => __awaiter(void 0, void 0, vo
 // create representative page follower(click follow)
 const createRepresentativePageFollower = (follower, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { representativeId, userId } = follower;
+    const representative = yield prismaDb_1.default.representative.findFirst({
+        where: {
+            id: representativeId,
+        },
+        include: {
+            user: true
+        }
+    });
+    if (!representative) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representative not found",
+        });
+    }
     // Check if the follower already exists
     const existingFollower = yield prismaDb_1.default.representativePageFollower.findFirst({
         where: {
@@ -111,11 +204,48 @@ const createRepresentativePageFollower = (follower, res) => __awaiter(void 0, vo
             representativeId,
             userId,
         },
+        include: {
+            user: true
+        }
+    });
+    if (!newFollower) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to follow representative page",
+        });
+    }
+    (0, notifyUser_1.notifyUser)(representative === null || representative === void 0 ? void 0 : representative.userId, {
+        type: "FOLLOW",
+        message: `${newFollower.user.fullName} started following you`,
+        recipient: representative === null || representative === void 0 ? void 0 : representative.userId,
+        sender: newFollower.userId,
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            type: "FOLLOW",
+            message: `${newFollower.user.fullName} started following you`,
+            recipient: representative === null || representative === void 0 ? void 0 : representative.userId,
+            sender: newFollower.userId,
+        }
     });
     return newFollower;
 });
 // unfollow representative page
 const unfollowRepresentativePage = (representativeId, userId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const representative = yield prismaDb_1.default.representative.findFirst({
+        where: {
+            id: representativeId,
+        }
+    });
+    if (!representative) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "Representative not found",
+        });
+    }
     const representativePageFollower = yield prismaDb_1.default.representativePageFollower.findFirst({
         where: {
             representativeId,
@@ -133,6 +263,30 @@ const unfollowRepresentativePage = (representativeId, userId, res) => __awaiter(
         where: {
             id: representativePageFollower.id,
         },
+        include: {
+            user: true,
+        }
+    });
+    if (!unfollow) {
+        return (0, sendResponse_1.default)(res, {
+            statusCode: 500,
+            success: false,
+            message: "Failed to unfollow representative page",
+        });
+    }
+    (0, notifyUser_1.notifyUser)(representative === null || representative === void 0 ? void 0 : representative.userId, {
+        type: "UNFOLLOW",
+        message: `${(_a = unfollow === null || unfollow === void 0 ? void 0 : unfollow.user) === null || _a === void 0 ? void 0 : _a.fullName} unfollowed you`,
+        recipient: representative === null || representative === void 0 ? void 0 : representative.userId,
+        sender: userId,
+    });
+    yield prismaDb_1.default.notification.create({
+        data: {
+            type: "UNFOLLOW",
+            message: `${(_b = unfollow === null || unfollow === void 0 ? void 0 : unfollow.user) === null || _b === void 0 ? void 0 : _b.fullName} unfollowed you`,
+            recipient: representative === null || representative === void 0 ? void 0 : representative.userId,
+            sender: userId,
+        }
     });
     return unfollow;
 });

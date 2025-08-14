@@ -21,7 +21,7 @@ const createBid = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
     const { response } = req.body;
     const { auctionId } = req.params;
     const userId = req.user.userId;
-    const bid = yield bid_services_1.bidServices.createBid({ auctionId, userId, response });
+    const bid = yield bid_services_1.bidServices.createBid({ auctionId, userId, response }, res);
     return (0, sendResponse_1.default)(res, {
         statusCode: 201,
         success: true,

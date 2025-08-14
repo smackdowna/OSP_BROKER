@@ -36,17 +36,6 @@ const createComment = (0, catchAsyncError_1.default)((req, res, next) => __await
         data: newComment,
     });
 }));
-// get all notifications
-const getAllNotifications = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.user.userId;
-    const notifications = yield comment_services_1.commentServices.getAllNotifications(userId);
-    (0, sendResponse_1.default)(res, {
-        statusCode: 200,
-        success: true,
-        message: "All notifications fetched successfully",
-        data: notifications,
-    });
-}));
 // get all comments
 const getAllComments = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const comments = yield comment_services_1.commentServices.getAllComments();
@@ -77,17 +66,6 @@ const getCommentById = (0, catchAsyncError_1.default)((req, res, next) => __awai
         success: true,
         message: "Comment fetched successfully",
         data: comment,
-    });
-}));
-// soft delete notification
-const softDeleteNotification = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const deletedNotification = yield comment_services_1.commentServices.softDeleteNotification(id, res);
-    (0, sendResponse_1.default)(res, {
-        statusCode: 200,
-        success: true,
-        message: "Notification soft deleted successfully",
-        data: deletedNotification,
     });
 }));
 // delete all comments
@@ -242,7 +220,5 @@ exports.commentController = {
     getCommentByTopicId,
     getCommentById,
     updateComment,
-    deleteComment,
-    getAllNotifications,
-    softDeleteNotification
+    deleteComment
 };

@@ -7,23 +7,28 @@ import { Response } from "express";
 
 
 // create a new bid
-const createBid = async (bid: TAuctionBid) => {
+const createBid = async (bid: TAuctionBid , res:Response) => {
     const { auctionId, userId, response } = bid;
 
     if (!auctionId || !userId || !response) {
         throw new AppError(400, "All fields are required");
     }
 
-    const existingBid = await prismadb.auctionBid.findFirst({
-        where: {
-            auctionId,
-            userId,
+    const auction= await prismadb.auction.findFirst({
+        where: { id: auctionId },
+        include: {
+            User: true,
+            auctionBids: true 
         },
     });
 
-    if (existingBid) {
-        throw new AppError(400, "You have already placed a bid on this auction");
+    if(!auction) {
+        throw new AppError(404, "Auction not found");
     }
+
+    // get all the previous bidders for the auction
+    const auctionBidders= auction.auctionBids.map((bid) => bid.userId);
+
 
     const newBid = await prismadb.auctionBid.create({
         data: {
@@ -31,7 +36,60 @@ const createBid = async (bid: TAuctionBid) => {
             userId,
             response,
         },
+        include:{
+            User: true,
+            Auction: true,
+        }
     });
+
+
+    if(!newBid){
+        throw new AppError(500, "Failed to create bid");
+    }
+
+    // notify auction creator
+    notifyUser(newBid.Auction.userId, {
+        type: "BID ",
+        message: `New bid placed for auction ${newBid.Auction.title}`,
+        recipient: newBid.Auction.userId,
+        sender: newBid.userId,
+    })
+
+
+    await prismadb.notification.create({
+        data: {
+            type: "BID",
+            message: `New bid placed for auction ${newBid?.Auction?.title}`,
+            recipient: newBid.Auction.userId,
+            sender: newBid.userId,
+        }
+    })
+
+
+    // notify all the previous bidders
+    if(auctionBidders.length > 0) {
+        await Promise.all(
+            auctionBidders.map(async (bidderId) => {
+                if(bidderId !== userId) {
+                    notifyUser(bidderId, {
+                        type: "BID",
+                        message: `New bid placed for auction ${newBid.Auction.title} by ${newBid.User.fullName}`,
+                        recipient: bidderId,
+                        sender: newBid.userId,
+                    });
+
+                    await prismadb.notification.create({
+                        data: {
+                            type: "BID",
+                            message: `New bid placed for auction ${newBid?.Auction?.title} by ${newBid.User.fullName}`,
+                            recipient: bidderId,
+                            sender: newBid.userId,
+                        }
+                    })
+                }
+            })
+        )
+    }
 
     return { bid: newBid };
 }
@@ -129,6 +187,10 @@ const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
             response,
             matched: matched !== undefined ? matched : false,
         },
+        include:{
+            User: true,
+            Auction: true,
+        }
     });
 
     const {auctionId}= updatedBid;
@@ -147,14 +209,40 @@ const updateBid = async (id: string, updateData: Partial<TAuctionBid>) => {
         });
 
         if(admin){
+
             notifyUser(admin.id,{
-                message: `Bid matched for auction ${auction?.title}`,
+                message: `Bid matched for auction ${auction?.title} by ${updatedBid.User.fullName}`,
                 bidId: updatedBid.id,
                 auctionId: updatedBid.auctionId,
                 auctionCreaterId: auction?.User.id,
                 bidCreaterId: updatedBid.userId,
             })
+
+            await prismadb.notification.create({
+                data: {
+                    type: "BID_MATCHED",
+                    message: `Bid matched for auction ${auction?.title} by ${updatedBid.User.fullName}`,
+                    recipient: admin.id,
+                    sender: updatedBid?.Auction?.userId,
+                }
+            })
         }
+
+        notifyUser(updatedBid.Auction.userId, {
+            type: "BID_MATCHED",
+            message: `Your bid for auction ${auction?.title} has been matched by ${updatedBid.User.fullName}`,
+            recipient: updatedBid.Auction.userId,
+            sender: updatedBid.userId,
+        })
+
+        await prismadb.notification.create({
+            data: {
+                type: "BID_MATCHED",
+                message: `Your bid for auction ${auction?.title} has been matched by ${updatedBid.User.fullName}`,
+                recipient: updatedBid?.Auction?.userId,
+                sender: updatedBid?.userId,
+            }
+        })
     }
 
     return { bid: updatedBid };
