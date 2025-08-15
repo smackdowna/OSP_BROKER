@@ -23,6 +23,7 @@ const auction_routes_1 = require("../modules/auction/auction.routes");
 const shop_routes_1 = require("../modules/shop/shop.routes");
 const rateCards_routes_1 = require("../modules/business/rateCards/rateCards.routes");
 const notification_routes_1 = require("../modules/notification/notification.routes");
+const payment_routes_1 = require("../modules/payment/payment.routes");
 const router = (0, express_1.Router)();
 const moduleRoutes = [
     {
@@ -112,6 +113,10 @@ const moduleRoutes = [
     {
         path: "/notification",
         route: notification_routes_1.notificationRoutes
+    },
+    {
+        path: "/payment",
+        route: payment_routes_1.paymentRoutes
     }
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

@@ -30,5 +30,7 @@ exports.default = {
     zoom_meeting_sdk_secret: process.env.ZOOM_MEETING_SDK_SECRET,
     imageKit_public_key: process.env.IMAGEKIT_PUBLIC_KEY,
     imageKit_private_key: process.env.IMAGEKIT_PRIVATE_KEY,
-    imageKit_url_endpoint: process.env.IMAGEKIT_URL_ENDPOINT
+    imageKit_url_endpoint: process.env.IMAGEKIT_URL_ENDPOINT,
+    stripe_publishable_key: process.env.STRIPE_PUBLISHABLE_KEY,
+    stripe_secret_key: process.env.STRIPE_SECRET_KEY,
 };
