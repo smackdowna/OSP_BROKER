@@ -21,6 +21,7 @@ import { auctionRouter } from "../modules/auction/auction.routes";
 import { shopRouter } from "../modules/shop/shop.routes";
 import { businessRateCardRouter } from "../modules/business/rateCards/rateCards.routes";
 import { notificationRoutes } from "../modules/notification/notification.routes";
+import { paymentRoutes } from "../modules/payment/payment.routes";
 
 
 const router = Router();
@@ -115,6 +116,10 @@ const moduleRoutes=[
     {
         path: "/notification",
         route: notificationRoutes
+    },
+    {
+        path: "/payment",
+        route: paymentRoutes
     }
 ]
 

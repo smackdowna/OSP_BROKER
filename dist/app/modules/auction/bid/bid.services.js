@@ -52,7 +52,7 @@ const createBid = (bid, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // notify auction creator
     (0, notifyUser_1.notifyUser)(newBid.Auction.userId, {
-        type: "BID",
+        type: "BID ",
         message: `New bid placed for auction ${newBid.Auction.title}`,
         recipient: newBid.Auction.userId,
         sender: newBid.userId,
