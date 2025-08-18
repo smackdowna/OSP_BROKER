@@ -1,6 +1,8 @@
 import prismadb from "../../db/prismaDb";
 import { TUserMembership } from "../membership/membership.interface";
-import { TCard } from "./payment.interface";
+import { TUserKudoCoin } from "../shop/kudoCoin/kudoCoin.interface";
+import { TUserPin } from "../shop/pin/pin.interface";
+import { TUserBadge } from "../shop/badge/badge.interface";
 import AppError from "../../errors/appError";
 import sendResponse from "../../middlewares/sendResponse";
 import { Response } from "express";
@@ -13,9 +15,6 @@ const createMembershipPayment = async (
   // paymentMethodId: string,
   res: Response
 ) => {
-  if (!userMembershipData) {
-    throw new AppError(400, "All fields are required");
-  }
 
   const { userId, membershipPlanId } = userMembershipData;
   // const { number, exp_month, exp_year, cvc } = card;
@@ -181,6 +180,347 @@ const createMembershipPayment = async (
   };
 };
 
+// create kudoCoin payment
+const createKudoCoinPayment = async(userKudoCoinData:TUserKudoCoin, res:Response)=>{
+  const {userId, kudoCoinId , quantity} = userKudoCoinData;
+  if(!userId || !kudoCoinId || !quantity) {
+    throw new AppError(400, "User ID, Kudo Coin ID and quantity are required");
+  }
+
+  const paymentMethodId = "pm_card_visa";
+
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+    include: {
+      userProfile: true,
+    },
+  });
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  // check if kudoCoin exists
+  const kudoCoin = await prismadb.kudoCoin.findFirst({
+    where: { id: kudoCoinId },
+  });
+
+  if (!kudoCoin) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Kudo Coin not found",
+    });
+  }
+
+  const stripeCustomer = await stripe.customers.create({
+    email: user.email,
+    name: user.fullName,
+    address: {
+      city: user.userProfile?.location || "",
+    },
+    payment_method: paymentMethodId, // Use the payment method ID directly
+    invoice_settings: {
+      default_payment_method: paymentMethodId, // Set the default payment method
+    },
+  });
+
+  if (!stripeCustomer) {
+    throw new AppError(500, "Failed to create stripe customer");
+  }
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: kudoCoin.price * quantity * 100, // convert to cents
+    currency: "usd",
+    customer: stripeCustomer.id,
+    payment_method: "pm_card_visa",
+    confirm: true, // immediately confirm payment
+    description: `Payment for Kudo Coin with price ${kudoCoin.price} and quantity ${quantity}`,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: "never", // prevent redirect-based methods
+    },
+    receipt_email: user.email, // optional: send receipt to user email
+  });
+
+  if (!paymentIntent || paymentIntent.status !== "succeeded") {
+    throw new AppError(500, "Failed to process payment");
+  }
+
+  const userKudoCoin= await prismadb.userKudoCoin.create({
+    data: {
+      userId: userId,
+      kudoCoinId: kudoCoinId,
+      quantity: quantity,
+      totalCost: quantity*kudoCoin.price
+    },
+  })
+
+  if (!userKudoCoin) {
+    throw new AppError(500, "Failed to create user kudo coin");
+  }
+
+  const paymentRecord = await prismadb.paymentRecord.create({
+    data: {
+      amount: kudoCoin.price * quantity,
+      paymentMethod: "CARD",
+      status: "COMPLETED",
+      transactionId: paymentIntent.id,
+      userKudoCoinId: userKudoCoin.id,
+    },
+  });
+
+  if (!paymentRecord) {
+    throw new AppError(500, "Failed to create payment record");
+  }
+
+  return {
+    kudoCoinPayment: {
+      stripeCustomer,
+      userKudoCoin,
+      paymentRecord,
+    },
+  };
+};
+
+// create pin payment
+const createPinPayment = async(userPinData:Partial<TUserPin>, res:Response)=>{
+  const {userId, pinId , count} = userPinData;
+  if(!userId || !pinId || !count) {
+    throw new AppError(400, "User ID, Pin ID and quantity are required");
+  }
+
+  const paymentMethodId = "pm_card_visa";
+
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+    include: {
+      userProfile: true,
+    },
+  });
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  // check if pin exists
+  const pin = await prismadb.pin.findFirst({
+    where: { id: pinId },
+  });
+
+  if (!pin) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Pin not found",
+    });
+  }
+
+  const stripeCustomer = await stripe.customers.create({
+    email: user.email,
+    name: user.fullName,
+    address: {
+      city: user.userProfile?.location || "",
+    },
+    payment_method: paymentMethodId, // Use the payment method ID directly
+    invoice_settings: {
+      default_payment_method: paymentMethodId, // Set the default payment method
+    },
+  });
+
+  if (!stripeCustomer) {
+    throw new AppError(500, "Failed to create stripe customer");
+  }
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: pin.price * count * 100, // convert to cents
+    currency: "usd",
+    customer: stripeCustomer.id,
+    payment_method: "pm_card_visa",
+    confirm: true, // immediately confirm payment
+    description: `Payment for Pin with price ${pin.price} and quantity ${count}`,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: "never", // prevent redirect-based methods
+    },
+    receipt_email: user.email, // optional: send receipt to user email
+  });
+
+  if (!paymentIntent || paymentIntent.status !== "succeeded") {
+    throw new AppError(500, "Failed to process payment");
+  }
+
+    const startDate = new Date();
+  let endDate = new Date(startDate);
+  const duration = pin.duration;
+
+  endDate.setDate(endDate.getDate() + duration);
+
+  const userPin= await prismadb.userPin.create({
+    data: {
+      userId: userId,
+      pinId: pinId,
+      count:count,
+      totalCost: pin.price * count,
+      expirationDate: endDate, 
+    },
+  });
+
+  if (!userPin) {
+    throw new AppError(500, "Failed to create user pin");
+  }
+
+  const paymentRecord = await prismadb.paymentRecord.create({
+    data: {
+      amount: pin.price * count,
+      paymentMethod: "CARD",
+      status: "COMPLETED",
+      transactionId: paymentIntent.id,
+      userPinId: userPin.id,
+    },
+  });
+
+  if (!paymentRecord) {
+    throw new AppError(500, "Failed to create payment record");
+  }
+
+  return {
+    pinPayment: {
+      stripeCustomer,
+      userPin,
+      paymentRecord,
+    },
+  };
+
+}
+
+// create badge payment
+const createBadgePayment= async(userBadgeDate:Partial<TUserBadge>, res:Response)=>{
+   const {userId, badgeId} = userBadgeDate;
+
+  if(!userId || !badgeId) {
+    throw new AppError(400, "User ID and Badge ID are required");
+  }
+
+  const paymentMethodId = "pm_card_visa";
+
+  const user = await prismadb.user.findFirst({
+    where: {
+      id: userId,
+    },
+    include: {
+      userProfile: true,
+    },
+  });
+
+  if (!user) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "User not found",
+    });
+  }
+
+  // check if badge exists
+  const badge = await prismadb.badge.findFirst({
+    where: { id: badgeId },
+  });
+
+  if (!badge) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Badge not found",
+    });
+  }
+
+  const stripeCustomer = await stripe.customers.create({
+    email: user.email,
+    name: user.fullName,
+    address: {
+      city: user.userProfile?.location || "",
+    },
+    payment_method: paymentMethodId, // Use the payment method ID directly
+    invoice_settings: {
+      default_payment_method: paymentMethodId, // Set the default payment method
+    },
+  });
+
+  if (!stripeCustomer) {
+    throw new AppError(500, "Failed to create stripe customer");
+  }
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: badge.price * 100, // convert to cents
+    currency: "usd",
+    customer: stripeCustomer.id,
+    payment_method: "pm_card_visa",
+    confirm: true, // immediately confirm payment
+    description: `Payment for Badge with price ${badge.price}`,
+    automatic_payment_methods: {
+      enabled: true,
+      allow_redirects: "never", // prevent redirect-based methods
+    },
+    receipt_email: user.email, // optional: send receipt to user email
+  });
+
+
+  if (!paymentIntent || paymentIntent.status !== "succeeded") {
+    throw new AppError(500, "Failed to process payment");
+  }
+
+  const userBadge = await prismadb.userBadge.create({
+    data: {
+      userId: userId,
+      badgeId: badgeId,
+      totalCost: badge.price
+    },
+  });
+
+  if (!userBadge) {
+    throw new AppError(500, "Failed to create user badge");
+  }
+
+  const paymentRecord = await prismadb.paymentRecord.create({
+    data: {
+      amount: badge.price,
+      paymentMethod: "CARD",
+      status: "COMPLETED",
+      transactionId: paymentIntent.id,
+      userBadgeId: userBadge.id,
+    },
+  });
+
+  if (!paymentRecord) {
+    throw new AppError(500, "Failed to create payment record");
+  }
+
+  return {
+    badgePayment: {
+      stripeCustomer,
+      userBadge,
+      paymentRecord,
+    },
+  };
+
+}
+
+
 export const paymentService = {
   createMembershipPayment,
+  createKudoCoinPayment,
+  createPinPayment,
+  createBadgePayment,
 };

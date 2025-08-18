@@ -43,6 +43,7 @@ router.get("/badge", requireAuth_1.verifyToken, badge_controller_1.badgeControll
 router.get("/badge/:id", requireAuth_1.verifyToken, badge_controller_1.badgeController.getBadgeById);
 router.put("/badge/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.updateBadge);
 router.post("/badge/softDelete/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.softDeleteBadge);
+router.delete("/badge", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.deleteAllBadges);
 router.delete("/badge/:id", requireAuth_1.verifyToken, (0, authorizeRole_1.authorizeRole)("ADMIN"), badge_controller_1.badgeController.deleteBadge);
 router.post("/badge/buy/:badgeId", requireAuth_1.verifyToken, badge_controller_1.badgeController.buyBadge);
 exports.shopRouter = router;

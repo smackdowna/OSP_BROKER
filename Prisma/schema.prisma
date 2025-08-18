@@ -429,6 +429,12 @@ model paymentRecord{
     userKudoCoinId String? @db.ObjectId
     UserKudoCoin userKudoCoin? @relation("userKudoCoinToPaymentRecord", fields: [userKudoCoinId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
 
+    userPinId String? @db.ObjectId
+    UserPin UserPin? @relation("userPinToPaymentRecord", fields: [userPinId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
+    userBadgeId String? @db.ObjectId
+    UserBadge UserBadge? @relation("userBadgeToPaymentRecord", fields: [userBadgeId], references: [id] , onDelete: Cascade , onUpdate: Cascade)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -724,6 +730,7 @@ model UserPin{
     pinnedAuction pinnedAuction[] @relation("userToPin")
     pinnedAuctionBid pinnedAuctionBid[] @relation("userToPin")
 
+    paymentRecord paymentRecord[] @relation("userPinToPaymentRecord")
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 } 
@@ -810,6 +817,7 @@ model userKudoCoin{
     kudoCoinId String @db.ObjectId
     KudoCoin kudoCoin @relation("kudoCoinToUserKudoCoin", fields: [kudoCoinId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     quantity Int @default(0) //number of kudo coins user has
+    totalCost Float @default(0)
 
     paymentRecord paymentRecord[] @relation("userKudoCoinToPaymentRecord")
 
@@ -822,6 +830,7 @@ model Badge{
     id String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     description String
+    price Float @default(0)
     isDeleted Boolean @default(false)
     userBadge UserBadge[] @relation("badgeToUserBadge")
 
@@ -835,6 +844,9 @@ model UserBadge{
     User User @relation("userToUserBadge", fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
     badgeId String @db.ObjectId
     Badge Badge @relation("badgeToUserBadge", fields: [badgeId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+    totalCost Float @default(0)
+
+    paymentRecord paymentRecord[] @relation("userBadgeToPaymentRecord")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

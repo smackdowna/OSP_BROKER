@@ -18,8 +18,8 @@ const sendResponse_1 = __importDefault(require("../../../middlewares/sendRespons
 const catchAsyncError_1 = __importDefault(require("../../../utils/catchAsyncError"));
 // Create a new badge
 const createBadge = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description } = req.body;
-    const badge = yield badge_services_1.badgeServices.createBadge({ name, description });
+    const { name, description, price } = req.body;
+    const badge = yield badge_services_1.badgeServices.createBadge({ name, description, price });
     return (0, sendResponse_1.default)(res, {
         statusCode: 201,
         success: true,
@@ -82,6 +82,16 @@ const deleteBadge = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 
         data: badge,
     });
 }));
+// Delete all badges
+const deleteAllBadges = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const badges = yield badge_services_1.badgeServices.deleteAllBadges(res);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "All badges deleted successfully",
+        data: badges,
+    });
+}));
 // Buy badge
 const buyBadge = (0, catchAsyncError_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.user;
@@ -101,5 +111,6 @@ exports.badgeController = {
     updateBadge,
     softDeleteBadge,
     deleteBadge,
+    deleteAllBadges,
     buyBadge
 };
