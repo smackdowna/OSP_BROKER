@@ -6,10 +6,10 @@ import catchAsyncError from "../../../utils/catchAsyncError";
 
 // Create a new badge
 const createBadge = catchAsyncError(async (req: Request, res: Response) => {
-    const { name, description } = req.body;
+    const { name, description , price } = req.body;
 
 
-    const badge = await badgeServices.createBadge({ name, description });
+    const badge = await badgeServices.createBadge({ name, description , price });
 
     return sendResponse(res, {
         statusCode: 201,
@@ -88,6 +88,18 @@ const deleteBadge = catchAsyncError(async (req: Request, res: Response) => {
     });
 });
 
+// Delete all badges
+const deleteAllBadges = catchAsyncError(async (req: Request, res: Response) => {
+    const badges = await badgeServices.deleteAllBadges(res);
+
+    return sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "All badges deleted successfully",
+        data: badges,
+    });
+});
+
 // Buy badge
 const buyBadge = catchAsyncError(async (req: Request, res: Response) => {
     const { userId } = req.user;
@@ -111,5 +123,6 @@ export const badgeController = {
     updateBadge,
     softDeleteBadge,
     deleteBadge,
+    deleteAllBadges,
     buyBadge
 };

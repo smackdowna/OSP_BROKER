@@ -5,7 +5,7 @@ import { TBadge } from "./badge.interface";
 
 // create badge
 const createBadge = async (badge: TBadge) => {
-    const { name, description } = badge;
+    const { name, description , price } = badge;
 
     if (!name || !description) {
         throw new AppError(400, "Name and description are required fields.");
@@ -23,6 +23,7 @@ const createBadge = async (badge: TBadge) => {
         data: {
             name,
             description,
+            price
         },
     });
 
@@ -145,6 +146,22 @@ const deleteBadge = async (id: string, res: Response) => {
     return { badge };
 }
 
+// delete all badges
+const deleteAllBadges = async (res: Response) => {
+    const badges = await prismadb.badge.deleteMany({
+        where: { isDeleted: false },
+    });
+
+    if (!badges) {
+        return res.status(404).json({
+            success: false,
+            message: "No badges found to delete",
+        });
+    }
+
+    return { badges };
+}
+
 // buy badge
 const buyBadge = async (userId: string, badgeId: string, res: Response) => {
     const existingBadge = await prismadb.badge.findFirst({
@@ -175,5 +192,6 @@ export const badgeServices = {
     updateBadge,
     softDeleteBadge,
     deleteBadge,
+    deleteAllBadges,
     buyBadge
 };

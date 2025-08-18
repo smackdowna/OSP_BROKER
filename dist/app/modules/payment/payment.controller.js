@@ -32,6 +32,53 @@ const createMembershipPayment = (0, catchAsyncError_1.default)((req, res, next) 
         data: payment,
     });
 }));
+// create kudo coin payment
+const createKudoCoinPayment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const { kudoCoinId } = req.params;
+    const { quantity } = req.body;
+    // Call the service to create the payment
+    const payment = yield payment_services_1.paymentService.createKudoCoinPayment({ userId, kudoCoinId, quantity }, res);
+    // Send the response
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Kudo coin payment created successfully",
+        data: payment,
+    });
+}));
+// create pin payment
+const createPinPayment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const { pinId } = req.params;
+    const { count } = req.body;
+    // Call the service to create the payment
+    const payment = yield payment_services_1.paymentService.createPinPayment({ userId, pinId, count }, res);
+    // Send the response
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Pin payment created successfully",
+        data: payment,
+    });
+}));
+// create badge payment
+const createBadgePayment = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const { badgeId } = req.params;
+    // Call the service to create the payment
+    const payment = yield payment_services_1.paymentService.createBadgePayment({ userId, badgeId }, res);
+    // Send the response
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Badge payment created successfully",
+        data: payment,
+    });
+}));
 exports.paymentController = {
     createMembershipPayment,
+    createKudoCoinPayment,
+    createPinPayment,
+    createBadgePayment
 };

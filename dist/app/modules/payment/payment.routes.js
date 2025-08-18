@@ -6,4 +6,7 @@ const express_1 = require("express");
 const requireAuth_1 = require("../../middlewares/requireAuth");
 const router = (0, express_1.Router)();
 router.post("/membership/:membershipPlanId", requireAuth_1.verifyToken, payment_controller_1.paymentController.createMembershipPayment);
+router.post("/kudoCoin/:kudoCoinId", requireAuth_1.verifyToken, payment_controller_1.paymentController.createKudoCoinPayment);
+router.post("/pin/:pinId", requireAuth_1.verifyToken, payment_controller_1.paymentController.createPinPayment);
+router.post("/badge/:badgeId", requireAuth_1.verifyToken, payment_controller_1.paymentController.createBadgePayment);
 exports.paymentRoutes = router;

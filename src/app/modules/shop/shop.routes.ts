@@ -47,6 +47,7 @@ router.get("/badge", verifyToken, badgeController.getAllBadges);
 router.get("/badge/:id", verifyToken, badgeController.getBadgeById);
 router.put("/badge/:id", verifyToken, authorizeRole("ADMIN"), badgeController.updateBadge);
 router.post("/badge/softDelete/:id", verifyToken, authorizeRole("ADMIN"), badgeController.softDeleteBadge);
+router.delete("/badge", verifyToken, authorizeRole("ADMIN"), badgeController.deleteAllBadges);
 router.delete("/badge/:id", verifyToken, authorizeRole("ADMIN"), badgeController.deleteBadge);
 router.post("/badge/buy/:badgeId", verifyToken, badgeController.buyBadge);
 

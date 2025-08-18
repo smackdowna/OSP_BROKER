@@ -17,7 +17,7 @@ const prismaDb_1 = __importDefault(require("../../../db/prismaDb"));
 const appError_1 = __importDefault(require("../../../errors/appError"));
 // create badge
 const createBadge = (badge) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description } = badge;
+    const { name, description, price } = badge;
     if (!name || !description) {
         throw new appError_1.default(400, "Name and description are required fields.");
     }
@@ -31,6 +31,7 @@ const createBadge = (badge) => __awaiter(void 0, void 0, void 0, function* () {
         data: {
             name,
             description,
+            price
         },
     });
     return { badge: newBadge };
@@ -128,6 +129,19 @@ const deleteBadge = (id, res) => __awaiter(void 0, void 0, void 0, function* () 
     });
     return { badge };
 });
+// delete all badges
+const deleteAllBadges = (res) => __awaiter(void 0, void 0, void 0, function* () {
+    const badges = yield prismaDb_1.default.badge.deleteMany({
+        where: { isDeleted: false },
+    });
+    if (!badges) {
+        return res.status(404).json({
+            success: false,
+            message: "No badges found to delete",
+        });
+    }
+    return { badges };
+});
 // buy badge
 const buyBadge = (userId, badgeId, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingBadge = yield prismaDb_1.default.badge.findFirst({
@@ -154,5 +168,6 @@ exports.badgeServices = {
     updateBadge,
     softDeleteBadge,
     deleteBadge,
+    deleteAllBadges,
     buyBadge
 };
