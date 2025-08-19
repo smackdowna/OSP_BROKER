@@ -1,0 +1,99 @@
+paths:
+  /user:
+    get:
+      summary: Retrieve a list of users (Admin only)
+      description: >
+        This endpoint is restricted to admin users. It retrieves a list of users from the system,
+        including their status and details.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []  # Optional: indicates admin JWT auth
+      responses:
+        "200":
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Users retrieved successfully"
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: "6862661bc67769d8ecf23f0a"
+                            fullName:
+                              type: string
+                              example: "bob"
+                            email:
+                              type: string
+                              example: "alice20@gmail.com"
+                            role:
+                              type: string
+                              example: "REPRESENTATIVE"
+                            phone:
+                              type: string
+                              example: "9900000000"
+                            isBanned:
+                              type: boolean
+                              example: false
+                            isDeleted:
+                              type: boolean
+                              example: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              example: "2025-06-30T10:25:31.872Z"
+                            updatedAt:
+                              type: string
+                              format: date-time
+                              example: "2025-08-14T09:59:48.822Z"
+        "401":
+          description: Unauthorized – not an admin
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthorized"
+                  data:
+                    type: object
+                    example: {}
+        "403":
+          description: Forbidden – insufficient permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Forbidden – Admin access required"
+                  data:
+                    type: object
+                    example: {}
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT

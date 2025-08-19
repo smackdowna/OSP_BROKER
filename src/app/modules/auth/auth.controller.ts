@@ -21,7 +21,7 @@ const loginUser = catchAsyncError(async (req: Request, res: Response, next: Next
     const { email, password } = req.body;
     const result = await authServices.loginUser({ email, password });
 
-    const { accessToken, user} = result;
+    const { accessToken,refreshToken, user} = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: config.node_env === "production",
@@ -43,13 +43,14 @@ const loginUser = catchAsyncError(async (req: Request, res: Response, next: Next
         data: {
             user: user,
             accessToken: accessToken,
+            refreshToken:refreshToken
         }
     });
 });
 
 // refresh token to get new access token controller
 const refreshToken = catchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
-    const { refreshToken } = req.cookies;
+    const { refreshToken } = req.body;
     if (!refreshToken) {
         return sendResponse(res, {
             statusCode: 401,
@@ -108,7 +109,7 @@ const googleSignIn = catchAsyncError(async (req: Request, res: Response, next: N
         });
     }
     const result = await authServices.googleSignIn(code);
-    const { accessToken, user} = result;
+    const { accessToken,refreshToken, user} = result;
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -125,6 +126,7 @@ const googleSignIn = catchAsyncError(async (req: Request, res: Response, next: N
             data: {
                 user: user,
                 accessToken: accessToken,
+                refreshToken: refreshToken
             }
         })
     )
@@ -142,7 +144,7 @@ const appleSignIn = catchAsyncError(async (req: Request, res: Response, next: Ne
         });
     }
     const result = await authServices.appleSignIn(code);
-    const { accessToken, user} = result;
+    const { accessToken,refreshToken, user} = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: config.node_env === "production",
@@ -157,6 +159,7 @@ const appleSignIn = catchAsyncError(async (req: Request, res: Response, next: Ne
             data: {
                 user: user,
                 accessToken: accessToken,
+                refreshToken: refreshToken
             }
         })
     )

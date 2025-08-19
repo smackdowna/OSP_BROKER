@@ -296,8 +296,15 @@ const googleSignIn= async (code: string) => {
       role: user.role
     }, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
 
+    const refreshToken= createToken({
+      userId: user.id.toString(),
+      email: user.email,
+      role: user.role
+    }, config.jwt_refresh_secret as string, config.jwt_refresh_expires_in as string);
+
     return {
       accessToken,
+      refreshToken,
       user
     }
 }
@@ -360,8 +367,15 @@ const appleSignIn = async (id_token: string)=>{
     role: user.role
   }, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
 
+  const refreshToken= createToken({ 
+    userId: user.id.toString(),
+    email: user.email,
+    role: user.role
+  }, config.jwt_refresh_secret as string, config.jwt_refresh_expires_in as string);
+
   return {
     accessToken,
+    refreshToken,
     user
   }
 }

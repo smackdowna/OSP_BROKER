@@ -32,7 +32,7 @@ const createUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(
 const loginUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     const result = yield auth_services_1.authServices.loginUser({ email, password });
-    const { accessToken, user } = result;
+    const { accessToken, refreshToken, user } = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: config_1.default.node_env === "production",
@@ -52,12 +52,13 @@ const loginUser = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(v
         data: {
             user: user,
             accessToken: accessToken,
+            refreshToken: refreshToken
         }
     });
 }));
 // refresh token to get new access token controller
 const refreshToken = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { refreshToken } = req.cookies;
+    const { refreshToken } = req.body;
     if (!refreshToken) {
         return (0, sendResponse_1.default)(res, {
             statusCode: 401,
@@ -110,7 +111,7 @@ const googleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaite
         });
     }
     const result = yield auth_services_1.authServices.googleSignIn(code);
-    const { accessToken, user } = result;
+    const { accessToken, refreshToken, user } = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: config_1.default.node_env === "production",
@@ -124,6 +125,7 @@ const googleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaite
         data: {
             user: user,
             accessToken: accessToken,
+            refreshToken: refreshToken
         }
     }));
 }));
@@ -139,7 +141,7 @@ const appleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         });
     }
     const result = yield auth_services_1.authServices.appleSignIn(code);
-    const { accessToken, user } = result;
+    const { accessToken, refreshToken, user } = result;
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: config_1.default.node_env === "production",
@@ -153,6 +155,7 @@ const appleSignIn = (0, catchAsyncError_1.default)((req, res, next) => __awaiter
         data: {
             user: user,
             accessToken: accessToken,
+            refreshToken: refreshToken
         }
     }));
 }));

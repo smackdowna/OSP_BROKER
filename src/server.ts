@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import router from "./app/routes";
 import notFoundHandler from "./app/middlewares/notFoundHandler";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
-
+import { setupSwagger } from "./app/config/swagger";
 
 const app = express();
 
@@ -44,12 +44,17 @@ app.get("/", (req, res) => {
 
 app.use("/api", router);
 
+setupSwagger(app);
+
 app.use(notFoundHandler);
 
 app.use(globalErrorHandler)
 
 app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${config.port}`);
+    console.log(`
+        Server is running on port ${config.port}
+        Swagger is running on port ${config.port}/api-docs
+        `);
 });
 
 export default app;
