@@ -12,6 +12,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const routes_1 = __importDefault(require("./app/routes"));
 const notFoundHandler_1 = __importDefault(require("./app/middlewares/notFoundHandler"));
 const globalErrorHandler_1 = __importDefault(require("./app/middlewares/globalErrorHandler"));
+const swagger_1 = require("./app/config/swagger");
 const app = (0, express_1.default)();
 // middlewares
 app.use((0, cookie_parser_1.default)());
@@ -33,9 +34,13 @@ app.get("/", (req, res) => {
     res.send("Welcome to the OSP_broker API");
 });
 app.use("/api", routes_1.default);
+(0, swagger_1.setupSwagger)(app);
 app.use(notFoundHandler_1.default);
 app.use(globalErrorHandler_1.default);
 app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${config_1.default.port}`);
+    console.log(`
+        Server is running on port ${config_1.default.port}
+        Swagger is running on port ${config_1.default.port}/api-docs
+        `);
 });
 exports.default = app;

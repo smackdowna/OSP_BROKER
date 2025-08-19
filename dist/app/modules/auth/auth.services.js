@@ -256,8 +256,14 @@ const googleSignIn = (code) => __awaiter(void 0, void 0, void 0, function* () {
         email: user.email,
         role: user.role
     }, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    const refreshToken = (0, auth_utils_1.createToken)({
+        userId: user.id.toString(),
+        email: user.email,
+        role: user.role
+    }, config_1.default.jwt_refresh_secret, config_1.default.jwt_refresh_expires_in);
     return {
         accessToken,
+        refreshToken,
         user
     };
 });
@@ -311,8 +317,14 @@ const appleSignIn = (id_token) => __awaiter(void 0, void 0, void 0, function* ()
         email: user.email,
         role: user.role
     }, config_1.default.jwt_access_secret, config_1.default.jwt_access_expires_in);
+    const refreshToken = (0, auth_utils_1.createToken)({
+        userId: user.id.toString(),
+        email: user.email,
+        role: user.role
+    }, config_1.default.jwt_refresh_secret, config_1.default.jwt_refresh_expires_in);
     return {
         accessToken,
+        refreshToken,
         user
     };
 });
