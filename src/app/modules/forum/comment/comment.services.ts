@@ -10,7 +10,7 @@ import { notifyUser } from "../../../utils/notifyUser";
 const createComment = async (commentBody: TComment , res:Response) => {
     const { comment, topicId,postId, author , commenterId } = commentBody;
 
-    if (!comment || !(topicId && postId) || !author || !commenterId) {
+    if (!comment || !(topicId || postId) || !author || !commenterId) {
         throw new AppError(400, "please provide all fields");
     }
 
@@ -34,7 +34,7 @@ const createComment = async (commentBody: TComment , res:Response) => {
                 sendResponse(res, {
                     statusCode: 404,
                     success: false,
-                    message: "Forum not found",
+                    message: "Forum not found", 
                 })
             );
         }
