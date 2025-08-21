@@ -20,7 +20,7 @@ const notifyUser_1 = require("../../../utils/notifyUser");
 // create comment 
 const createComment = (commentBody, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { comment, topicId, postId, author, commenterId } = commentBody;
-    if (!comment || !(topicId && postId) || !author || !commenterId) {
+    if (!comment || !(topicId || postId) || !author || !commenterId) {
         throw new appError_1.default(400, "please provide all fields");
     }
     let newComment;
