@@ -74,6 +74,17 @@ const getBusinessById = (0, catchAsyncError_1.default)((req, res, next) => __awa
         data: business,
     });
 }));
+// get business by businessAdmin userId
+const getBusinessByBusinessAdminUserId = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user.userId;
+    const business = yield business_services_1.businessServices.getBusinessByBusinessAdminUserId(userId, res);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Business retrieved successfully",
+        data: business,
+    });
+}));
 // update business
 const updateBusiness = (0, catchAsyncError_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -221,6 +232,7 @@ exports.businessController = {
     createBusiness,
     getAllBusinesses,
     getBusinessById,
+    getBusinessByBusinessAdminUserId,
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,

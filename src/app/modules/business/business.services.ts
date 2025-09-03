@@ -184,6 +184,43 @@ const getBusinessById = async (id: string, res: Response) => {
     return { business };
 }
 
+
+// get business by businessAdmin userId
+const getBusinessByBusinessAdminUserId= async(businessAdminUserId: string, res:Response) => {
+    if(!businessAdminUserId){
+        throw new AppError(400, "please provide business admin id");
+    }
+
+    const business= await prismadb.business.findFirst({
+        where:{
+            businessAdminId: businessAdminUserId
+        },
+        include: {
+            representative: {
+                select: {
+                    businessId: true
+                }
+            },
+            _count: {   
+                select: {
+                    representative: true
+                }
+            }
+        }
+    });
+
+    if(!business){
+        sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: "No business found for this businessadmin id",
+        });
+    }
+
+    return business;
+}
+
+
 // update business
 const updateBusiness = async (id: string,res: Response, business: TBusiness) => {
     const {
@@ -721,6 +758,7 @@ export const businessServices = {
     createBusiness,
     getAllBusinesses,
     getBusinessById,
+    getBusinessByBusinessAdminUserId,
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,

@@ -147,6 +147,37 @@ const getBusinessById = (id, res) => __awaiter(void 0, void 0, void 0, function*
     }
     return { business };
 });
+// get business by businessAdmin userId
+const getBusinessByBusinessAdminUserId = (businessAdminUserId, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!businessAdminUserId) {
+        throw new appError_1.default(400, "please provide business admin id");
+    }
+    const business = yield prismaDb_1.default.business.findFirst({
+        where: {
+            businessAdminId: businessAdminUserId
+        },
+        include: {
+            representative: {
+                select: {
+                    businessId: true
+                }
+            },
+            _count: {
+                select: {
+                    representative: true
+                }
+            }
+        }
+    });
+    if (!business) {
+        (0, sendResponse_1.default)(res, {
+            statusCode: 404,
+            success: false,
+            message: "No business found for this businessadmin id",
+        });
+    }
+    return business;
+});
 // update business
 const updateBusiness = (id, res, business) => __awaiter(void 0, void 0, void 0, function* () {
     const { businessName, slogan, mission, industry, isIsp, products, services, companyType, foundedYear, history, hqLocation, servingAreas, keyPeople, ownership, lastYearRevenue, employeeCount, acquisitions, strategicPartners, saleDeckUrl, websiteLinks } = business;
@@ -565,6 +596,7 @@ exports.businessServices = {
     createBusiness,
     getAllBusinesses,
     getBusinessById,
+    getBusinessByBusinessAdminUserId,
     updateBusiness,
     deleteBusiness,
     approveBusinessPage,

@@ -28,6 +28,7 @@ router.delete('/category/:id', verifyToken, authorizeRole("ADMIN"), businessCate
 // Business routes
 router.post('/', verifyToken, verifyMembership, businessController.createBusiness);
 router.get('/',  businessController.getAllBusinesses);
+router.get('/businessAdmin', verifyToken, verifyMembership, businessController.getBusinessByBusinessAdminUserId);
 router.get('/:id',  businessController.getBusinessById);
 router.put('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.updateBusiness);
 router.delete('/:id', verifyToken, verifyMembership,authorizeRole("BUSINESS_ADMIN"), businessController.deleteBusiness);
